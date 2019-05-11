@@ -1,18 +1,28 @@
 package cn.yue.base.common.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
+import android.view.Window;
 
+import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.RxActivity;
 
+import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
+import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.widget.dialog.HintDialog;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 介绍：
@@ -21,11 +31,12 @@ import cn.yue.base.common.utils.app.RunTimePermissionUtil;
  * 时间：2017/2/20.
  */
 
-public abstract class BaseActivity extends RxActivity {
+public abstract class BaseActivity extends RxActivity implements ILifecycleProvider<ActivityEvent>{
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         if (hasContentView()) {
             setContentView(getLayoutId());
         }
@@ -45,29 +56,47 @@ public abstract class BaseActivity extends RxActivity {
 
     protected void initBundle(Bundle bundle) {}
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon) {
+        setSystemBar(isFillUpTop, isDarkIcon, Color.TRANSPARENT);
+    }
+
+    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+        try {
+            BarUtils.setStyle(this, isFillUpTop, isDarkIcon, bgColor);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    public <T> SingleTransformer<T, T> toBindLifecycle() {
+        return new SingleTransformer<T, T>() {
+
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(ActivityEvent.DESTROY))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
+    public <T> SingleTransformer<T, T> toBindLifecycle(ActivityEvent activityEvent) {
+        return new SingleTransformer<T, T>() {
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(activityEvent))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
     }
 
     public void requestPermission(String permission, PermissionCallBack permissionCallBack) {
@@ -88,25 +117,21 @@ public abstract class BaseActivity extends RxActivity {
         this.permissionCallBack = permissionCallBack;
     }
 
-    private AlertDialog failDialog;
+    private HintDialog failDialog;
     public void showFailDialog() {
         if (failDialog == null) {
-            failDialog = new AlertDialog.Builder(this)
-                    .setTitle("消息")
-                    .setMessage("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            failDialog = new HintDialog.Builder(this)
+                    .setTitleStr("消息")
+                    .setContentStr("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
+                    .setLeftClickStr("取消")
+                    .setRightClickStr("确定")
+                    .setOnRightClickListener(new HintDialog.OnRightClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            return;
-                        }
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onRightClick() {
                             startSettings();
                         }
-                    }).create();
+                    })
+                    .build();
         }
         failDialog.show();
     }
@@ -120,10 +145,19 @@ public abstract class BaseActivity extends RxActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
+                        ToastUtils.showShortToast("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (failDialog != null) {
+            failDialog.dismiss();
         }
     }
 

@@ -1,10 +1,12 @@
 package cn.yue.base.middle.components;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -13,34 +15,48 @@ import java.util.List;
 
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.mvp.IBaseView;
 import cn.yue.base.middle.mvp.IStatusView;
+import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.mvp.PageStatus;
+import cn.yue.base.middle.mvp.photo.IPhotoView;
+import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetSingleObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.middle.view.PageHintView;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends BaseFragment implements IStatusView {
+public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
 
-    private String pageNt = "0";
-    private List<S> dataList = new ArrayList<>();
+    private String pageNt = "1";
+    private String lastNt = "1";
+    protected List<S> dataList = new ArrayList<>();
     protected int total;    //当接口返回总数时，为返回数量；接口未返回数量，为统计数量；
     private CommonAdapter<S> adapter;
     private BasePullFooter footer;
     private PageStatus status = PageStatus.STATUS_NORMAL;
+    private boolean isFirstLoading = true;
     private SwipeRefreshLayout refreshL;
+    private RecyclerView baseRV;
     protected PageHintView hintView;
+    private PhotoHelper photoHelper;
+    public int[] COLORS = {
+            cn.yue.base.common.R.color.progress_color_1,
+            cn.yue.base.common.R.color.progress_color_2,
+            cn.yue.base.common.R.color.progress_color_3,
+            cn.yue.base.common.R.color.progress_color_4
+    };
 
     @Override
     protected int getLayoutId() {
@@ -49,33 +65,41 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        hintView = findViewById(R.id.hintView);
+        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+            @Override
+            public void onReload() {
+                if (NetworkUtils.isConnected()) {
+                    mActivity.recreateFragment(BasePullListFragment.this.getClass().getName());
+                } else {
+                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                }
+            }
+
+            @Override
+            public void onRefresh() {
+                if (NetworkUtils.isConnected()) {
+                    if (autoRefresh()) {
+                        refreshWithLoading();
+                    }
+                } else {
+                    showStatusView(PageStatus.STATUS_ERROR_NET);
+                }
+            }
+        });
+
         refreshL = findViewById(R.id.refreshL);
+        refreshL.setEnabled(canPullDown());
+        refreshL.setColorSchemeResources(COLORS);
         refreshL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refresh();
             }
         });
-        RecyclerView baseRV = findViewById(R.id.baseRV);
-        baseRV.setLayoutManager(getLayoutManager());
-        baseRV.setAdapter(adapter = getAdapter());
-        baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                boolean isTheLast = false;
-                if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-                    isTheLast = ((LinearLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition() >= dataList.size();
-                } else if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                    isTheLast = ((GridLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition() >= dataList.size() - ((GridLayoutManager)recyclerView.getLayoutManager()).getSpanCount();
-                }
-                if (isTheLast && (status == PageStatus.STATUS_NORMAL || status == PageStatus.STATUS_SUCCESS)) {
-                    status = PageStatus.STATUS_LOADING_ADD;
-                    adapter.addFooterView(footer);
-                    footer.showStatusView(status);
-                    loadData();
-                }
-            }
-        });
+        if (canPullDown()) {
+            hintView.setRefreshTarget(refreshL);
+        }
         footer = getFooter();
         if (footer != null) {
             footer.setOnReloadListener(new BasePullFooter.OnReloadListener() {
@@ -85,8 +109,63 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
                 }
             });
         }
-        hintView = findViewById(R.id.hintView);
-        refresh();
+        baseRV = findViewById(R.id.baseRV);
+        initRecyclerView(baseRV);
+        baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dataList.isEmpty()) {
+                    return;
+                }
+                boolean isTheLast = false;
+                if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+                    isTheLast = ((LinearLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition() >= dataList.size() - 1;
+                } else if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
+                    isTheLast = ((GridLayoutManager)recyclerView.getLayoutManager()).findLastVisibleItemPosition() >= dataList.size() - ((GridLayoutManager)recyclerView.getLayoutManager()).getSpanCount() - 1;
+                } else if (recyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+                    StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager)recyclerView.getLayoutManager();
+                    int[] lastSpan = layoutManager.findLastVisibleItemPositions(null);
+                    for (int position : lastSpan) {
+                        if (position >= dataList.size() - layoutManager.getSpanCount() - 1) {
+                            isTheLast = true;
+                            break;
+                        }
+                    }
+                }
+                if (isTheLast && status == PageStatus.STATUS_SUCCESS) {
+                    status = PageStatus.STATUS_LOADING_ADD;
+                    footer.showStatusView(status);
+                    loadData();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void initOther() {
+        super.initOther();
+        if (NetworkUtils.isConnected()) {
+            if (autoRefresh()) {
+                refreshWithLoading();
+            }
+        } else {
+            showStatusView(PageStatus.STATUS_ERROR_NET);
+        }
+    }
+
+    protected boolean autoRefresh() {
+        return true;
+    }
+
+    protected boolean canPullDown() {
+        return true;
+    }
+
+    protected void initRecyclerView(RecyclerView baseRV) {
+        baseRV.setLayoutManager(getLayoutManager());
+        baseRV.setAdapter(adapter = getAdapter());
+        adapter.addFooterView(footer);
+        footer.showStatusView(status);
     }
 
     protected RecyclerView.LayoutManager getLayoutManager() {
@@ -94,10 +173,19 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
     }
 
     protected CommonAdapter<S> getAdapter() {
+        if (adapter != null) {
+            return adapter;
+        }
         return new CommonAdapter<S>(mActivity, new ArrayList<S>()) {
+
+            @Override
+            protected int getViewType(int position) {
+                return getItemType(position);
+            }
+
             @Override
             public int getLayoutIdByType(int viewType) {
-                return getItemLayoutId();
+                return getItemLayoutId(viewType);
             }
 
             @Override
@@ -107,26 +195,64 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         };
     }
 
-    protected abstract int getItemLayoutId();
+    /**
+     * 返回viewType，可选实现
+     */
+    protected int getItemType(int position) {
+        return 0;
+    }
 
+    /**
+     * 根据viewType 返回对应的layout
+     */
+    protected abstract int getItemLayoutId(int viewType);
+
+    /**
+     * 布局
+     */
     protected abstract void bindItemData(CommonViewHolder<S> holder, int position, S s);
 
     protected BasePullFooter getFooter() {
-        return new BasePullFooter(mActivity);
+        if (footer == null) {
+            footer = new BasePullFooter(mActivity);
+        }
+        return footer;
     }
 
+    /**
+     * 刷新 loading动画
+     */
+    public void refreshWithLoading() {
+        baseRV.setVisibility(View.GONE);
+        showPageHintLoading();
+        refresh(false);
+    }
+
+    /**
+     * 刷新 swipe动画
+     */
     public void refresh() {
+        refresh(true);
+    }
+
+    /**
+     * 刷新 选择是否有swipe动画
+     * @param hasRefreshAnim
+     */
+    public void refresh(boolean hasRefreshAnim) {
         if (status == PageStatus.STATUS_LOADING_ADD || status == PageStatus.STATUS_LOADING_REFRESH) {
             return;
         }
         status = PageStatus.STATUS_LOADING_REFRESH;
-        refreshL.setRefreshing(true);
+        if (hasRefreshAnim) {
+            refreshL.setRefreshing(true);
+        }
         pageNt = initPageNt();
         loadData();
     }
 
     protected String initPageNt() {
-        return "0";
+        return "1";
     }
 
     protected abstract Single<P> getRequestSingle(String nt);
@@ -136,25 +262,45 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
             return;
         }
         getRequestSingle(pageNt)
-                .compose(this.<P>bindToLifecycle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .delay(1000, TimeUnit.MILLISECONDS)
+                .compose(this.<P>toBindLifecycle())
                 .subscribe(new BaseNetSingleObserver<P>() {
+
+                    private boolean isLoadingRefresh = false;
+                    @Override
+                    protected void onStart() {
+                        super.onStart();
+                        if (status == PageStatus.STATUS_LOADING_REFRESH) {
+                            isLoadingRefresh = true;
+                        } else {
+                            isLoadingRefresh = false;
+                        }
+                    }
+
                     @Override
                     public void onSuccess(P p) {
                         if (refreshL.isRefreshing()) {
                             refreshL.setRefreshing(false);
                         }
-                        if (status == PageStatus.STATUS_LOADING_REFRESH) {
+                        if (isLoadingRefresh) {
                             dataList.clear();
                         }
-                        if (status == PageStatus.STATUS_LOADING_REFRESH && p.getCurrentPageTotal() == 0) {
+                        if (isLoadingRefresh && p.getCurrentPageTotal() == 0) {
                             loadEmpty();
                         } else {
                             loadSuccess(p);
                             if (p.getCurrentPageTotal() < p.getPageSize()) {
                                 loadNoMore();
+                            } else if (p.getTotal() > 0 && p.getTotal() <= dataList.size()) {
+                                loadNoMore();
+                            } else if (p.getCurrentPageTotal() == 0) {
+                                loadNoMore();
+                            } else if (TextUtils.isEmpty(p.getPageNt()) && !initPageNt().matches("\\d+")) {
+                                loadNoMore();
                             }
+                        }
+                        if (isLoadingRefresh) {
+                            onRefreshComplete(p, null);
                         }
                     }
 
@@ -164,17 +310,31 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
                             refreshL.setRefreshing(false);
                         }
                         loadFailed(e);
+                        if (isLoadingRefresh) {
+                            onRefreshComplete(null, e);
+                        }
+                    }
+
+                    @Override
+                    protected void onCancel(ResultException e) {
+                        super.onCancel(e);
+                        loadFailed(e);
                     }
                 });
     }
 
     protected void loadSuccess(P p) {
         showStatusView(PageStatus.STATUS_SUCCESS);
+        footer.showStatusView(status);
         if (TextUtils.isEmpty(p.getPageNt())) {
-            if (p.getPageNo() == 0) {
-                pageNt = String.valueOf(Integer.valueOf(pageNt) + 1);
-            } else {
-                pageNt = String.valueOf(p.getPageNo() + 1);
+            try {
+                if (p.getPageNo() == 0) {
+                    pageNt = String.valueOf(Integer.valueOf(pageNt) + 1);
+                } else {
+                    pageNt = String.valueOf(p.getPageNo() + 1);
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
         } else {
             pageNt = p.getPageNt();
@@ -184,90 +344,185 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         } else {
             total += p.getCurrentPageTotal();
         }
-        dataList = p.getList() == null? new ArrayList<S>() : p.getList();
-        adapter.setList(dataList);
+        lastNt = pageNt;
+        dataList.addAll(p.getList() == null? new ArrayList<S>() : p.getList());
+        notifyDataSetChanged();
     }
 
     protected void loadFailed(ResultException e) {
+        pageNt = lastNt;
         if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_NET);
+            if (this.status == PageStatus.STATUS_LOADING_REFRESH) {
+                showStatusView(PageStatus.STATUS_ERROR_NET);
+            } else if (this.status == PageStatus.STATUS_LOADING_ADD) {
+                footer.showStatusView(status);
+            }
         } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
             showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+        } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
+            showStatusView(PageStatus.STATUS_SUCCESS);
+            footer.showStatusView(PageStatus.STATUS_SUCCESS);
         } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-            this.status = PageStatus.STATUS_ERROR_OPERATION;
-            showHintErrorOperation(e.getMessage());
+            showStatusView(PageStatus.STATUS_ERROR_OPERATION);
+            ToastUtils.showShortToast(e.getMessage());
         } else {
-            this.status = PageStatus.STATUS_ERROR_SERVER;
-            showHintErrorServer(e.getMessage());
+            showStatusView(PageStatus.STATUS_ERROR_SERVER);
+            ToastUtils.showShortToast(e.getMessage());
         }
     }
 
     protected void loadNoMore() {
-        if (adapter.getFooterView() == null || adapter.getFooterView() != footer) {
-            adapter.addFooterView(footer);
-        }
         showStatusView(PageStatus.STATUS_END);
     }
 
     protected void loadEmpty() {
         total = 0;
         dataList.clear();
-        adapter.setList(dataList);
-        showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+        notifyDataSetChanged();
+        if (showSuccessWithNoData()) {
+            showStatusView(PageStatus.STATUS_SUCCESS);
+            footer.showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+        } else {
+            showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+        }
+    }
+
+    protected boolean showSuccessWithNoData() {
+        return false;
+    }
+
+    protected void onRefreshComplete(P p, ResultException e) {
+
+    }
+
+    protected void notifyDataSetChanged() {
+        if (adapter != null) {
+            adapter.setList(dataList);
+        }
+    }
+
+    protected void notifyItemChangedReally() {
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void showStatusView(PageStatus status) {
+        this.status = status;
         switch (status) {
+            case STATUS_LOADING_REFRESH:
+                showPageHintLoading();
+                break;
             case STATUS_SUCCESS:
                 showPageHintSuccess();
-                adapter.removeFooterView(footer);
                 break;
             case STATUS_END:
                 showPageHintSuccess();
                 footer.showStatusView(status);
                 break;
             case STATUS_ERROR_NET:
-                if (this.status == PageStatus.STATUS_LOADING_REFRESH) {
-                    showPageHintErrorNet();
-                } else if (this.status == PageStatus.STATUS_LOADING_ADD) {
-                    footer.showStatusView(status);
-                }
+                showPageHintErrorNet();
                 break;
             case STATUS_ERROR_NO_DATA:
                 showPageHintErrorNoData();
-                adapter.removeFooterView(footer);
+                break;
+            case STATUS_ERROR_OPERATION:
+                showPageHintErrorOperation();
+                break;
+            case STATUS_ERROR_SERVER:
+                showPageHintErrorServer();
                 break;
         }
-        this.status = status;
     }
 
-
-    protected void showPageHintSuccess() {
+    private void showPageHintLoading() {
         if (hintView != null) {
-            hintView.setVisibility(View.GONE);
+            hintView.showLoading();
         }
     }
 
-    protected void showPageHintErrorNet() {
+    private void showPageHintSuccess() {
+        if (baseRV != null) {
+            baseRV.setVisibility(View.VISIBLE);
+        }
         if (hintView != null) {
-            hintView.setVisibility(View.VISIBLE);
-            hintView.setHintText("网络连接异常~");
+            hintView.showSuccess();
+        }
+        isFirstLoading = false;
+    }
+
+    private void showPageHintErrorNet() {
+        if (hintView != null) {
+            if (isFirstLoading) {
+                hintView.showErrorNet();
+            } else {
+                ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+            }
         }
     }
 
-    protected void showPageHintErrorNoData() {
+    private void showPageHintErrorNoData() {
         if (hintView != null) {
-            hintView.setVisibility(View.VISIBLE);
-            hintView.setHintText("无数据~");
+            hintView.showErrorNoData();
         }
     }
 
-    protected void showHintErrorOperation(String errorMessage) {
-        ToastUtils.showShortToast(errorMessage);
+    private void showPageHintErrorOperation() {
+        if (hintView != null && isFirstLoading) {
+            hintView.showErrorOperation();
+        }
     }
 
-    protected void showHintErrorServer(String errorMessage) {
-        ToastUtils.showShortToast(errorMessage);
+    private void showPageHintErrorServer() {
+        if (hintView != null && isFirstLoading) {
+            hintView.showErrorOperation();
+        }
+    }
+
+    private WaitDialog waitDialog;
+    @Override
+    public void showWaitDialog(String title) {
+        if (waitDialog == null) {
+            waitDialog = new WaitDialog(mActivity);
+        }
+        waitDialog.show(title, true, null);
+    }
+
+    @Override
+    public void dismissWaitDialog() {
+        if (waitDialog != null && waitDialog.isShowing()) {
+            waitDialog.cancel();
+        }
+    }
+
+    public PhotoHelper getPhotoHelper() {
+        if (photoHelper == null) {
+            photoHelper = new PhotoHelper(mActivity, this);
+        }
+        return photoHelper;
+    }
+
+    @Override
+    public void selectImageResult(List<String> selectList) {
+
+    }
+
+    @Override
+    public void cropImageResult(String image) {
+
+    }
+
+    @Override
+    public void uploadImageResult(List<String> serverList) {
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (photoHelper != null) {
+            photoHelper.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

@@ -13,15 +13,21 @@ import cn.yue.base.middle.net.wrapper.BaseListBean;
  * Description :
  * Created by yue on 2019/3/11
  */
-public abstract class BasePullPageDBFragment<DB extends ViewDataBinding, S> extends BasePullListFragment<BaseListBean<S>, S>{
+public abstract class BasePullPageDBFragment<DB extends ViewDataBinding, S> extends BasePullListFragment<BaseListBean<S>, S> {
 
     protected DB binding;
     @Override
     protected CommonAdapter<S> getAdapter() {
         CommonAdapter adapter = new CommonAdapter<S>(mActivity, new ArrayList<S>()) {
+
+            @Override
+            protected int getViewType(int position) {
+                return getItemType(position);
+            }
+
             @Override
             public int getLayoutIdByType(int viewType) {
-                return getItemLayoutId();
+                return getItemLayoutId(viewType);
             }
 
             @Override
@@ -39,4 +45,5 @@ public abstract class BasePullPageDBFragment<DB extends ViewDataBinding, S> exte
     }
 
     protected abstract void bindItemData(int position, S s);
+
 }

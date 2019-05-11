@@ -41,6 +41,66 @@ public class BarUtils {
     public static final int DEFAULT_STATUS_BAR_ALPHA = 112;
 
     /**
+     * 设置状态栏样式
+     * @param activity
+     * @param isFillUpTop   是否置顶，全屏，布局在状态栏底部
+     * @param isDarkIcon    状态栏内的时间等ICON，文字颜色为暗色系
+     * @param bgColor       状态栏背景色
+     */
+    public static void setStyle(Activity activity, boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+        Window window = activity.getWindow();
+        View decorView = window.getDecorView();
+        if (isFillUpTop) {
+            if (isDarkIcon) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
+        } else {
+            if (isDarkIcon) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
+        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(bgColor);
+    }
+
+    /**
+     * 设置状态栏样式
+     * @param isFillUpTop   是否置顶，全屏，布局在状态栏底部
+     * @param isDarkIcon    状态栏内的时间等ICON，文字颜色为暗色系
+     * @param bgColor       状态栏背景色
+     */
+    public static void setStyle(Window window, boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+        View decorView = window.getDecorView();
+        if (isFillUpTop) {
+            if (isDarkIcon) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
+        } else {
+            if (isDarkIcon) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
+        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(bgColor);
+    }
+
+    /**
      * 设置状态栏颜色
      *
      * @param activity 需要设置的 activity

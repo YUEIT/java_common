@@ -1,6 +1,5 @@
 package cn.yue.base.common.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -8,26 +7,36 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
+import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxFragmentActivity;
 
 import java.util.List;
 import java.util.UUID;
 
 import cn.yue.base.common.R;
+import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
+import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.widget.TopBar;
+import cn.yue.base.common.widget.dialog.HintDialog;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 介绍：
@@ -36,10 +45,11 @@ import cn.yue.base.common.widget.TopBar;
  * 时间：2017/2/20.
  */
 
-public abstract class BaseFragmentActivity extends RxFragmentActivity {
+public abstract class BaseFragmentActivity extends RxFragmentActivity implements ILifecycleProvider<ActivityEvent>{
 
     private TopBar topBar;
     private FrameLayout topFL;
+    private FrameLayout content;
     protected FragmentManager fragmentManager;
     protected BaseFragment currentFragment;
     private int resultCode;
@@ -49,22 +59,21 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //6.0以上，调用系统方法
-            Window window = getWindow();
-            window.setStatusBarColor(Color.WHITE);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-        setContentView(R.layout.base_activity_layout);
+        setSystemBar(false, true, Color.WHITE);
+        setContentView(getContentViewLayoutId());
         initView();
         replace(getFragment(), null, false);
+    }
+
+    protected int getContentViewLayoutId() {
+        return R.layout.base_activity_layout;
     }
 
     private void initView() {
         topFL = findViewById(R.id.topBar);
         topFL.addView(topBar = new TopBar(this));
+        content = findViewById(R.id.content);
+        content.setBackgroundColor(Color.WHITE);
         fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
@@ -79,6 +88,47 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
         });
     }
 
+    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon) {
+        setSystemBar(isFillUpTop, isDarkIcon, Color.TRANSPARENT);
+    }
+
+    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+        try {
+            BarUtils.setStyle(this, isFillUpTop, isDarkIcon, bgColor);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (isFillUpTop) {
+            setFillUpTopLayout(isFillUpTop);
+        }
+    }
+
+    public void setFillUpTopLayout(boolean isFillUpTop) {
+        int systemBarPadding;
+        int subject;
+        if (isFillUpTop) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                systemBarPadding = 0;
+            } else {
+                systemBarPadding = Math.max(BarUtils.getStatusBarHeight(this), getResources().getDimensionPixelOffset(R.dimen.q50));
+            }
+            subject = 0;
+            if (getTopBar() != null) {
+                getTopBar().setBgColor(Color.TRANSPARENT);
+            }
+        } else {
+            systemBarPadding = 0;
+            subject = R.id.topBar;
+        }
+
+        RelativeLayout.LayoutParams topBarLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        topBarLayoutParams.topMargin = systemBarPadding;
+        topFL.setLayoutParams(topBarLayoutParams);
+        RelativeLayout.LayoutParams contentLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        contentLayoutParams.addRule(RelativeLayout.BELOW, subject);
+        content.setLayoutParams(contentLayoutParams);
+    }
+
     public TopBar getTopBar() {
         return topBar;
     }
@@ -88,10 +138,25 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
         topFL.addView(view);
     }
 
+    public View getCustomTopBar() {
+        return topFL.getChildAt(0);
+    }
+
+    public void removeTopBar() {
+        topFL.removeView(topBar);
+    }
+
+    public void setContentBackground(@ColorInt int color) {
+        content.setBackgroundColor(color);
+    }
 
     public abstract Fragment getFragment();
 
-    public Fragment instantiate(Class<Fragment> mClass, Bundle args){
+    public void recreateFragment(String fragmentName) {
+        replace(getFragment(), null, false);
+    }
+
+    public Fragment instantiate(Class mClass, Bundle args){
         return Fragment.instantiate(this, mClass.getSimpleName(), args);
     }
 
@@ -100,7 +165,7 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
             return;
         }
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.right_in, R.anim.left_out, R.anim.left_in, R.anim.right_out);
+//        transaction.setCustomAnimations(R.anim.right_in, R.anim.left_out, R.anim.left_in, R.anim.right_out);
         if (TextUtils.isEmpty(tag)) {
             tag = UUID.randomUUID().toString();
         }
@@ -122,12 +187,15 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        setExitAnim();
+    }
+
+    protected void setExitAnim() {
         overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
 
@@ -156,7 +224,7 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
 
         }
         super.onBackPressed();
-        this.overridePendingTransition(R.anim.left_in, R.anim.right_out);
+        setExitAnim();
     }
 
     public void setFragmentResult(int resultCode, Bundle resultBundle) {
@@ -190,11 +258,39 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
             if (fragments != null && fragments.size() > 0) {
                 for (Fragment fragment : fragments) {
                     if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
-                        ((BaseFragment) fragment).onFragmentResult(requestCode, data.getExtras());
+                        ((BaseFragment) fragment).onActivityResult(requestCode, resultCode, data);
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public <T> SingleTransformer<T, T> toBindLifecycle() {
+        return new SingleTransformer<T, T>() {
+
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(ActivityEvent.DESTROY))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
+    }
+
+    @Override
+    public <T> SingleTransformer<T, T> toBindLifecycle(ActivityEvent activityEvent) {
+        return new SingleTransformer<T, T>() {
+
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(activityEvent))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
     }
 
     /**
@@ -212,25 +308,21 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
         this.permissionCallBack = permissionCallBack;
     }
 
-    private AlertDialog failDialog;
+    private HintDialog failDialog;
     public void showFailDialog() {
         if (failDialog == null) {
-            failDialog = new AlertDialog.Builder(this)
-                    .setTitle("消息")
-                    .setMessage("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            failDialog = new HintDialog.Builder(this)
+                    .setTitleStr("消息")
+                    .setContentStr("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
+                    .setLeftClickStr("取消")
+                    .setRightClickStr("确定")
+                    .setOnRightClickListener(new HintDialog.OnRightClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            return;
-                        }
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onRightClick() {
                             startSettings();
                         }
-                    }).create();
+                    })
+                    .build();
         }
         failDialog.show();
     }
@@ -244,6 +336,7 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
+                        ToastUtils.showShortToast("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }

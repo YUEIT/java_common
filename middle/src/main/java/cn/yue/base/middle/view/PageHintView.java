@@ -1,15 +1,16 @@
 package cn.yue.base.middle.view;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
+import cn.yue.base.common.activity.FRouter;
+import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
 
 /**
@@ -31,86 +32,158 @@ public class PageHintView extends RelativeLayout{
         initView(context);
     }
 
-    private ImageView hintIV;
-    private TextView hintTV;
     private void initView(Context context) {
-        inflate(context, R.layout.layout_page_hint, this);
-        hintIV = findViewById(R.id.hintIV);
-        hintTV = findViewById(R.id.hintTV);
-        setDefault();
+        setClickable(true);
+        setDefault(context);
     }
 
-    private void setDefault() {
-        if (isNotNullHintTV()) {
-            hintTV.setTextSize(13f);
-            hintTV.setTextColor(0xffa4a4a4);
+    private View noNetView;
+    private View noDataView;
+    private View loadingView;
+    private View serverErrorView;
+
+    private void setDefault(Context context) {
+        loadingView = inflate(context, R.layout.layout_page_hint_loading, null);
+        noNetView = inflate(context, R.layout.layout_page_hint_no_net, null);
+        noDataView = inflate(context, R.layout.layout_page_hint_no_data, null);
+        serverErrorView = inflate(context, R.layout.layout_page_hint_server_error, null);
+        ImageView loadingIV = loadingView.findViewById(R.id.loadingIV);
+        ImageLoader.getLoader().loadGif(loadingIV, R.drawable.icon_page_loading);
+
+        noNetView.findViewById(R.id.reloadTV).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onReloadListener != null) {
+                    onReloadListener.onReload();
+                }
+            }
+        });
+        noNetView.findViewById(R.id.checkNetTV).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance().build("/middle/noNet").navigation(context);
+            }
+        });
+
+        serverErrorView.findViewById(R.id.reloadTV).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onReloadListener != null) {
+                    onReloadListener.onRefresh();
+                }
+            }
+        });
+
+        serverErrorView.findViewById(R.id.checkNetTV).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance().build("/middle/noNet").navigation(context);
+            }
+        });
+    }
+
+    private OnReloadListener onReloadListener;
+
+    public void setOnReloadListener(OnReloadListener onReloadListener) {
+        this.onReloadListener = onReloadListener;
+    }
+
+    public abstract static class OnReloadListener {
+        public abstract void onReload();
+        public void onRefresh(){}
+    }
+
+    public void setNoNetView(View noNetView) {
+        if (noNetView != null) {
+            this.noNetView = noNetView;
         }
     }
 
-    public void setHintText(String s) {
-        if (isNotNullHintTV()) {
-            hintTV.setText(s);
+    public View setNoNetViewById(@LayoutRes int layoutId) {
+        View view = inflate(getContext(), layoutId, null);
+        setNoNetView(view);
+        return view;
+    }
+
+    public void setNoDataView(View noDataView) {
+        if (noDataView != null) {
+            this.noDataView = noDataView;
         }
     }
 
-    public void setHintTextColor(@ColorInt int color) {
-        if (isNotNullHintTV()) {
-            hintTV.setTextColor(color);
+    public View setNoDataViewById(@LayoutRes int layoutId) {
+        View view = inflate(getContext(), layoutId, null);
+        setNoDataView(view);
+        return view;
+    }
+
+    public void setLoadingView(View loadingView) {
+        if (noDataView != null) {
+            this.loadingView = loadingView;
         }
     }
 
-    public void setHintTextSize(float size) {
-        if (isNotNullHintTV()) {
-            hintTV.setTextSize(size);
+    public View setLoadingViewById(@LayoutRes int layoutId) {
+        View view = inflate(getContext(), layoutId, null);
+        setLoadingView(view);
+        return view;
+    }
+
+    public void showLoading() {
+        if (loadingView != null) {
+            setVisibility(View.VISIBLE);
+            removeAllViews();
+            addView(loadingView);
+            setRefreshEnable(false);
         }
     }
 
-    public void setHintTextSize(int unit, float size) {
-        if (isNotNullHintTV()) {
-            hintTV.setTextSize(unit, size);
+    public void showSuccess() {
+        setVisibility(View.GONE);
+        setRefreshEnable(true);
+    }
+
+    public void showErrorNet() {
+        if (noNetView != null) {
+            setVisibility(View.VISIBLE);
+            removeAllViews();
+            addView(noNetView);
+            setRefreshEnable(false);
         }
     }
 
-    public void setHintTextTypeface(Typeface typeface) {
-        if (isNotNullHintTV()) {
-            hintTV.setTypeface(typeface);
+    public void showErrorNoData() {
+        if (noDataView != null) {
+            setVisibility(View.VISIBLE);
+            removeAllViews();
+            addView(noDataView);
+            setRefreshEnable(true);
         }
     }
 
-    public void setHintTextDrawable(Drawable left, Drawable top, Drawable right, Drawable bottom, int padding) {
-        if (isNotNullHintTV()) {
-            hintTV.setCompoundDrawables(left, top, right, bottom);
-            hintTV.setCompoundDrawablePadding(padding);
+    public void showErrorOperation() {
+        if (noNetView != null) {
+            setVisibility(View.VISIBLE);
+            removeAllViews();
+            addView(serverErrorView);
+            setRefreshEnable(false);
         }
     }
 
-    public void setHintTextMarginTop(int marginTop) {
-        if (isNotNullHintTV()) {
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)hintTV.getLayoutParams();
-            layoutParams.topMargin = marginTop;
-            hintTV.setLayoutParams(layoutParams);
+    private SwipeRefreshLayout refreshLayout;
+    public void setRefreshTarget(SwipeRefreshLayout refreshLayout) {
+        this.refreshLayout = refreshLayout;
+    }
+
+    public void setRefreshEnable(boolean enable) {
+        if (refreshLayout != null) {
+            refreshLayout.setEnabled(enable);
         }
     }
 
-    public void setHintImage(@DrawableRes int resId) {
-        if (isNotNullHintIV()) {
-            hintIV.setImageResource(resId);
-        }
+    @Override
+    public void addView(View child) {
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        addView(child, params);
     }
-
-    public void setHintImageSize(int w, int h) {
-        if (isNotNullHintIV()) {
-           RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(w, h);
-           hintIV.setLayoutParams(layoutParams);
-        }
-    }
-
-    private boolean isNotNullHintTV() {
-        return hintTV != null;
-    }
-
-    private boolean isNotNullHintIV() {
-        return hintIV != null;
-    }
-
 }

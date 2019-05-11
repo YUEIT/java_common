@@ -16,11 +16,15 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <activity android:name=".activity.CommonTransparentActivity"
+            android:hardwareAccelerated="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/AppFullTheme"/>
+
         <activity android:name=".photo.SelectPhotoActivity"
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 
-        <activity android:name=".image.ViewPhotoActivity"/>
     </application>
 
 </manifest>

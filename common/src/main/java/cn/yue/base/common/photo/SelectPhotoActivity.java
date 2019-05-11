@@ -1,14 +1,8 @@
 package cn.yue.base.common.photo;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StrictMode;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -16,19 +10,14 @@ import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.BaseFragmentActivity;
-import cn.yue.base.common.activity.PermissionCallBack;
-import cn.yue.base.common.utils.app.RunTimePermissionUtil;
-import cn.yue.base.common.utils.debug.LogUtils;
 
 /**
  * Description :
@@ -38,18 +27,33 @@ import cn.yue.base.common.utils.debug.LogUtils;
 @Route(path = "/common/selectPhoto")
 public class SelectPhotoActivity extends BaseFragmentActivity {
 
+    private int maxNum;
     private List<String> photoList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initPhotoError();
-        changeFragment(SelectPhotoFragment.class.getName());
+        if (getIntent() != null) {
+            maxNum = getIntent().getIntExtra("maxNum", 1);
+            List<String> defaultList = getIntent().getStringArrayListExtra("photos");
+            if (defaultList != null) {
+                photoList.addAll(defaultList);
+            }
+        }
+        changeFragment(SelectPhotoFragment.class.getName(), "最近照片");
     }
 
-    private void changeTopBar() {
+    private void changeTopBar(String title) {
         if (currentFragment instanceof SelectPhotoFolderFragment) {
-            getTopBar().setCenterTextStr("相册选择")
+            getTopBar().setCenterTextStr(title)
+                    .setLeftImage(R.drawable.app_icon_back)
+                    .setLeftTextStr("")
+                    .setLeftClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            finish();
+                        }
+                    })
                     .setRightTextStr("取消")
                     .setRightClickListener(new View.OnClickListener() {
                         @Override
@@ -59,14 +63,15 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                     });
         } else if (currentFragment instanceof SelectPhotoFragment) {
             getTopBar().setLeftTextStr("相册")
+                    .setLeftImage(R.drawable.app_icon_back)
                     .setLeftClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            changeFragment(SelectPhotoFolderFragment.class.getName());
+                            changeFragment(SelectPhotoFolderFragment.class.getName(), "相册选择");
                         }
                     })
-                    .setCenterTextStr("最近照片")
-                    .setRightTextStr(photoList.isEmpty() ? "取消" : "确定（" + photoList.size() + "）")
+                    .setCenterTextStr(title)
+                    .setRightTextStr(photoList.isEmpty() ? "取消" : "确定（" + photoList.size() + "/" + getMaxNum() +  "）")
                     .setRightClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -80,7 +85,7 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         }
     }
 
-    private void changeFragment(String fragmentName) {
+    private void changeFragment(String fragmentName, String title) {
         // check input
         BaseFragment showFragment = getFragment(fragmentName);
         if (showFragment != currentFragment && fragmentManager != null) {
@@ -98,7 +103,7 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
             }
             currentFragment = showFragment;
         }
-        changeTopBar();
+        changeTopBar(title);
     }
 
     private void setAnimation(FragmentTransaction transaction) {
@@ -109,8 +114,8 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         }
     }
 
-    public void changeToSelectPhotoFragment(String folderPath) {
-        changeFragment(SelectPhotoFragment.class.getName());
+    public void changeToSelectPhotoFragment(String folderPath, String name) {
+        changeFragment(SelectPhotoFragment.class.getName(), name);
         ((SelectPhotoFragment) currentFragment).refresh(folderPath);
     }
 
@@ -140,10 +145,14 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         this.photoList = photoList;
     }
 
+    public int getMaxNum() {
+        return maxNum;
+    }
+
     @Override
     public void onBackPressed() {
         if (getCurrentFragment() instanceof SelectPhotoFragment) {
-            changeFragment(SelectPhotoFolderFragment.class.getName());
+            changeFragment(SelectPhotoFolderFragment.class.getName(), "相册选择");
         } else if (getCurrentFragment() instanceof SelectPhotoFolderFragment) {
             finish();
         }
@@ -155,77 +164,4 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
-
-    private void initPhotoError() { // android 7.0系统解决拍照的问题
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            builder.detectFileUriExposure();
-        }
-    }
-
-    private final static int REQUEST_CODE_CAMERA = 102;
-    private final static int REQUEST_CODE_PHOTO_CROP = 103;
-    private boolean crop = false;
-    private Uri targetUri;
-    private String photoPath;
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        LogUtils.i("" + requestCode + "," + resultCode);
-        if (resultCode != Activity.RESULT_OK) {
-            return;
-        }
-//        if (requestCode == REQUEST_CODE_CAMERA) {
-//            if (crop) {
-//                Intent intent = new Intent("com.android.camera.action.CROP");
-//                intent.setDataAndType(targetUri, "image/*");
-//                intent.putExtra("crop", "true");//可裁剪
-//                //intent.putExtra("aspectX", 2);
-//                //intent.putExtra("aspectY", 1);
-//                intent.putExtra("scale", false);
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, targetUri);
-//                //intent.putExtra("return-data", false);//若为false则表示不返回数据
-//                intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-//                intent.putExtra("noFaceDetection", true);
-//                startActivityForResult(intent, REQUEST_CODE_PHOTO_CROP);
-//            } else {
-//                ArrayList<String> temp = new ArrayList<>();
-//                temp.add(photoPath);
-//                finishAllWithResult(temp);
-//            }
-//        }
-        if (requestCode == REQUEST_CODE_PHOTO_CROP) {
-            ArrayList<String> temp = new ArrayList<>();
-            temp.add(photoPath);
-            finishAllWithResult(temp);
-        }
-
-    }
-
-    private void toCamera() {
-        RunTimePermissionUtil.requestPermissions(this, RunTimePermissionUtil.REQUEST_CODE, new PermissionCallBack() {
-            @Override
-            public void requestSuccess(String permission) {
-                String cachePath = Environment.getExternalStorageDirectory() + File.separator + "cache" + File.separator;
-                File tempFile = new File(cachePath, UUID.randomUUID().toString() + ".jpg");
-                photoPath = tempFile.getAbsolutePath();
-                targetUri = Uri.fromFile(tempFile);
-
-                if (targetUri != null) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, targetUri);
-                    //intent.putExtra("return-data", false);//若为false则表示不返回数据
-                    startActivityForResult(intent, REQUEST_CODE_CAMERA);
-                }
-            }
-
-            @Override
-            public void requestFailed(String permission) {
-
-            }
-        }, Manifest.permission.CAMERA);
-    }
-
 }

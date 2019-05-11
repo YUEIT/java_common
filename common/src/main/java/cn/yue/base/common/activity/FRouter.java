@@ -1,6 +1,7 @@
 package cn.yue.base.common.activity;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,23 +10,27 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.exception.NoRouteFoundException;
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.enums.RouteType;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import cn.yue.base.common.Constant;
-import cn.yue.base.common.R;
+import cn.yue.base.common.utils.debug.ToastUtils;
 
 
 /**
  * Created by yue on 2018/6/5.
  */
 
-public class FRouter implements Parcelable{
+public class FRouter implements Parcelable {
 
     public static final String TAG = "FRouter";
     private Uri uri;
@@ -36,14 +41,24 @@ public class FRouter implements Parcelable{
     private int timeout;
     private int enterAnim;
     private int exitAnim;
+    private int transition; //入场方式
     private boolean isInterceptLogin; //是否登录拦截
-    private String loginUri; //登录路径
+
+    public static void init(Application application) {
+        ARouter.init(application);
+    }
+
+    //必须写在init之前，否则这些配置在init过程中将无效
+    public static void debug() {
+        ARouter.openLog();     // 打印日志
+        ARouter.openDebug();   // 开启调试模式(如果在InstantRun模式下运行，必须开启调试模式！线上版本需要关闭,否则有安全风险)
+    }
 
     private static class FRouterHolder {
         private static FRouter instance = new FRouter();
     }
 
-    public static FRouter getInstance(){
+    public static FRouter getInstance() {
         FRouter fRouter = FRouterHolder.instance;
         fRouter.clear();
         return fRouter;
@@ -57,6 +72,7 @@ public class FRouter implements Parcelable{
         timeout = in.readInt();
         enterAnim = in.readInt();
         exitAnim = in.readInt();
+        transition = in.readInt();
     }
 
     @Override
@@ -73,6 +89,7 @@ public class FRouter implements Parcelable{
         dest.writeInt(timeout);
         dest.writeInt(enterAnim);
         dest.writeInt(exitAnim);
+        dest.writeInt(transition);
     }
 
     public static final Creator<FRouter> CREATOR = new Creator<FRouter>() {
@@ -96,19 +113,19 @@ public class FRouter implements Parcelable{
         this.timeout = 300;
         this.setPath(path);
         this.setUri(uri);
-        this.mBundle = null == bundle?new Bundle():bundle;
+        this.mBundle = null == bundle ? new Bundle() : bundle;
         this.isInterceptLogin = false;
-        this.loginUri = null;
+        this.transition = 0;
     }
 
-    private void clear(){
+    private void clear() {
         this.mBundle = new Bundle();
         this.path = null;
         this.isInterceptLogin = false;
-        this.loginUri = null;
         this.flags = 0;
         this.enterAnim = 0;
         this.exitAnim = 0;
+        this.transition = 0;
     }
 
     public Object getTag() {
@@ -129,7 +146,11 @@ public class FRouter implements Parcelable{
     }
 
     public int getRealEnterAnim() {
-        return enterAnim <= 0? R.anim.right_in : enterAnim;
+        if (enterAnim > 0) {
+            return enterAnim;
+        } else {
+            return TransitionAnimation.getStartEnterAnim(transition);
+        }
     }
 
     public int getExitAnim() {
@@ -137,9 +158,16 @@ public class FRouter implements Parcelable{
     }
 
     public int getRealExitAnim() {
-        return exitAnim <= 0? R.anim.left_out : exitAnim;
+        if (exitAnim > 0) {
+            return exitAnim;
+        } else {
+            return TransitionAnimation.getStartExitAnim(transition);
+        }
     }
 
+    public int getTransition() {
+        return transition;
+    }
 
     public int getTimeout() {
         return this.timeout;
@@ -160,7 +188,7 @@ public class FRouter implements Parcelable{
         return this;
     }
 
-    public String getPath(){
+    public String getPath() {
         return path;
     }
 
@@ -174,8 +202,22 @@ public class FRouter implements Parcelable{
     }
 
     private Class targetActivity;
+
     public void setTargetActivity(Class targetActivity) {
         this.targetActivity = targetActivity;
+    }
+
+    public RouteType getRouteType() {
+        if (TextUtils.isEmpty(path)) {
+            throw new NullPointerException("path is null");
+        }
+        Postcard postcard = ARouter.getInstance().build(path);
+        try {
+            LogisticsCenter.completion(postcard);
+        } catch (NoRouteFoundException e) {
+            return RouteType.UNKNOWN;
+        }
+        return postcard.getType();
     }
 
     public void navigation(Context context) {
@@ -183,26 +225,16 @@ public class FRouter implements Parcelable{
     }
 
     public void navigation(@NonNull Context context, Class toActivity) {
-        if(isInterceptLogin && interceptLogin(context)){
+        if (isInterceptLogin && interceptLogin(context)) {
             return;
         }
-        if(context instanceof Activity) {
-            ((Activity)context).overridePendingTransition(getRealEnterAnim(), getRealExitAnim());
+        if (getRouteType() == RouteType.ACTIVITY) {
+            jumpToActivity(context);
+        } else if (getRouteType() == RouteType.FRAGMENT) {
+            jumpToFragment(context, toActivity);
+        } else {
+            ToastUtils.showShortToast("找不到页面~");
         }
-        Intent intent = new Intent();
-        intent.putExtra(TAG, this);
-        intent.putExtras(mBundle);
-        intent.setFlags(flags);
-        if(toActivity == null){
-            if (targetActivity == null) {
-                intent.setClass(context, CommonActivity.class);
-            } else {
-                intent.setClass(context, targetActivity);
-            }
-        }else{
-            intent.setClass(context, toActivity);
-        }
-        context.startActivity(intent);
     }
 
     public void navigation(Activity context, int requestCode) {
@@ -210,32 +242,84 @@ public class FRouter implements Parcelable{
     }
 
     public void navigation(@NonNull Activity context, Class toActivity, int requestCode) {
-        if(isInterceptLogin && interceptLogin(context)){
+        if (isInterceptLogin && interceptLogin(context)) {
             return;
         }
-        context.overridePendingTransition(getRealEnterAnim(), getRealExitAnim());
+        if (getRouteType() == RouteType.ACTIVITY) {
+            jumpToActivity(context, requestCode);
+        } else if (getRouteType() == RouteType.FRAGMENT) {
+            jumpToFragment(context, toActivity, requestCode);
+        } else {
+            ToastUtils.showShortToast("找不到页面~");
+        }
+    }
+
+
+    private void jumpToActivity(Context context) {
+        jumpToActivity(context, -1);
+    }
+
+    private void jumpToActivity(Context context, int requestCode) {
+        Postcard postcard = ARouter.getInstance()
+                .build(path)
+                .withFlags(flags)
+                .with(getExtras())
+                .withTransition(getRealEnterAnim(), getRealExitAnim())
+                .setTimeout(getTimeout());
+        if (requestCode <= 0 || !(context instanceof Activity)) {
+            postcard.navigation(context);
+        } else {
+            postcard.navigation((Activity) context, requestCode);
+        }
+    }
+
+    private void jumpToFragment(Context context) {
+        jumpToFragment(context, null);
+    }
+
+    private void jumpToFragment(Context context, Class toActivity) {
+        jumpToFragment(context, toActivity, -1);
+    }
+
+    private void jumpToFragment(Context context, Class toActivity, int requestCode) {
         Intent intent = new Intent();
         intent.putExtra(TAG, this);
         intent.putExtras(mBundle);
         intent.setFlags(flags);
-        if(toActivity == null) {
+        if (toActivity == null) {
             if (targetActivity == null) {
                 intent.setClass(context, CommonActivity.class);
             } else {
                 intent.setClass(context, targetActivity);
             }
-        }else{
+        } else {
             intent.setClass(context, toActivity);
         }
-        context.startActivityForResult(intent, requestCode);
+        if (requestCode <= 0) {
+            context.startActivity(intent);
+        } else {
+            if (context instanceof Activity) {
+                ((Activity) context).startActivityForResult(intent, requestCode);
+            }
+        }
+        if (context instanceof Activity) {
+            ((Activity) context).overridePendingTransition(getRealEnterAnim(), getRealExitAnim());
+        }
     }
 
+    public DialogFragment navigationDialogFragment(BaseFragmentActivity context) {
+        DialogFragment dialogFragment = (DialogFragment) ARouter.getInstance()
+                .build(path)
+                .with(mBundle)
+                .navigation(context);
+        dialogFragment.show(context.fragmentManager, null);
+        return dialogFragment;
+    }
 
     public FRouter with(Bundle bundle) {
-        if(null != bundle) {
+        if (null != bundle) {
             this.mBundle = bundle;
         }
-
         return this;
     }
 
@@ -374,43 +458,32 @@ public class FRouter implements Parcelable{
         return this;
     }
 
+    public FRouter withTransitionStyle(int transitionStyle) {
+        this.transition = transitionStyle;
+        return this;
+    }
+
     public String toString() {
         return "FRouter{uri=" + this.uri + ", tag=" + this.tag + ", mBundle=" + this.mBundle + ", flags=" + this.flags + ", timeout=" + this.timeout + ", provider=" + ", greenChannel=" + ", enterAnim=" + this.enterAnim + ", exitAnim=" + this.exitAnim + "}\n" + super.toString();
     }
 
-    public FRouter setInterceptLogin(){
-        return setInterceptLogin(null);
-    }
-
-    public FRouter setInterceptLogin(String loginUri) {
+    public FRouter setInterceptLogin() {
         isInterceptLogin = true;
-        this.loginUri = loginUri;
         return this;
     }
 
-    private boolean interceptLogin(Context context){
-        if(!Constant.logined){
-            ARouter.getInstance().build(TextUtils.isEmpty(loginUri)? defaultLoginUrl: loginUri).navigation(context);
-            return true;
-        }
-        return false;
+    public interface OnInterceptLoginListener {
+        boolean interceptLogin(Context context);
     }
 
-    private String defaultLoginUrl;
+    private OnInterceptLoginListener onInterceptLoginListener;
 
-    private void setDefault(String loginUrl) {
-        this.defaultLoginUrl = loginUrl;
+    public void setOnInterceptLoginListener(OnInterceptLoginListener onInterceptLoginListener) {
+        this.onInterceptLoginListener = onInterceptLoginListener;
     }
 
-    public void navigationLogin(Context context) {
-        navigationLogin(context, null);
-    }
-
-    public void navigationLogin(Context context, String url) {
-        if (TextUtils.isEmpty(defaultLoginUrl)) {
-            return;
-        }
-        ARouter.getInstance().build(TextUtils.isEmpty(url)? defaultLoginUrl: url).navigation(context);
+    private boolean interceptLogin(Context context) {
+        return onInterceptLoginListener.interceptLogin(context);
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
  * Created by yue on 2018/7/11.
  */
 
-public class BaseListBean<T> extends BaseListJavaBean<T> {
+public class BaseListBean<T> extends BaseUnityListBean<T> {
 
     public List<T> getList() {
         return super.getRealList();
@@ -33,5 +33,6 @@ public class BaseListBean<T> extends BaseListJavaBean<T> {
     public int getCurrentPageTotal() {
         return getList()==null?0:getList().size();
     }
+
 }
 

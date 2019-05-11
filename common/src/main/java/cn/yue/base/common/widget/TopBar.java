@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,7 +18,7 @@ import cn.yue.base.common.R;
  * Description :
  * Created by yue on 2019/3/8
  */
-public class TopBar extends RelativeLayout{
+public class TopBar extends RelativeLayout {
 
     private LinearLayout leftLL;
     private LinearLayout rightLL;
@@ -25,8 +27,14 @@ public class TopBar extends RelativeLayout{
     private TextView centerTV;
     private TextView rightTV;
     private ImageView rightIV;
+    private View divider;
+
     public TopBar(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public TopBar(Context context, AttributeSet attrs) {
+        super(context, attrs);
         initView(context);
     }
 
@@ -39,20 +47,33 @@ public class TopBar extends RelativeLayout{
         centerTV = findViewById(R.id.centerTV);
         rightTV = findViewById(R.id.rightTV);
         rightIV = findViewById(R.id.rightIV);
+        divider = findViewById(R.id.divider);
         defaultStyle();
     }
 
     private void defaultStyle() {
-        leftIV.setImageResource(R.drawable.app_icon_left_back);
-        leftTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        leftTV.setTextColor(Color.parseColor("#4a4a4a"));
-        centerTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        centerTV.setTextColor(Color.parseColor("#4a4a4a"));
-        rightTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        rightTV.setTextColor(Color.parseColor("#4a4a4a"));
+        setBackgroundColor(Color.WHITE);
+        leftTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        leftTV.setTextColor(Color.parseColor("#000000"));
+        centerTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        centerTV.setTextColor(Color.parseColor("#000000"));
+        rightTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        rightTV.setTextColor(Color.parseColor("#000000"));
+        leftIV.setVisibility(GONE);
         leftTV.setVisibility(GONE);
         rightTV.setVisibility(GONE);
         rightIV.setVisibility(GONE);
+        divider.setVisibility(GONE);
+    }
+
+    public TopBar setBgColor(@ColorInt int color) {
+        setBackgroundColor(color);
+        return this;
+    }
+
+    public TopBar setBarVisibility(int visible) {
+        setVisibility(visible);
+        return this;
     }
 
     public TopBar setLeftTextStr(String s) {
@@ -154,6 +175,13 @@ public class TopBar extends RelativeLayout{
     public TopBar setRightTextColor(@ColorInt int color) {
         if (rightTV != null) {
             rightTV.setTextColor(color);
+        }
+        return this;
+    }
+
+    public TopBar setDividerVisible(boolean visible) {
+        if (divider != null) {
+            divider.setVisibility(visible ? VISIBLE : GONE);
         }
         return this;
     }

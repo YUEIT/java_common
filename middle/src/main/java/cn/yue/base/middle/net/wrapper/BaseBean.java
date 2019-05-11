@@ -2,15 +2,15 @@ package cn.yue.base.middle.net.wrapper;
 
 import android.text.TextUtils;
 
-import com.google.gson.annotations.SerializedName;
+import cn.yue.base.middle.net.NetworkConfig;
 
 
 public class BaseBean<T> {
 
     protected String msg;
     protected String message;
-    @SerializedName("flag")
-    protected String code;//错误码
+    protected String flag;//错误码
+    protected String status;//错误码
     protected T data;
 
     public String getMsg() {
@@ -38,12 +38,24 @@ public class BaseBean<T> {
         return "";
     }
 
-    public String getCode() {
-        return code;
+    public String getFlag() {
+        return flag;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public String getRealCode() {
+        if (NetworkConfig.SUCCESS_FLAG.equals(flag)) {
+            return NetworkConfig.SUCCESS_FLAG;
+        } else {
+            if (NetworkConfig.ERROR_SERVER.equals(flag) && !("0".equals(status) || "1".equals(status))) {
+                return status;
+            } else {
+                return flag;
+            }
+        }
     }
 
     public T getData() {
@@ -57,8 +69,10 @@ public class BaseBean<T> {
     @Override
     public String toString() {
         return "BaseBean{" +
-                "message='" + message + '\'' +
-                ", code='" + code + '\'' +
+                "msg='" + msg + '\'' +
+                ", message='" + message + '\'' +
+                ", flag='" + flag + '\'' +
+                ", status='" + status + '\'' +
                 ", data=" + data +
                 '}';
     }

@@ -2,12 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+def targetBuildVersion = target_sdk_version.toInteger()
+def minBuildVersion = min_sdk_version.toInteger()
 android {
-    compileSdkVersion 27
+    compileSdkVersion targetBuildVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion minBuildVersion
+        targetSdkVersion targetBuildVersion
         versionCode 1
         versionName "1.0"
 
@@ -29,7 +31,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {

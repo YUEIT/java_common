@@ -24,7 +24,7 @@ public abstract class BaseNetSingleObserver<T> extends DisposableSingleObserver<
             }
             onException(resultException);
         } else if (e instanceof CancellationException) {
-            onCancel(new ResultException(NetworkConfig.ERROR_CANCEL, e.getMessage()));
+            onCancel(new ResultException(NetworkConfig.ERROR_CANCEL, "请求取消~"));
         } else {
             onException(new ResultException(NetworkConfig.ERROR_OPERATION, e.getMessage()));
         }

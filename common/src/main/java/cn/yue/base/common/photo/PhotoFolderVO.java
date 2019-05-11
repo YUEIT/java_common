@@ -3,8 +3,6 @@ package cn.yue.base.common.photo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Description :
  * Created by yue on 2019/3/12

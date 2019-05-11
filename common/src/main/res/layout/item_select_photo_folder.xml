@@ -7,7 +7,8 @@
         android:id="@+id/folderIV"
         android:scaleType="centerCrop"
         android:layout_width="70dp"
-        android:layout_height="70dp" />
+        android:layout_height="70dp"
+        android:layout_margin="1dp" />
 
     <TextView
         android:id="@+id/folderTV"

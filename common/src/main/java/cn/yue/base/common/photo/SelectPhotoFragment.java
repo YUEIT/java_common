@@ -22,6 +22,7 @@ import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.code.ThreadPoolUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 
@@ -36,6 +37,10 @@ public class SelectPhotoFragment extends BaseFragment {
     private List<String> photoList = new ArrayList<>();
     private int page;
     private boolean isCanLoadMore = true;
+
+    @Override
+    protected void initTopBar(TopBar topBar) {
+    }
 
     @Override
     protected int getLayoutId() {
@@ -59,13 +64,16 @@ public class SelectPhotoFragment extends BaseFragment {
                 final CheckBox checkIV = holder.getView(R.id.checkIV);
 
                 photoIV.setBackgroundColor(Color.parseColor("#ffffff"));
-                ImageLoader.getLoader().loadImage(photoIV, s);
+                ImageLoader.getLoader().loadImageNoCache(photoIV, s);
                 photoIV.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (getSelectList().size() >= getMaxNum() && !checkIV.isChecked()){
+                            return;
+                        }
                         checkIV.setChecked(!checkIV.isChecked());
                         addSelectList(s, checkIV.isChecked());
-                        topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "）");
+                        topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "/" + getMaxNum() +  "）");
                     }
                 });
                 if (getSelectList().contains(s)) {
@@ -169,6 +177,13 @@ public class SelectPhotoFragment extends BaseFragment {
             ((SelectPhotoActivity)mActivity).setPhotoList(new ArrayList<String>());
         }
         return ((SelectPhotoActivity)mActivity).getPhotoList();
+    }
+
+    private int getMaxNum() {
+        if (((SelectPhotoActivity)mActivity).getMaxNum() <= 0) {
+            return 1;
+        }
+        return ((SelectPhotoActivity)mActivity).getMaxNum();
     }
 
     private void addSelectList(String s, boolean checked) {

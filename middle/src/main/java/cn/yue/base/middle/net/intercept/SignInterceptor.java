@@ -14,7 +14,7 @@ import cn.yue.base.common.utils.debug.LogUtils;
 import cn.yue.base.middle.init.InitConstant;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
-import cn.yue.base.middle.net.gson.RequestConverterBean;
+import cn.yue.base.middle.net.convert.RequestConverterBean;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -157,7 +157,7 @@ public class SignInterceptor implements Interceptor {
             }
             String appVersion = InitConstant.versionName;
             String deviceId = InitConstant.getDeviceId();
-            String sign = EncryptUtils.encryptMD5ToString((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
+            String sign = EncryptUtils.md5((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
                     deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());
             tmp.put("app_version", appVersion);
             tmp.put("client_type", InitConstant.APP_CLIENT_TYPE + "");

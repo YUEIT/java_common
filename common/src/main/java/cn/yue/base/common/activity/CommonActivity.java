@@ -13,45 +13,57 @@ import cn.yue.base.common.utils.debug.LogUtils;
  * Created by yue on 2018/6/4.
  */
 
-public class CommonActivity extends BaseFragmentActivity{
+public class CommonActivity extends BaseFragmentActivity {
 
+    private int transition; //入场动画
     @Override
     public Fragment getFragment() {
-        Fragment fragment = null;
-        if(getIntent()!=null && getIntent().getExtras()!=null && getIntent().getExtras().getParcelable(FRouter.TAG) != null) {
-            FRouter fRouter = getIntent().getExtras().getParcelable(FRouter.TAG);
-            try {
-                fragment = (Fragment) ARouter.getInstance()
-                        .build(fRouter.getPath())
-                        .with(getIntent().getExtras())
-                        .setTimeout(fRouter.getTimeout())
-//                        .withTransition(fRouter.getEnterAnim(), fRouter.getExitAnim())
-                        .navigation(this, new NavigationCallback() {
-                            @Override
-                            public void onFound(Postcard postcard) {
-
-                            }
-
-                            @Override
-                            public void onLost(Postcard postcard) {
-                                //showError();
-                                LogUtils.e("no find page " + postcard);
-                            }
-
-                            @Override
-                            public void onArrival(Postcard postcard) {
-
-                            }
-
-                            @Override
-                            public void onInterrupt(Postcard postcard) {
-
-                            }
-                        });
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+        if (getIntent() == null
+                || getIntent().getExtras() == null
+                || getIntent().getExtras().getParcelable(FRouter.TAG) == null) {
+            return null;
         }
-        return fragment;
+        FRouter fRouter = getIntent().getExtras().getParcelable(FRouter.TAG);
+        if (fRouter == null) {
+            return null;
+        }
+        transition = fRouter.getTransition();
+        try {
+            return (Fragment) ARouter.getInstance()
+                    .build(fRouter.getPath())
+                    .with(getIntent().getExtras())
+                    .setTimeout(fRouter.getTimeout())
+//                        .withTransition(fRouter.getEnterAnim(), fRouter.getExitAnim())
+                    .navigation(this, new NavigationCallback() {
+                        @Override
+                        public void onFound(Postcard postcard) {
+
+                        }
+
+                        @Override
+                        public void onLost(Postcard postcard) {
+                            //showError();
+                            LogUtils.e("no find page " + postcard);
+                        }
+
+                        @Override
+                        public void onArrival(Postcard postcard) {
+
+                        }
+
+                        @Override
+                        public void onInterrupt(Postcard postcard) {
+
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    protected void setExitAnim() {
+        overridePendingTransition(TransitionAnimation.getStopEnterAnim(transition), TransitionAnimation.getStopExitAnim(transition));
     }
 }

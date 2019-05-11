@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,9 @@ import java.util.List;
 
 public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    protected static final int TYPE_DIVIDER = Integer.MAX_VALUE/2;
-    private static final int TYPE_HEADER_VIEW = Integer.MIN_VALUE;
-    private static final int TYPE_FOOTER_VIEW = Integer.MIN_VALUE + 1;
+    protected static final int TYPE_DIVIDER = 0;
+    private static final int TYPE_HEADER_VIEW = Integer.MIN_VALUE/2;
+    private static final int TYPE_FOOTER_VIEW = Integer.MAX_VALUE/2;
     /**
      * RecyclerView使用的，真正的Adapter
      */
@@ -243,11 +244,10 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
     }
 
     public void addHeaderView(View header) {
-
         if (header == null) {
             throw new RuntimeException("header is null");
         }
-
+        header.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         mHeaderViews.add(header);
         this.notifyDataSetChanged();
     }
@@ -363,13 +363,14 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d("luobiao", "onCreateViewHolder: " + viewType);
         int headerViewsCountCount = getHeaderViewsCount();
-        if (viewType < TYPE_HEADER_VIEW + headerViewsCountCount) {
+        if (viewType < 0 && viewType >= TYPE_HEADER_VIEW) {
             return new ViewHolder(mHeaderViews.get(viewType - TYPE_HEADER_VIEW));
-        } else if (viewType >= TYPE_FOOTER_VIEW && viewType < TYPE_DIVIDER) {
+        } else if (viewType >= TYPE_FOOTER_VIEW) {
             return new ViewHolder(mFooterViews.get(viewType - TYPE_FOOTER_VIEW));
         } else {
-            return mInnerAdapter.onCreateViewHolder(parent, viewType - TYPE_DIVIDER);
+            return mInnerAdapter.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -403,6 +404,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public int getItemViewType(int position) {
         int innerCount = mInnerAdapter.getItemCount();
         int headerViewsCountCount = getHeaderViewsCount();
+        // min/2 ~ 0 header   0 ~ max/2 inner  max/2 ~ max  footer
         if (position < headerViewsCountCount) {
             return TYPE_HEADER_VIEW + position;
         } else if (headerViewsCountCount <= position && position < headerViewsCountCount + innerCount) {
@@ -411,9 +413,9 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
             if(innerItemViewType >= Integer.MAX_VALUE / 2) {
                 throw new IllegalArgumentException("your adapter's return value of getViewTypeCount() must < Integer.MAX_VALUE / 2");
             }
-            return innerItemViewType + Integer.MAX_VALUE / 2;
+            return innerItemViewType;
         } else {
-            return TYPE_FOOTER_VIEW + position - innerCount;
+            return TYPE_FOOTER_VIEW + position - headerViewsCountCount - innerCount;
         }
     }
 

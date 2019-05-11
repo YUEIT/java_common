@@ -9,9 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.trello.rxlifecycle2.android.FragmentEvent;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 
 import java.util.List;
@@ -19,6 +21,11 @@ import java.util.UUID;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.widget.TopBar;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 介绍：
@@ -27,7 +34,7 @@ import cn.yue.base.common.widget.TopBar;
  * 时间：2017/2/20.
  */
 
-public abstract class BaseFragment extends RxFragment {
+public abstract class BaseFragment extends RxFragment implements View.OnTouchListener, ILifecycleProvider<FragmentEvent>{
 
     protected View cacheView;
     protected FragmentManager mFragmentManager;
@@ -59,8 +66,14 @@ public abstract class BaseFragment extends RxFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initView(savedInstanceState);
+        view.setOnTouchListener(this);
+        if (!hasCache) {
+            initView(savedInstanceState);
+            initOther();
+        }
     }
+
+    protected void initOther() { }
 
     @Override
     public final View onCreateView(@Nullable LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,7 +85,9 @@ public abstract class BaseFragment extends RxFragment {
             } else {
                 cacheView = inflater.inflate(getLayoutId(), container, false);
             }
+            hasCache = false;
         } else {
+            hasCache = true;
             ViewGroup v = (ViewGroup) cacheView.getParent();
             if (v != null) {
                 v.removeView(cacheView);
@@ -83,12 +98,15 @@ public abstract class BaseFragment extends RxFragment {
 
     /**
      * true 避免当前Fragment被repalce后回退回来重走oncreateview，导致重复初始化View和数据
-     *
-     * @return
      */
     protected boolean needCache() {
         return true;
     }
+
+    /**
+     * 是否有缓存，避免重新走initView方法
+     */
+    private boolean hasCache;
 
     /**
      * 获取布局
@@ -107,8 +125,15 @@ public abstract class BaseFragment extends RxFragment {
 
 
     protected void initTopBar(TopBar topBar) {
-        if (needTopBar() && null != topBar) {
+        if (null != topBar) {
             topBar.setVisibility(View.VISIBLE);
+            topBar.setLeftImage(R.drawable.app_icon_back);
+            topBar.setLeftClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finishAll();
+                }
+            });
         }
     }
 
@@ -120,8 +145,43 @@ public abstract class BaseFragment extends RxFragment {
         mActivity.customTopBar(view);
     }
 
-    protected boolean needTopBar() {
+    public void hideTopBar() {
+        if (mActivity.getTopBar() != null) {
+            mActivity.getTopBar().setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
         return true;
+    }
+
+    @Override
+    public <T> SingleTransformer<T, T> toBindLifecycle() {
+        return new SingleTransformer<T, T>() {
+
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(FragmentEvent.DESTROY))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
+    }
+
+    @Override
+    public <T> SingleTransformer<T, T> toBindLifecycle(FragmentEvent fragmentEvent) {
+        return new SingleTransformer<T, T>() {
+
+            @Override
+            public SingleSource<T> apply(Single<T> upstream) {
+                return upstream.
+                        compose(bindUntilEvent(fragmentEvent))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+            }
+        };
     }
 
     @Override

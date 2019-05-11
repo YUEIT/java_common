@@ -1,5 +1,6 @@
 package cn.yue.base.common.image;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.widget.ImageView;
@@ -17,10 +18,11 @@ public class ImageLoader {
         if(loader == null){
             loader = new GlideImageLoader();
         }
+        loader.clearCache();
         return loader;
     }
 
-    public  interface Loader{
+    public interface Loader{
 
         void loadImage(ImageView imageView, String url);
 
@@ -36,8 +38,18 @@ public class ImageLoader {
 
         void loadGif(ImageView imageView, String url);
 
+        void loadGif(ImageView imageView, @DrawableRes int resId);
+
         void loadRoundImage(ImageView imageView, String url, int radius);
 
         void loadCircleImage(ImageView imageView, String url);
+
+        void loadAsBitmap(Context context, String url, LoadBitmapCallBack callBack);
+
+        Loader setPlaceholder(@DrawableRes int resId);
+
+        void loadImageNoCache(ImageView imageView, String url);
+
+        void clearCache();
     }
 }

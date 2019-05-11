@@ -1,5 +1,6 @@
 package cn.yue.base.common.image;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -7,15 +8,21 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.TransformationUtils;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.security.MessageDigest;
 
@@ -25,7 +32,7 @@ import cn.yue.base.common.R;
  * Description :
  * Created by yue on 2018/11/15
  */
-public class GlideImageLoader implements ImageLoader.Loader {
+class GlideImageLoader implements ImageLoader.Loader {
 
     @Override
     public void loadImage(ImageView imageView, String url) {
@@ -40,10 +47,7 @@ public class GlideImageLoader implements ImageLoader.Loader {
         if (imageView == null) {
             return;
         }
-        Glide.with(imageView.getContext())
-                .load(url)
-                .apply(fitCenter ? getRequestOptions().fitCenter() : getRequestOptions().centerCrop())
-                .into(imageView);
+        realLoadImage(imageView, url, 0, null, fitCenter);
     }
 
     @Override
@@ -59,10 +63,7 @@ public class GlideImageLoader implements ImageLoader.Loader {
         if (imageView == null) {
             return;
         }
-        Glide.with(imageView.getContext())
-                .load(resId)
-                .apply(fitCenter ? getRequestOptions().fitCenter() : getRequestOptions().centerCrop())
-                .into(imageView);
+        realLoadImage(imageView, null, resId, null, fitCenter);
     }
 
     @Override
@@ -78,10 +79,42 @@ public class GlideImageLoader implements ImageLoader.Loader {
         if (imageView == null) {
             return;
         }
-        Glide.with(imageView.getContext())
-                .load(drawable)
-                .apply(fitCenter ? getRequestOptions().fitCenter() : getRequestOptions().centerCrop())
+        realLoadImage(imageView, null, 0, drawable, fitCenter);
+    }
+
+    private void realLoadImage(ImageView imageView, String url, int resId, Drawable drawable, boolean fitCenter) {
+        if (imageView == null) {
+            return;
+        }
+        RequestBuilder requestBuilder = null;
+        if (!TextUtils.isEmpty(url)) {
+            if (isGif(url)) {
+                loadGif(imageView, url);
+                return;
+            }
+            requestBuilder = Glide.with(imageView.getContext())
+                    .load(url);
+        }
+        if (resId > 0) {
+            requestBuilder = Glide.with(imageView.getContext())
+                    .load(resId);
+        }
+        if (drawable != null) {
+            requestBuilder = Glide.with(imageView.getContext())
+                    .load(drawable);
+        }
+        if (requestBuilder == null) {
+            return;
+        }
+        requestBuilder.apply(fitCenter ? getRequestOptions().fitCenter() : getRequestOptions().centerCrop())
                 .into(imageView);
+    }
+
+    private boolean isGif(String url) {
+        if (url.endsWith("gif")) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -89,13 +122,20 @@ public class GlideImageLoader implements ImageLoader.Loader {
         if (imageView == null) {
             return;
         }
-        RequestOptions requestOptions = getRequestOptions()
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .dontAnimate();
         Glide.with(imageView.getContext())
                 .asGif()
                 .load(url)
-                .apply(requestOptions)
+                .into(imageView);
+    }
+
+    @Override
+    public void loadGif(ImageView imageView, int resId) {
+        if (imageView == null) {
+            return;
+        }
+        Glide.with(imageView.getContext())
+                .asGif()
+                .load(resId)
                 .into(imageView);
     }
 
@@ -128,10 +168,56 @@ public class GlideImageLoader implements ImageLoader.Loader {
                 .into(imageView);
     }
 
+    @Override
+    public void loadAsBitmap(Context context, String url, final LoadBitmapCallBack callBack) {
+        if (context == null || callBack == null) {
+            return;
+        }
+        Glide.with(context)
+                .asBitmap()
+                .load(url)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        callBack.onBitmapLoaded(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        callBack.onBitmapNoFound();
+                    }
+                });
+
+    }
+
+    public void loadImageNoCache(ImageView imageView, String url) {
+        Glide.with(imageView.getContext())
+                .load(url)
+                .apply(getRequestOptions()
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .dontAnimate())
+                .into(imageView);
+    }
+
+    private int placeholderResId;
+
+    @Override
+    public ImageLoader.Loader setPlaceholder(@DrawableRes int resId) {
+        this.placeholderResId = resId;
+        return this;
+    }
+
+    @Override
+    public void clearCache() {
+        placeholderResId = R.drawable.drawable_default;
+    }
+
     private RequestOptions getRequestOptions() {
         return new RequestOptions()
-                .placeholder(R.drawable.drawable_default)
-                .error(R.drawable.drawable_default);
+                .placeholder(placeholderResId)
+                .error(placeholderResId);
     }
 
     final static class GlideRoundTransform extends BitmapTransformation {

@@ -18,5 +18,10 @@ public abstract class BaseEndSingleObserver<T> extends BaseNetSingleObserver<T> 
         onEnd(true, t, null);
     }
 
+    @Override
+    protected void onCancel(ResultException e) {
+        onEnd(false,null, e);
+    }
+
     public abstract void onEnd(boolean success, T t, ResultException e);
 }

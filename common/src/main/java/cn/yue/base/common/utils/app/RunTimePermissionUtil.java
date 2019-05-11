@@ -1,12 +1,16 @@
 package cn.yue.base.common.utils.app;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import cn.yue.base.common.activity.BaseActivity;
@@ -20,6 +24,18 @@ import cn.yue.base.common.activity.PermissionCallBack;
 public class RunTimePermissionUtil {
 
     public static int REQUEST_CODE = 100;
+
+    public static void requestPermissions(Context context, PermissionCallBack permissionCallBack, String... permissions) {
+        if (context instanceof BaseActivity) {
+            requestPermissions((BaseActivity) context, permissionCallBack, permissions);
+        } else if (context instanceof BaseFragmentActivity) {
+            requestPermissions((BaseFragmentActivity) context, permissionCallBack, permissions);
+        }
+    }
+
+    public static void requestPermissions(BaseFragmentActivity context, PermissionCallBack permissionCallBack, String... permissions) {
+        requestPermissions(context, REQUEST_CODE, permissionCallBack, permissions);
+    }
 
     public static void requestPermissions(BaseFragmentActivity context, int requestCode, PermissionCallBack permissionCallBack, String... permissions) {
         //检查权限是否授权
@@ -36,6 +52,10 @@ public class RunTimePermissionUtil {
         } else {
             ActivityCompat.requestPermissions(context, getNeedRequestPermissions(context, permissions), requestCode);
         }
+    }
+
+    public static void requestPermissions(BaseActivity context, PermissionCallBack permissionCallBack, String... permissions) {
+        requestPermissions(context, REQUEST_CODE, permissionCallBack, permissions);
     }
 
     public static void requestPermissions(BaseActivity context, int requestCode, PermissionCallBack permissionCallBack, String... permissions) {
@@ -105,4 +125,21 @@ public class RunTimePermissionUtil {
         }
         return permissionList.toArray(new String[permissionList.size()]);
     }
+
+    public static String getPermissionName(String permission) {
+        if (permissionMap.isEmpty()) {
+            permissionMap.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, "写入存储空间");
+            permissionMap.put(Manifest.permission.READ_EXTERNAL_STORAGE, "读取存储空间");
+            permissionMap.put(Manifest.permission.READ_PHONE_STATE, "手机识别码");
+            permissionMap.put(Manifest.permission.CAMERA, "相机拍照");
+            permissionMap.put(Manifest.permission.ACCESS_FINE_LOCATION, "定位");
+        }
+        String permissionName = permissionMap.get(permission);
+        if (!TextUtils.isEmpty(permissionName)) {
+            return permissionName;
+        }
+        return "";
+    }
+
+    private static HashMap<String, String> permissionMap = new HashMap<>();
 }

@@ -1,13 +1,14 @@
-apply plugin: 'com.android.application'
+apply from: rootProject.getRootDir().getAbsolutePath() + "/release.gradle"
 
+def targetBuildVersion = target_sdk_version.toInteger()
+def minBuildVersion = min_sdk_version.toInteger()
 android {
-    compileSdkVersion 27
+    compileSdkVersion targetBuildVersion
     defaultConfig {
         applicationId "cn.yue.base.community"
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion minBuildVersion
+        targetSdkVersion targetBuildVersion
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -23,6 +24,10 @@ android {
     }
     dataBinding {
         enabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

@@ -14,6 +14,7 @@ import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.utils.code.ThreadPoolUtils;
+import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 
@@ -21,9 +22,13 @@ import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
  * Description :
  * Created by yue on 2019/3/12
  */
-public class SelectPhotoFolderFragment extends BaseFragment{
+public class SelectPhotoFolderFragment extends BaseFragment {
 
     private CommonAdapter commonAdapter;
+
+    @Override
+    protected void initTopBar(TopBar topBar) {
+    }
 
     @Override
     protected int getLayoutId() {
@@ -47,7 +52,7 @@ public class SelectPhotoFolderFragment extends BaseFragment{
                 holder.setOnItemClickListener(position, photoFolderVO, new CommonViewHolder.OnItemClickListener<PhotoFolderVO>() {
                     @Override
                     public void onItemClick(int position, PhotoFolderVO photoFolderVO1) {
-                        ((SelectPhotoActivity)mActivity).changeToSelectPhotoFragment(photoFolderVO1.getPath());
+                        ((SelectPhotoActivity)mActivity).changeToSelectPhotoFragment(photoFolderVO1.getPath(), photoFolderVO1.getName());
                     }
                 });
             }
@@ -63,6 +68,11 @@ public class SelectPhotoFolderFragment extends BaseFragment{
             @Override
             public void run() {
                 List<PhotoFolderVO> allFolder = PhotoUtils.getAllPhotoFolder(mActivity);
+                List<String> lastPhotos = PhotoUtils.getTheLastPhotos(mActivity, 100);
+                if (lastPhotos != null && !lastPhotos.isEmpty()){
+                    PhotoFolderVO lastPhotoFolderVO = new PhotoFolderVO("", lastPhotos.get(0), "最近照片", lastPhotos.size());
+                    allFolder.add(0, lastPhotoFolderVO);
+                }
                 handler.sendMessage(Message.obtain(handler, 101, allFolder));
             }
         });
@@ -74,7 +84,9 @@ public class SelectPhotoFolderFragment extends BaseFragment{
         public boolean handleMessage(Message msg) {
             if (msg.what == 101) {
                 allFolder.clear();
-                allFolder.addAll((List<PhotoFolderVO>) msg.obj);
+                if ((List<PhotoFolderVO>) msg.obj != null) {
+                    allFolder.addAll((List<PhotoFolderVO>) msg.obj);
+                }
                 if (commonAdapter != null) {
                     commonAdapter.setList(allFolder);
                 }

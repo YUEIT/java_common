@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
@@ -121,7 +120,7 @@ public class PhotoView extends android.support.v7.widget.AppCompatImageView {
     /**
      * 单击监听
      */
-    private View.OnClickListener mOnClickListener;
+    private OnClickListener mOnClickListener;
 
     public PhotoView(Context context) {
         this(context, null);
@@ -154,8 +153,8 @@ public class PhotoView extends android.support.v7.widget.AppCompatImageView {
     public void loadImage(int resizeX, int resizeY, String uri) {
         RequestOptions requestOptions = new RequestOptions()
                 .override(resizeX, resizeY)
-                .placeholder(R.drawable.drawable_default)
-                .error(R.drawable.drawable_default)
+                .placeholder(R.drawable.drawable_default_big)
+                .error(R.drawable.drawable_default_big)
                 .fitCenter()
                 .priority(Priority.HIGH);
 
@@ -220,8 +219,8 @@ public class PhotoView extends android.support.v7.widget.AppCompatImageView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int preWidth = View.MeasureSpec.getSize(widthMeasureSpec);
-        int preHeight = View.MeasureSpec.getSize(heightMeasureSpec);
+        int preWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int preHeight = MeasureSpec.getSize(heightMeasureSpec);
 
         boolean hasSizeChanged = false;
         if (preWidth != mWidth || preHeight != mHeight) {
@@ -607,7 +606,7 @@ public class PhotoView extends android.support.v7.widget.AppCompatImageView {
     }
 
     @Override
-    public void setOnClickListener(View.OnClickListener listener) {
+    public void setOnClickListener(OnClickListener listener) {
         this.mOnClickListener = listener;
     }
 }
