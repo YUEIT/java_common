@@ -5,7 +5,7 @@ def minBuildVersion = min_sdk_version.toInteger()
 android {
     compileSdkVersion targetBuildVersion
     defaultConfig {
-        applicationId "cn.yue.base.community"
+        applicationId "cn.yue.base.test"
         minSdkVersion minBuildVersion
         targetSdkVersion targetBuildVersion
         multiDexEnabled true

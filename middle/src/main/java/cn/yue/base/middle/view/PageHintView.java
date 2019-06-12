@@ -2,7 +2,6 @@ package cn.yue.base.middle.view;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,8 +169,8 @@ public class PageHintView extends RelativeLayout{
         }
     }
 
-    private SwipeRefreshLayout refreshLayout;
-    public void setRefreshTarget(SwipeRefreshLayout refreshLayout) {
+    private ViewGroup refreshLayout;
+    public void setRefreshTarget(ViewGroup refreshLayout) {
         this.refreshLayout = refreshLayout;
     }
 

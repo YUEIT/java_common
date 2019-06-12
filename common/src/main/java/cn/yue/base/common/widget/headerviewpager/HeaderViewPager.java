@@ -112,6 +112,11 @@ public class HeaderViewPager extends LinearLayout {
     public void setSwipeRefreshLayout(SwipeRefreshLayout refreshLayout){
         this.refreshLayout = refreshLayout;
     }
+    //解决溢出顶部的刷新控件的滑动冲突
+    private boolean isRefreshLayoutOverTop = false;
+    public void setRefreshLayoutOverTop(boolean isRefreshLayoutOverTop) {
+        this.isRefreshLayoutOverTop = isRefreshLayoutOverTop;
+    }
     /**
      * 说明：一旦dispatTouchEvent返回true，即表示当前View就是事件传递需要的 targetView，事件不会再传递给
      * 其他View，如果需要将事件继续传递给子View，可以手动传递
@@ -187,7 +192,7 @@ public class HeaderViewPager extends LinearLayout {
                     invalidate();  //更新界面，该行代码会导致computeScroll中的代码执行
                     //阻止快读滑动的时候点击事件的发生，滑动的时候，将Up事件改为Cancel就不会发生点击了
                     if ((shiftX > mTouchSlop || shiftY > mTouchSlop)) {
-                        if (isClickHead || !isStickied()) {
+                        if (isClickHead || (!isStickied() && !isRefreshLayoutOverTop)) {
                             int action = ev.getAction();
                             ev.setAction(MotionEvent.ACTION_CANCEL);
                             boolean dd = super.dispatchTouchEvent(ev);

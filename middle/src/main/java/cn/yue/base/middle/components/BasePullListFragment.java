@@ -2,13 +2,13 @@ package cn.yue.base.middle.components;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetSingleObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.refresh.IRefreshLayout;
 import io.reactivex.Single;
 
 /**
@@ -47,16 +48,10 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
     private BasePullFooter footer;
     private PageStatus status = PageStatus.STATUS_NORMAL;
     private boolean isFirstLoading = true;
-    private SwipeRefreshLayout refreshL;
+    private IRefreshLayout refreshL;
     private RecyclerView baseRV;
     protected PageHintView hintView;
     private PhotoHelper photoHelper;
-    public int[] COLORS = {
-            cn.yue.base.common.R.color.progress_color_1,
-            cn.yue.base.common.R.color.progress_color_2,
-            cn.yue.base.common.R.color.progress_color_3,
-            cn.yue.base.common.R.color.progress_color_4
-    };
 
     @Override
     protected int getLayoutId() {
@@ -89,16 +84,16 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         });
 
         refreshL = findViewById(R.id.refreshL);
+        refreshL.init();
         refreshL.setEnabled(canPullDown());
-        refreshL.setColorSchemeResources(COLORS);
-        refreshL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refresh();
             }
         });
         if (canPullDown()) {
-            hintView.setRefreshTarget(refreshL);
+            hintView.setRefreshTarget((ViewGroup) refreshL);
         }
         footer = getFooter();
         if (footer != null) {
@@ -110,6 +105,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
             });
         }
         baseRV = findViewById(R.id.baseRV);
+        refreshL.setTargetView(baseRV);
         initRecyclerView(baseRV);
         baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -245,7 +241,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         }
         status = PageStatus.STATUS_LOADING_REFRESH;
         if (hasRefreshAnim) {
-            refreshL.setRefreshing(true);
+            refreshL.startRefresh();
         }
         pageNt = initPageNt();
         loadData();
@@ -279,9 +275,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
 
                     @Override
                     public void onSuccess(P p) {
-                        if (refreshL.isRefreshing()) {
-                            refreshL.setRefreshing(false);
-                        }
+                        refreshL.finishRefreshing();
                         if (isLoadingRefresh) {
                             dataList.clear();
                         }
@@ -306,9 +300,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
 
                     @Override
                     public void onException(ResultException e) {
-                        if (refreshL.isRefreshing()) {
-                            refreshL.setRefreshing(false);
-                        }
+                        refreshL.finishRefreshing();
                         loadFailed(e);
                         if (isLoadingRefresh) {
                             onRefreshComplete(null, e);

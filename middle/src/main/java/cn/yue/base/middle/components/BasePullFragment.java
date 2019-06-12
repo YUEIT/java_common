@@ -2,8 +2,8 @@ package cn.yue.base.middle.components;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 
 import java.util.List;
@@ -22,6 +22,7 @@ import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
  * Description :
@@ -31,16 +32,10 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
 
     private boolean isFirstLoading = true;
     protected PageStatus status = PageStatus.STATUS_NORMAL;
-    protected SwipeRefreshLayout refreshL;
+    protected IRefreshLayout refreshL;
     protected PageHintView hintView;
     private ViewStub baseVS;
     private PhotoHelper photoHelper;
-    public int[] COLORS = {
-            cn.yue.base.common.R.color.progress_color_1,
-            cn.yue.base.common.R.color.progress_color_2,
-            cn.yue.base.common.R.color.progress_color_3,
-            cn.yue.base.common.R.color.progress_color_4
-    };
 
     @Override
     protected int getLayoutId() {
@@ -71,17 +66,16 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
         });
 
         refreshL = findViewById(R.id.refreshL);
-        refreshL.setColorSchemeColors(COLORS);
-        refreshL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refresh();
-                stopRefreshAnim();
+                refreshL.finishRefreshing();
             }
         });
         refreshL.setEnabled(canPullDown());
         if (canPullDown()) {
-            hintView.setRefreshTarget(refreshL);
+            hintView.setRefreshTarget((ViewGroup) refreshL);
         }
         baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());
@@ -117,9 +111,7 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
     }
 
     public void stopRefreshAnim() {
-        if (refreshL.isRefreshing()) {
-            refreshL.setRefreshing(false);
-        }
+        refreshL.finishRefreshing();
     }
 
     public void showLoadingView() {
@@ -127,7 +119,7 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
             baseVS.setVisibility(View.GONE);
             showStatusView(PageStatus.STATUS_LOADING_REFRESH);
         } else {
-            refreshL.setRefreshing(true);
+            refreshL.startRefresh();
         }
     }
 

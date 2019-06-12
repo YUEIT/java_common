@@ -1,6 +1,5 @@
 package cn.yue.base.test;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,8 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import cn.yue.base.common.activity.BaseActivity;
-import cn.yue.base.common.activity.PermissionCallBack;
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.activity.FRouter;
 
 /**
  * Description :
@@ -67,18 +65,7 @@ public class LaunchActivity extends BaseActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                requestPermission(Manifest.permission.READ_PHONE_STATE, new PermissionCallBack() {
-                    @Override
-                    public void requestSuccess(String permission) {
-                        finish();
-                    }
-
-                    @Override
-                    public void requestFailed(String permission) {
-                        ToastUtils.showShortToast("未获取到必要权限，无法正常启动App...");
-                        finish();
-                    }
-                });
+                FRouter.getInstance().build("/app/testPullList").navigation(LaunchActivity.this);
             }
         },2000);
 
