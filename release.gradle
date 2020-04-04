@@ -8,7 +8,7 @@ Properties versionProps = new Properties()
 versionProps.load(new FileInputStream(versionPropsFile))
 
 android {
-    buildToolsVersion build_tools_version
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
     defaultConfig {
         versionCode appVersionCode(versionProps['version_name'].toString())
         versionName versionProps['version_name'].toString()
@@ -108,8 +108,10 @@ repositories {
 }
 
 //之前用的是这项命令，直接移过来，实际没什么作用
-task classOver << {
-    println "assemble release success"
+task classOver {
+    doLast {
+        println "assemble release success"
+    }
 }
 
 afterEvaluate {
@@ -119,14 +121,14 @@ afterEvaluate {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.meituan.android.walle:payload_reader:1.1.6'
-    implementation 'com.meituan.android.walle:payload_writer:1.1.6'
+    implementation rootProject.ext.dependencies["walle-payload_reader"]
+    implementation rootProject.ext.dependencies["walle-payload_writer"]
 }
 
-task forEachAllFragment << {
-    fileTree("${project.getProjectDir()}/src/main/java").filter {
-        it.name.endsWith('Fragment.java')
-    } each {
-        file -> println file.name
-    }
-}
+//task forEachAllFragment << {
+//    fileTree("${project.getProjectDir()}/src/main/java").filter {
+//        it.name.endsWith('Fragment.java')
+//    } each {
+//        file -> println file.name
+//    }
+//}

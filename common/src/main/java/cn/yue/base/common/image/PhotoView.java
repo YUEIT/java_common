@@ -5,8 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -31,7 +31,7 @@ import cn.yue.base.common.R;
  * Created by yue on 2019/3/11
  */
 
-public class PhotoView extends android.support.v7.widget.AppCompatImageView {
+public class PhotoView extends androidx.appcompat.widget.AppCompatImageView {
 
     private static final String TAG = "PhotoView";
     private Context mContext;

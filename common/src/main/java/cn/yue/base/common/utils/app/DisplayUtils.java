@@ -1,7 +1,7 @@
 package cn.yue.base.common.utils.app;
 
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import cn.yue.base.common.utils.Utils;
 

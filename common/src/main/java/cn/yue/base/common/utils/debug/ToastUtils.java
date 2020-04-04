@@ -2,7 +2,7 @@ package cn.yue.base.common.utils.debug;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.widget.Toast;
 
 import cn.yue.base.common.utils.Utils;

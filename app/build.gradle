@@ -1,15 +1,13 @@
 apply from: rootProject.getRootDir().getAbsolutePath() + "/release.gradle"
 
-def targetBuildVersion = target_sdk_version.toInteger()
-def minBuildVersion = min_sdk_version.toInteger()
 android {
-    compileSdkVersion targetBuildVersion
+    compileSdkVersion rootProject.ext.android.targetSdkVersion
     defaultConfig {
         applicationId "cn.yue.base.test"
-        minSdkVersion minBuildVersion
-        targetSdkVersion targetBuildVersion
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [ moduleName : project.getName() ]
@@ -33,14 +31,17 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation rootProject.ext.androidx["junit"]
+    androidTestImplementation rootProject.ext.androidx["junit-test"]
+    androidTestImplementation rootProject.ext.androidx["espresso-test"]
+
+    implementation rootProject.ext.androidx["appcompat"]
+    implementation rootProject.ext.androidx["constraintlayout"]
+
     api project(':middle')
-    api 'com.alibaba:arouter-api:1.3.1'
-    annotationProcessor 'com.alibaba:arouter-compiler:1.1.4'
+    //aRouter
+    api rootProject.ext.dependencies["arouter-api"]
+    annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
 
     implementation 'fm.jiecao:jiecaovideoplayer:5.5.4'
 }

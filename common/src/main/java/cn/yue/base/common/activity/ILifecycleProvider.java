@@ -1,6 +1,7 @@
 package cn.yue.base.common.activity;
 
-import com.trello.rxlifecycle2.LifecycleProvider;
+
+import com.trello.rxlifecycle3.LifecycleProvider;
 
 import io.reactivex.SingleTransformer;
 import io.reactivex.annotations.CheckReturnValue;

@@ -10,7 +10,7 @@ import android.graphics.drawable.GradientDrawable.Orientation;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;

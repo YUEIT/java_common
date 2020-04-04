@@ -1,6 +1,6 @@
 package cn.yue.base.common.utils.constant;
 
-import android.support.v4.util.SimpleArrayMap;
+import androidx.collection.SimpleArrayMap;
 
 /**
  * Description : 拼音相关工具类

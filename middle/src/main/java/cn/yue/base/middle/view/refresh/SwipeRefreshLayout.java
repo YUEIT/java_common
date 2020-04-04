@@ -1,8 +1,8 @@
 package cn.yue.base.middle.view.refresh;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -11,7 +11,7 @@ import android.view.View;
  * Created by yue on 2019/6/11
  */
 
-public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLayout implements IRefreshLayout{
+public class SwipeRefreshLayout extends androidx.swiperefreshlayout.widget.SwipeRefreshLayout implements IRefreshLayout{
 
     public int[] COLORS = {
             cn.yue.base.common.R.color.progress_color_1,
@@ -52,7 +52,7 @@ public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLa
 
     @Override
     public void setOnRefreshListener(IRefreshLayout.OnRefreshListener onRefreshListener) {
-        setOnRefreshListener(new android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener() {
+        setOnRefreshListener(new androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if (onRefreshListener != null) {

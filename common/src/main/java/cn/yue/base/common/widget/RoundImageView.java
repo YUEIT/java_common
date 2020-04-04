@@ -26,7 +26,7 @@ import cn.yue.base.common.R;
  * Created by yue on 2017/7/19
  */
 
-public class RoundImageView extends android.support.v7.widget.AppCompatImageView {
+public class RoundImageView extends androidx.appcompat.widget.AppCompatImageView {
     /**
      * 图片的类型，圆形or圆角
      */
