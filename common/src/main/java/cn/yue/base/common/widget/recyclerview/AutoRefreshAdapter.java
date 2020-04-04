@@ -1,11 +1,9 @@
 package cn.yue.base.common.widget.recyclerview;
 
 /**
- * 介绍：用DiffUtil和SortedList修改过的支持自动刷新和数据去重
- * （注意这个并不适合于数据移动，因为SortedList有自动排序的功能）
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/12/16.
+ * Description : 介绍：用DiffUtil和SortedList修改过的支持自动刷新和数据去重
+ *  （注意这个并不适合于数据移动，因为SortedList有自动排序的功能）
+ * Created by yue on 2016/12/16
  */
 
 import android.content.Context;

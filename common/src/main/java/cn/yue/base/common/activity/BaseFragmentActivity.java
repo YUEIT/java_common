@@ -39,10 +39,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * 介绍：
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/20.
+ * Description :
+ * Created by yue on 2019/3/11
  */
 
 public abstract class BaseFragmentActivity extends RxFragmentActivity implements ILifecycleProvider<ActivityEvent>{

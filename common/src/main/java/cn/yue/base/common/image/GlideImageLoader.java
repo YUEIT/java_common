@@ -30,8 +30,9 @@ import cn.yue.base.common.R;
 
 /**
  * Description :
- * Created by yue on 2018/11/15
+ * Created by yue on 2019/3/11
  */
+
 class GlideImageLoader implements ImageLoader.Loader {
 
     @Override

@@ -9,10 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * 介绍：
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/12/2.
+ * Description : 通用ViewHolder
+ * Created by yue on 2016/12/16
  */
 
 public class CommonViewHolder<T> extends RecyclerView.ViewHolder{

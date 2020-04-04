@@ -14,12 +14,9 @@ import cn.yue.base.middle.net.wrapper.BaseBean;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 
-
 /**
- * 注册一个自定义的转换类GsonResponseBodyConverter
- * 这个类会自动将 flag msg 都剥离掉
- *
- * @param <T>
+ * Description : 注册一个自定义的转换类GsonResponseBodyConverter
+ * Created by yue on 2018/7/24
  */
 class SignGsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
     private static final Object EMPTY_OBJECT = new Object();

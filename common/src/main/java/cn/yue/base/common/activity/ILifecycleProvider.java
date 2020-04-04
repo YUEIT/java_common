@@ -7,8 +7,9 @@ import io.reactivex.annotations.CheckReturnValue;
 
 /**
  * Description :
- * Created by yue on 2019/3/25
+ * Created by yue on 2019/3/11
  */
+
 public interface ILifecycleProvider<E> extends LifecycleProvider<E> {
 
     @CheckReturnValue

@@ -14,7 +14,7 @@ import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 
 /**
- * Description :
+ * Description : 表情adapter
  * Created by yue on 2018/11/15
  */
 public class EmotionAdapter<T extends IEmotion> extends CommonAdapter<T>{

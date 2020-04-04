@@ -5,8 +5,9 @@ import android.os.Parcelable;
 
 /**
  * Description :
- * Created by yue on 2019/3/12
+ * Created by yue on 2019/3/11
  */
+
 public class PhotoFolderVO implements Parcelable{
 
     private String path;

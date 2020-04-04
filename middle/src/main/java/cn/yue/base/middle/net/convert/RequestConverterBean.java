@@ -4,6 +4,7 @@ package cn.yue.base.middle.net.convert;
  * Description :
  * Created by yue on 2018/7/24
  */
+
 public class RequestConverterBean {
 
     String className;

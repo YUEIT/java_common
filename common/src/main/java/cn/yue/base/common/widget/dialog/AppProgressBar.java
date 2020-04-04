@@ -11,6 +11,11 @@ import android.widget.RelativeLayout;
 
 import cn.yue.base.common.R;
 
+/**
+ * Description : 进度条
+ * Created by yue on 2019/3/11
+ */
+
 public class AppProgressBar extends RelativeLayout {
     private static final int CIRCLE_DIAMETER = 40;
     private static final int CIRCLE_BG_LIGHT = 0xFFFAFAFA;

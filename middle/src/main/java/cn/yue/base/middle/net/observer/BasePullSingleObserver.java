@@ -9,6 +9,7 @@ import cn.yue.base.middle.net.ResultException;
  * Description :
  * Created by yue on 2019/4/1
  */
+
 public abstract class BasePullSingleObserver<T> extends BaseNetSingleObserver<T> {
 
     private BasePullFragment fragment;

@@ -10,7 +10,7 @@ import cn.yue.base.common.widget.emoji.EmojiUtils;
 import cn.yue.base.common.widget.keyboard.OnEmotionClickListener;
 
 /**
- * Description :
+ * Description : 表情管理类，初始化和清空表情
  * Created by yue on 2018/11/16
  */
 public class EmotionUtils {

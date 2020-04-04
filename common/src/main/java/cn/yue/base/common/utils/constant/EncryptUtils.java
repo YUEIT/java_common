@@ -19,12 +19,9 @@ import cn.yue.base.common.utils.debug.CloseUtils;
 import static cn.yue.base.common.utils.constant.ConvertUtils.bytes2HexString;
 import static cn.yue.base.common.utils.constant.ConvertUtils.hexString2Bytes;
 
-
 /**
- * 介绍：加密解密相关的工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 加密解密相关的工具类
+ * Created by yue on 2019/3/11
  */
 public class EncryptUtils {
 

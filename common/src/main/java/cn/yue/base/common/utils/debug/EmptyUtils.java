@@ -11,10 +11,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * 介绍：判空相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 判空相关工具类
+ * Created by yue on 2019/3/11
  */
 public class EmptyUtils {
 

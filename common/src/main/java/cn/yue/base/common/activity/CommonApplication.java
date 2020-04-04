@@ -11,8 +11,9 @@ import cn.yue.base.common.utils.debug.LogUtils;
 
 /**
  * Description :
- * Created by yue on 2018/12/12
+ * Created by yue on 2019/3/11
  */
+
 public class CommonApplication extends Application {
 
     @Override

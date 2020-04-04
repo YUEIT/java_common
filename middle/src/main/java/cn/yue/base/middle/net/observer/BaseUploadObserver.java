@@ -13,6 +13,7 @@ import io.reactivex.observers.DisposableSingleObserver;
  * Description :
  * Created by yue on 2019/3/6
  */
+
 public abstract class BaseUploadObserver extends DisposableSingleObserver<ImageResultListData> {
 
     @Override

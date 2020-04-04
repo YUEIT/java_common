@@ -17,7 +17,7 @@ import android.widget.Toast;
 import cn.yue.base.common.utils.app.DisplayUtils;
 
 /**
- * Description :
+ * Description : 自定义toast
  * Created by yue on 2019/3/12
  */
 public class CustomToast extends Toast {

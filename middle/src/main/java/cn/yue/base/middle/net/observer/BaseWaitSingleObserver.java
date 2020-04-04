@@ -8,6 +8,7 @@ import cn.yue.base.middle.net.ResultException;
  * Description :
  * Created by yue on 2019/3/31
  */
+
 public abstract class BaseWaitSingleObserver<T> extends BaseNetSingleObserver<T> {
 
     private IWaitView iBaseView;

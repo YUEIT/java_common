@@ -10,6 +10,7 @@ import android.view.View;
  * Description :
  * Created by yue on 2019/6/11
  */
+
 public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLayout implements IRefreshLayout{
 
     public int[] COLORS = {

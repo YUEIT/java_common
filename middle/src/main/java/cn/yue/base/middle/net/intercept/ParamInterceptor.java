@@ -8,9 +8,9 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
-
 /**
- * Created by yue on 2018/7/10.
+ * Description :
+ * Created by yue on 2018/7/24
  */
 
 public class ParamInterceptor implements Interceptor {

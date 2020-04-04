@@ -11,6 +11,11 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.view.ViewCompat;
 import android.view.animation.Animation;
 
+/**
+ * Description : 圆形ImageView
+ * Created by yue on 2019/3/11
+ */
+
 final class CircleImageView extends android.support.v7.widget.AppCompatImageView {
 
     private static final int KEY_SHADOW_COLOR = 0x1E000000;

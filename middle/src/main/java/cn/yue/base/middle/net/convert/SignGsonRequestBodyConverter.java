@@ -30,15 +30,13 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Converter;
 
-
 /**
  * request请求 body参数解析
  * Created by yue on 2018/7/25.
  */
+
 final class SignGsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.parse("application/json; charset=UTF-8");
-  private static final Charset UTF_8 = Charset.forName("UTF-8");
-
   private final Gson gson;
   private final TypeAdapter<T> adapter;
 

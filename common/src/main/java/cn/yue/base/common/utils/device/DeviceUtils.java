@@ -23,15 +23,13 @@ import java.util.List;
 import java.util.UUID;
 
 import cn.yue.base.common.utils.Utils;
-import cn.yue.base.common.utils.code.SPUtils;
+import cn.yue.base.common.utils.code.SharePreferencesUtils;
 import cn.yue.base.common.utils.code.ShellUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
 
 /**
- * 介绍：设备相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 设备相关工具类
+ * Created by yue on 2019/3/11
  */
 public class DeviceUtils {
 
@@ -520,10 +518,10 @@ public class DeviceUtils {
     public static String getNullDeviceId(String deviceId) {
         if (TextUtils.isEmpty(deviceId) || deviceId.length() < 16) {//说明获取不到了，或者小于16
             //先从本地持久化取
-            String cstDeviceId = SPUtils.getInstance().getString(KEY_CST_DEVICE_ID, "");
+            String cstDeviceId = SharePreferencesUtils.getInstance().getString(KEY_CST_DEVICE_ID, "");
             if (TextUtils.isEmpty(cstDeviceId)) {//娶不到自己构造一个随机字符串，并保存
                 cstDeviceId = UUID.randomUUID().toString();
-                SPUtils.getInstance().put(KEY_CST_DEVICE_ID, cstDeviceId);
+                SharePreferencesUtils.getInstance().put(KEY_CST_DEVICE_ID, cstDeviceId);
             }
             return cstDeviceId;
         }

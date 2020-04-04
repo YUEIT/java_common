@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import cn.yue.base.common.widget.keyboard.mode.IEmotion;
 
+/**
+ * Description : emoji表情
+ * Created by yue on 2019/3/11
+ */
 
 public class Emoji implements Serializable, IEmotion {
 

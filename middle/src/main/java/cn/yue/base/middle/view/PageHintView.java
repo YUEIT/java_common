@@ -16,6 +16,7 @@ import cn.yue.base.middle.R;
  * Description :
  * Created by yue on 2018/11/13
  */
+
 public class PageHintView extends RelativeLayout{
 
     public PageHintView(Context context) {

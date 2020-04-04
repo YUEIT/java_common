@@ -9,10 +9,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 /**
- * 介绍：编码解码相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 编码解码相关工具类
+ * Created by yue on 2019/3/11
  */
 public class EncodeUtils {
 

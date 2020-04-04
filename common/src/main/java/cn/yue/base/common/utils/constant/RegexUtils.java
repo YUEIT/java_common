@@ -7,13 +7,9 @@ import java.util.regex.Pattern;
 
 import static cn.yue.base.common.utils.constant.ConstantUtils.*;
 
-
-
 /**
- * 介绍：正则相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 正则相关工具类
+ * Created by yue on 2019/3/11
  */
 public class RegexUtils {
 

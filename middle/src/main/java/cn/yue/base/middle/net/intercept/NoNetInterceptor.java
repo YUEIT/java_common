@@ -8,6 +8,10 @@ import cn.yue.base.middle.net.ResultException;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
+/**
+ * Description :
+ * Created by yue on 2018/7/24
+ */
 
 public class NoNetInterceptor implements Interceptor {
     @Override

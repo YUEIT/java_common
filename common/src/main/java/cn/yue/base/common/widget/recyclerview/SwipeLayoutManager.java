@@ -7,10 +7,8 @@ import android.view.View;
 import java.util.ArrayList;
 
 /**
- * 介绍：
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/12/27.
+ * Description : 流式布局
+ * Created by yue on 2016/12/16
  */
 
 public class SwipeLayoutManager extends CommonLayoutManager{

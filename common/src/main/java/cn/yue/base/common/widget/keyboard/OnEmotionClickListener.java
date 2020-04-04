@@ -5,7 +5,7 @@ import android.content.Context;
 import cn.yue.base.common.widget.keyboard.mode.IEmotion;
 
 /**
- * Description :
+ * Description : 表情点击
  * Created by yue on 2018/11/17
  */
 public abstract class OnEmotionClickListener {

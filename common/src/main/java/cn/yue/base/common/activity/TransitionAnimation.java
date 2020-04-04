@@ -4,8 +4,9 @@ import cn.yue.base.common.R;
 
 /**
  * Description :
- * Created by yue on 2019/3/21
+ * Created by yue on 2019/3/11
  */
+
 public class TransitionAnimation {
 
     //根据启动时入场方式设置参数

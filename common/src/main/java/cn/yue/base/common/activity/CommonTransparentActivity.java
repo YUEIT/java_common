@@ -4,9 +4,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-
 /**
- * Created by yue on 2018/6/4.
+ * Description :
+ * Created by yue on 2019/3/11
  */
 
 public class CommonTransparentActivity extends CommonActivity {

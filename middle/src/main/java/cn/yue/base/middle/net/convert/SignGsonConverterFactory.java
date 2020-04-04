@@ -20,6 +20,11 @@ import retrofit2.Retrofit;
  * you must {@linkplain Retrofit.Builder#addConverterFactory(Converter.Factory) add this instance}
  * last to allow the other converters a chance to see their types.
  */
+/**
+ * Description : 参数解析 （加密过的）
+ * Created by yue on 2018/7/24
+ */
+
 public final class SignGsonConverterFactory extends Converter.Factory {
     /**
      * Create an instance using a default {@link Gson} instance for conversion. Encoding to JSON and

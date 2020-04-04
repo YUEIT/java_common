@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.middle.init.InitConstant;
 import cn.yue.base.middle.net.convert.SignGsonConverterFactory;
-import cn.yue.base.middle.net.convert.SingleGsonConverterFactory;
 import cn.yue.base.middle.net.intercept.NoNetInterceptor;
 import cn.yue.base.middle.net.intercept.ParamInterceptor;
 import cn.yue.base.middle.net.intercept.ResponseInterceptor;
@@ -19,7 +18,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by yue on 2018/7/6.
+ * Description :
+ * Created by yue on 2018/7/24
  */
 
 public class RetrofitManager {
@@ -112,7 +112,7 @@ public class RetrofitManager {
                 .client(builder.build())
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(SingleGsonConverterFactory.create())
+                .addConverterFactory(SignGsonConverterFactory.create())
                 .build();
     }
 
@@ -126,7 +126,7 @@ public class RetrofitManager {
                 .client(builder.build())
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(SingleGsonConverterFactory.create())
+                .addConverterFactory(SignGsonConverterFactory.create())
                 .build();
     }
     // 查看CallObservable的subscribeActual方法可知，一般情况下异常会被“observer.onError(t);”中处理

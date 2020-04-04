@@ -43,10 +43,8 @@ import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_RIGHT;
 import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_TOP;
 
 /**
- * 介绍：
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/20.
+ * Description :
+ * Created by yue on 2019/3/11
  */
 
 public abstract class BaseDialogFragment extends android.support.v4.app.DialogFragment implements ILifecycleProvider<FragmentEvent> {

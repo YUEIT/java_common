@@ -13,7 +13,7 @@ import cn.yue.base.common.utils.device.KeyboardUtils;
 
 
 /**
- * Description :
+ * Description : 键盘
  * Created by yue on 2018/11/14
  */
 public abstract class BaseKeyboardLayout extends RelativeLayout implements IKeyboard{

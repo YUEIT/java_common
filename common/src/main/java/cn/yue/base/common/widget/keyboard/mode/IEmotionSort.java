@@ -3,7 +3,7 @@ package cn.yue.base.common.widget.keyboard.mode;
 import java.util.List;
 
 /**
- * Description :
+ * Description : 表情分类需实现
  * Created by yue on 2018/11/15
  */
 public interface IEmotionSort {

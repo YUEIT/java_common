@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 介绍：图片上传后的返回对象
- * 作者：qianjujun
- * 邮箱：qianjujun@imcoming.com
- * 时间： 2016/5/7
+ * Description :
+ * Created by yue on 2018/7/24
  */
+
 public class ImageResult {
 
 

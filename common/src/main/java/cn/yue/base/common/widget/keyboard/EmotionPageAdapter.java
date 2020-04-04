@@ -15,7 +15,7 @@ import cn.yue.base.common.R;
 import cn.yue.base.common.widget.keyboard.mode.IEmotionPage;
 
 /**
- * Description :
+ * Description : 表情页Adapter
  * Created by yue on 2018/11/15
  */
 public class EmotionPageAdapter<T extends IEmotionPage> extends PagerAdapter {

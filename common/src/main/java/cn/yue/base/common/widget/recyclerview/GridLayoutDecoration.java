@@ -13,10 +13,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 /**
- * 介绍：GridLayoutManager\StaggeredGridLayoutManager 分界线
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/28.
+ * Description : GridLayoutManager\StaggeredGridLayoutManager 分界线
+ * Created by yue on 2016/12/16
  */
 
 public class GridLayoutDecoration extends RecyclerView.ItemDecoration {

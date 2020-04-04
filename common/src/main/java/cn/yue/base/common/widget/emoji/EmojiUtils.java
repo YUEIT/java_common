@@ -8,7 +8,7 @@ import java.util.List;
 import cn.yue.base.common.R;
 
 /**
- * Description :
+ * Description : emoji管理工具类，主要初始化获取类别、分页数据
  * Created by yue on 2018/11/16
  */
 public final class EmojiUtils {

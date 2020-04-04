@@ -6,7 +6,7 @@ import cn.yue.base.common.widget.keyboard.mode.IEmotionPage;
 import cn.yue.base.common.widget.keyboard.mode.IEmotionSort;
 
 /**
- * Description :
+ * Description : emoji分类
  * Created by yue on 2018/11/16
  */
 public class EmojiSort implements IEmotionSort {

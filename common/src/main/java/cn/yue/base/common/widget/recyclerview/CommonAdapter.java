@@ -15,10 +15,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 介绍：通用adapter
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/11/14.
+ * Description : 通用Adapter
+ * Created by yue on 2016/12/16
  */
 
 public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{

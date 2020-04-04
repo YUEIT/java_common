@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 /**
- * Description :
+ * Description : 自定义键盘帮助类
  * Created by yue on 2018/11/14
  */
 public class KeyboardHelp {

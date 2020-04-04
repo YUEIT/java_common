@@ -18,8 +18,8 @@ import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.activity.PermissionCallBack;
 
 /**
- * Description :
- * Created by yue on 2018/11/12
+ * Description : 运行时权限工具
+ * Created by yue on 2019/3/11
  */
 public class RunTimePermissionUtil {
 

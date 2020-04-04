@@ -21,12 +21,9 @@ import cn.yue.base.common.utils.debug.CloseUtils;
 
 import static cn.yue.base.common.utils.constant.ConstantUtils.KB;
 
-
 /**
- * 介绍：压缩相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 压缩相关工具类
+ * Created by yue on 2019/3/11
  */
 public class ZipUtils {
 

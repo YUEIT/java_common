@@ -4,6 +4,10 @@ import android.text.TextUtils;
 
 import cn.yue.base.middle.net.NetworkConfig;
 
+/**
+ * Description :
+ * Created by yue on 2018/7/24
+ */
 
 public class BaseBean<T> {
 

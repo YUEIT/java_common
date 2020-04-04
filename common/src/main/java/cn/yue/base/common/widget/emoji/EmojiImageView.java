@@ -10,7 +10,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 
 /**
- * Description :
+ * Description : 用于显示emoji的ImageView
  * Created by yue on 2018/12/12
  */
 public class EmojiImageView extends AppCompatImageView {

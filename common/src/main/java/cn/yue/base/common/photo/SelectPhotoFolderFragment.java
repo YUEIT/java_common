@@ -20,8 +20,9 @@ import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 
 /**
  * Description :
- * Created by yue on 2019/3/12
+ * Created by yue on 2019/3/11
  */
+
 public class SelectPhotoFolderFragment extends BaseFragment {
 
     private CommonAdapter commonAdapter;

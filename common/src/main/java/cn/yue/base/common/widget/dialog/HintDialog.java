@@ -17,7 +17,7 @@ import android.widget.TextView;
 import cn.yue.base.common.R;
 
 /**
- * Description :
+ * Description : 提示框
  * Created by yue on 2019/3/15
  */
 public class HintDialog extends Dialog{

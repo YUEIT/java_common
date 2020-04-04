@@ -21,7 +21,7 @@ import cn.yue.base.common.activity.BaseFragmentActivity;
 
 /**
  * Description :
- * Created by yue on 2018/11/19
+ * Created by yue on 2019/3/11
  */
 
 @Route(path = "/common/selectPhoto")

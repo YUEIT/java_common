@@ -11,6 +11,7 @@ import io.reactivex.observers.DisposableSingleObserver;
  * Description :
  * Created by yue on 2019/3/6
  */
+
 public abstract class BaseNetSingleObserver<T> extends DisposableSingleObserver<T> {
 
     @Override

@@ -1,5 +1,9 @@
 package cn.yue.base.middle.net;
 
+/**
+ * Description :
+ * Created by yue on 2018/7/24
+ */
 
 public class ResultException extends RuntimeException {
 

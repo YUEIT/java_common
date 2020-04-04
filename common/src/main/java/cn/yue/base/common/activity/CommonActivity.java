@@ -8,9 +8,9 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import cn.yue.base.common.utils.debug.LogUtils;
 
-
 /**
- * Created by yue on 2018/6/4.
+ * Description :
+ * Created by yue on 2019/3/11
  */
 
 public class CommonActivity extends BaseFragmentActivity {

@@ -15,6 +15,10 @@ import java.util.ArrayList;
 
 import cn.yue.base.common.R;
 
+/**
+ * Description : 表情页标识
+ * Created by yue on 2018/11/16
+ */
 public class EmotionIndicatorView extends LinearLayout {
 
     private static final int MARGIN_LEFT = 4;

@@ -3,6 +3,11 @@ package cn.yue.base.middle.net.wrapper;
 
 import java.util.List;
 
+/**
+ * Description :
+ * Created by yue on 2018/7/24
+ */
+
 public class BaseUnityListBean<T> {
     private List<T> list;       // 瀑布式
     private List<T> page_list;  //分页式

@@ -26,6 +26,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
+/**
+ * Description : copy for Material theme
+ * Created by yue on 2019/3/11
+ */
+
 final class MaterialProgressDrawable extends Drawable implements Animatable {
     private static final Interpolator LINEAR_INTERPOLATOR = new LinearInterpolator();
     private static final Interpolator MATERIAL_INTERPOLATOR = new FastOutSlowInInterpolator();

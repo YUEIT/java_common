@@ -15,6 +15,10 @@ import android.widget.TextView;
 import cn.yue.base.common.R;
 import cn.yue.base.common.image.ImageLoader;
 
+/**
+ * Description : 等待框
+ * Created by yue on 2019/3/11
+ */
 
 public class WaitDialog {
 

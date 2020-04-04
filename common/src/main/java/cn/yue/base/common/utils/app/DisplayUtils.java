@@ -5,6 +5,11 @@ import android.support.v4.content.ContextCompat;
 
 import cn.yue.base.common.utils.Utils;
 
+/**
+ * Description : 分辨率转换
+ * Created by yue on 2019/3/11
+ */
+
 public class DisplayUtils {
 
     /**

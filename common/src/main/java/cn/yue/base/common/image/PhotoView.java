@@ -28,8 +28,9 @@ import cn.yue.base.common.R;
 
 /**
  * Description :
- * Created by yue on 2018/11/27
+ * Created by yue on 2019/3/11
  */
+
 public class PhotoView extends android.support.v7.widget.AppCompatImageView {
 
     private static final String TAG = "PhotoView";

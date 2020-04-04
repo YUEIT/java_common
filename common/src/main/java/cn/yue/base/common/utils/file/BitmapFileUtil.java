@@ -27,7 +27,10 @@ import cn.yue.base.common.Constant;
 import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.ScreenUtils;
 
-
+/**
+ * Description :
+ * Created by yue on 2019/3/11
+ */
 public class BitmapFileUtil {
 
 

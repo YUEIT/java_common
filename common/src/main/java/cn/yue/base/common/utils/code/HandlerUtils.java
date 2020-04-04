@@ -6,10 +6,8 @@ import android.os.Message;
 import java.lang.ref.WeakReference;
 
 /**
- * 介绍：Handler相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : Handler相关工具类
+ * Created by yue on 2019/3/11
  */
 public class HandlerUtils {
 

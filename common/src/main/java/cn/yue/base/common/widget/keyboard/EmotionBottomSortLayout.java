@@ -19,7 +19,7 @@ import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 
 /**
- * Description :
+ * Description : 键盘底下的表情分类layout
  * Created by yue on 2018/11/16
  */
 public class EmotionBottomSortLayout extends LinearLayout {

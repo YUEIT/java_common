@@ -2,8 +2,9 @@ package cn.yue.base.common.photo;
 
 /**
  * Description :
- * Created by yue on 2018/11/28
+ * Created by yue on 2019/3/11
  */
+
 public class MediaVO {
 
     private long modifyTime;

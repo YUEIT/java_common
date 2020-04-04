@@ -3,10 +3,8 @@ package cn.yue.base.common.utils.constant;
 import android.support.v4.util.SimpleArrayMap;
 
 /**
- * 介绍：拼音相关工具类
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/2/23.
+ * Description : 拼音相关工具类
+ * Created by yue on 2019/3/11
  */
 public class PinyinUtils {
 

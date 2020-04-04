@@ -14,6 +14,11 @@ import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Converter;
 
+/**
+ * Description :
+ * Created by yue on 2018/7/24
+ */
+
 final class GsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.parse("application/json; charset=UTF-8");
   private static final Charset UTF_8 = Charset.forName("UTF-8");

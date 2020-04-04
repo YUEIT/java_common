@@ -9,8 +9,9 @@ import android.view.View;
 
 /**
  * Description :
- * Created by yue on 2018/11/27
+ * Created by yue on 2019/3/11
  */
+
 public class PhotoViewPager extends ViewPager{
 
     public PhotoViewPager(@NonNull Context context) {

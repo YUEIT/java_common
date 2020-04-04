@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Description :
- * Created by yue on 2018/11/20
+ * Description : 类型转换工具
+ * Created by yue on 2019/3/11
  */
 public class TypeUtils {
 

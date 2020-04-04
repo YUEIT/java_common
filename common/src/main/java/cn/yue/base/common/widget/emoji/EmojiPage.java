@@ -5,7 +5,7 @@ import java.util.List;
 import cn.yue.base.common.widget.keyboard.mode.IEmotionPage;
 
 /**
- * Description :
+ * Description : 一页emoji
  * Created by yue on 2018/11/15
  */
 public class EmojiPage implements IEmotionPage {

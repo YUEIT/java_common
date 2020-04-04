@@ -21,17 +21,14 @@ import android.util.TypedValue;
 
 import cn.yue.base.common.R;
 
-
 /**
- * 介绍：圆角图片（目前模式支持FIT_XY、CENTER_CROP）
- * 作者：luobiao
- * 邮箱：luobiao@imcoming.cn
- * 时间：2017/7/19.
+ * Description : 圆角图片（目前模式支持FIT_XY、CENTER_CROP）
+ * Created by yue on 2017/7/19
  */
 
 public class RoundImageView extends android.support.v7.widget.AppCompatImageView {
     /**
-     * 图片的类型，圆形or圆角 (ps:圆角也适配好了)
+     * 图片的类型，圆形or圆角
      */
     private int type = 1;
     public static final int TYPE_CIRCLE = 0;

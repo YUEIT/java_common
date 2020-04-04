@@ -19,7 +19,7 @@ import cn.yue.base.common.utils.code.TypeUtils;
 
 
 /**
- * Description :
+ * Description : emoji表情初始化
  * Created by yue on 2018/11/17
  */
 public final class EmojiConstant {
