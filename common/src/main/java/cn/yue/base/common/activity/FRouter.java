@@ -8,11 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
+import android.util.SparseArray;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import android.text.TextUtils;
-import android.util.SparseArray;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.exception.NoRouteFoundException;
@@ -45,6 +46,7 @@ public class FRouter implements Parcelable {
     private boolean isInterceptLogin; //是否登录拦截
 
     public static void init(Application application) {
+        debug();
         ARouter.init(application);
     }
 

@@ -1,6 +1,7 @@
 package cn.yue.base.middle.mvp;
 
-import com.trello.rxlifecycle2.android.FragmentEvent;
+
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import cn.yue.base.common.activity.ILifecycleProvider;
 

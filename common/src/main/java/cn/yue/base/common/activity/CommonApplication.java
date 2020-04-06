@@ -14,7 +14,7 @@ import cn.yue.base.common.utils.debug.LogUtils;
  * Created by yue on 2019/3/11
  */
 
-public class CommonApplication extends Application {
+public abstract class CommonApplication extends Application {
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -37,11 +37,11 @@ public class CommonApplication extends Application {
     private void initUtils() {
         Utils.init(this);
         initPhotoError();
-        init();
         FRouter.init(this);
+        init();
     }
 
-    protected void init() {}
+    protected abstract void init();
 
     /**
      *  android 7.0系统解决拍照的问题

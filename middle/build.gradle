@@ -10,7 +10,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [ moduleName : project.getName() ]
+                arguments = [ AROUTER_MODULE_NAME  : project.getName() ]
             }
         }
     }
@@ -49,6 +49,8 @@ dependencies {
     api rootProject.ext.dependencies["retrofit"]
     api rootProject.ext.dependencies["retrofit-converter-gson"]
     api rootProject.ext.dependencies["retrofit-adapter-rxjava"]
-
+    //aRouter
+    api rootProject.ext.dependencies["arouter-api"]
+    annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
     api rootProject.ext.dependencies["tkrefreshlayout"]
 }

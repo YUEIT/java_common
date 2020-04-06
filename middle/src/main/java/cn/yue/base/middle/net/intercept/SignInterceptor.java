@@ -69,7 +69,7 @@ public class SignInterceptor implements Interceptor {
                 encodeData = URLEncoder.encode(encodeData.toString(), "utf-8");
                 encodeData = encodeData.replaceAll("\\+", "%20");
             }
-            String appVersion = InitConstant.versionName;
+            String appVersion = InitConstant.getVersionName();
             String deviceId = InitConstant.getDeviceId();
             String sign = EncryptUtils.md5((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
                     deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());
@@ -155,7 +155,7 @@ public class SignInterceptor implements Interceptor {
                 encodeData = encodeData.replaceAll("\\+", "%20");
 
             }
-            String appVersion = InitConstant.versionName;
+            String appVersion = InitConstant.getVersionName();
             String deviceId = InitConstant.getDeviceId();
             String sign = EncryptUtils.md5((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
                     deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());

@@ -28,11 +28,35 @@ public class InitConstant {
 
     /**------------------------------------------------------------------------------------------**/
 
-    public static double latitude = 0;     //纬度
+    private static double latitude = 0;     //纬度
 
-    public static double longitude = 0;    //经度
+    public static void setLatitude(double latitude) {
+        InitConstant.latitude = latitude;
+    }
 
-    public static String versionName;
+    public static double getLatitude() {
+        return latitude;
+    }
+
+    private static double longitude = 0;    //经度
+
+    public static void setLongitude(double longitude) {
+        InitConstant.longitude = longitude;
+    }
+
+    public static double getLongitude() {
+        return longitude;
+    }
+
+    private static String versionName;
+
+    public static void setVersionName(String versionName) {
+        InitConstant.versionName = versionName;
+    }
+
+    public static String getVersionName() {
+        return versionName;
+    }
 
     private static String deviceId;
 

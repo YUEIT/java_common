@@ -12,6 +12,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.module.IAppModule;
+import cn.yue.base.middle.module.manager.ModuleManager;
 
 /**
  * Description :
@@ -33,9 +35,11 @@ public class TestFragment extends BaseHintFragment{
             @Override
             public void onClick(View v) {
                 Log.d("luobiao", "onClick: real content");
+                ModuleManager.getModuleService(IAppModule.class).toOrderPay();
             }
         });
         hookOnClickListener(testTV);
+
     }
 
     private void hookOnClickListener(View view) {

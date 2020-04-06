@@ -20,7 +20,7 @@ public class ParamInterceptor implements Interceptor {
         Request original = chain.request();
         HttpUrl url = original.url().newBuilder()
                 .addQueryParameter("appplt", "aph")
-                .addQueryParameter("appver", InitConstant.versionName)
+                .addQueryParameter("appver", InitConstant.getVersionName())
                 .addQueryParameter("appid", "1")
                 .build();
 

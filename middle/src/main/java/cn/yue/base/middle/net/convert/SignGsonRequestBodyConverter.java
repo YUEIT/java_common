@@ -19,7 +19,6 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +62,7 @@ final class SignGsonRequestBodyConverter<T> implements Converter<T, RequestBody>
 //        encodeData = encodeData.replaceAll("\\+", "%20");
 //
 //      }
-      String appVersion = InitConstant.versionName;
+      String appVersion = InitConstant.getVersionName();
       String deviceId = InitConstant.getDeviceId();
       String sign = EncryptUtils.encryptMD5ToString((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
               deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());
