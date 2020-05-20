@@ -3,9 +3,10 @@ package cn.yue.base.common.photo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.ImageView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.image.ImageLoader;
+import cn.yue.base.common.photo.data.MediaVO;
+import cn.yue.base.common.photo.data.PhotoFolderVO;
 import cn.yue.base.common.utils.code.ThreadPoolUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
@@ -49,11 +52,11 @@ public class SelectPhotoFolderFragment extends BaseFragment {
             @Override
             public void bindData(CommonViewHolder holder, int position, PhotoFolderVO photoFolderVO) {
                 holder.setText(R.id.folderTV,photoFolderVO.getName() + "（" + photoFolderVO.getCount() +"）");
-                ImageLoader.getLoader().loadImage((ImageView) holder.getView(R.id.folderIV), photoFolderVO.getCover());
+                ImageLoader.getLoader().loadImage((ImageView) holder.getView(R.id.folderIV), photoFolderVO.getCoverUri());
                 holder.setOnItemClickListener(position, photoFolderVO, new CommonViewHolder.OnItemClickListener<PhotoFolderVO>() {
                     @Override
                     public void onItemClick(int position, PhotoFolderVO photoFolderVO1) {
-                        ((SelectPhotoActivity)mActivity).changeToSelectPhotoFragment(photoFolderVO1.getPath(), photoFolderVO1.getName());
+                        ((SelectPhotoActivity)mActivity).changeToSelectPhotoFragment(photoFolderVO1.getId(), photoFolderVO1.getName());
                     }
                 });
             }
@@ -68,10 +71,14 @@ public class SelectPhotoFolderFragment extends BaseFragment {
         threadPoolUtils.execute(new Runnable() {
             @Override
             public void run() {
-                List<PhotoFolderVO> allFolder = PhotoUtils.getAllPhotoFolder(mActivity);
-                List<String> lastPhotos = PhotoUtils.getTheLastPhotos(mActivity, 100);
+                List<PhotoFolderVO> allFolder = PhotoUtils.getAllPhotosFolder(mActivity);
+                List<MediaVO> lastPhotos = PhotoUtils.getTheLastPhotos(mActivity, 100);
                 if (lastPhotos != null && !lastPhotos.isEmpty()){
-                    PhotoFolderVO lastPhotoFolderVO = new PhotoFolderVO("", lastPhotos.get(0), "最近照片", lastPhotos.size());
+                    PhotoFolderVO lastPhotoFolderVO = new PhotoFolderVO();
+                    lastPhotoFolderVO.setId("");
+                    lastPhotoFolderVO.setCoverUri(lastPhotos.get(0).getUri());
+                    lastPhotoFolderVO.setCount(lastPhotos.size());
+                    lastPhotoFolderVO.setName("最近照片");
                     allFolder.add(0, lastPhotoFolderVO);
                 }
                 handler.sendMessage(Message.obtain(handler, 101, allFolder));

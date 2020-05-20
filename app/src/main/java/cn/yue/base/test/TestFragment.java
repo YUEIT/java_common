@@ -1,19 +1,29 @@
 package cn.yue.base.test;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import cn.yue.base.common.activity.FRouter;
+import cn.yue.base.common.image.ImageLoader;
+import cn.yue.base.common.photo.data.MimeType;
+import cn.yue.base.common.widget.recyclerview.CommonAdapter;
+import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
-import cn.yue.base.middle.module.IAppModule;
-import cn.yue.base.middle.module.manager.ModuleManager;
 
 /**
  * Description :
@@ -27,6 +37,7 @@ public class TestFragment extends BaseHintFragment{
         return R.layout.fragment_test;
     }
 
+    private CommonAdapter commonAdapter;
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
@@ -34,12 +45,33 @@ public class TestFragment extends BaseHintFragment{
         testTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("luobiao", "onClick: real content");
-                ModuleManager.getModuleService(IAppModule.class).toOrderPay();
+                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }
         });
-        hookOnClickListener(testTV);
+        RecyclerView testRV = findViewById(R.id.testRV);
+        testRV.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.HORIZONTAL, false));
+        testRV.setAdapter(commonAdapter = new CommonAdapter<Uri>(mActivity) {
 
+            @Override
+            public int getLayoutIdByType(int viewType) {
+                return R.layout.item_test_photo;
+            }
+
+            @Override
+            public void bindData(CommonViewHolder<Uri> holder, int position, Uri uri) {
+                ImageLoader.getLoader().loadImage(holder.getView(R.id.itemIV), uri);
+                holder.setOnItemClickListener(position, uri, new CommonViewHolder.OnItemClickListener<Uri>() {
+                    @Override
+                    public void onItemClick(int position, Uri uri1) {
+                        ArrayList<String> list = new ArrayList<>();
+                        String path = MimeType.getPath(mActivity.getContentResolver(), uri1);
+                        list.add(path);
+                        Log.d("luobiao", "onItemClick: " + path);
+                        FRouter.getInstance().build("/common/viewPhoto").withStringArrayList("list", list).navigation(mActivity);
+                    }
+                });
+            }
+        });
     }
 
     private void hookOnClickListener(View view) {
@@ -74,6 +106,15 @@ public class TestFragment extends BaseHintFragment{
             if (origin != null) {
                 origin.onClick(v);
             }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && data != null) {
+            List<Uri> uris = data.getParcelableArrayListExtra("photos");
+            commonAdapter.setList(uris);
         }
     }
 }

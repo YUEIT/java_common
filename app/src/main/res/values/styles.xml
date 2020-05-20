@@ -21,7 +21,7 @@
         <item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
         <!-- 底部导航栏透明，但整个windowBackground会扩展到导航栏部分 -->
         <!--<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>-->
-        <item name="android:windowBackground">@drawable/launcher</item>
+        <item name="android:windowBackground">@drawable/ic_launcher_background</item>
     </style>
 
 </resources>

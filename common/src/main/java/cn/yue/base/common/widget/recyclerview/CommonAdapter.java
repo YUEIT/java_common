@@ -2,13 +2,13 @@ package cn.yue.base.common.widget.recyclerview;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -361,7 +361,6 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d("luobiao", "onCreateViewHolder: " + viewType);
         int headerViewsCountCount = getHeaderViewsCount();
         if (viewType < 0 && viewType >= TYPE_HEADER_VIEW) {
             return new ViewHolder(mHeaderViews.get(viewType - TYPE_HEADER_VIEW));

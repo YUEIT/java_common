@@ -38,6 +38,10 @@ dependencies {
 
     api project(':common')
     api rootProject.ext.androidx["multidex"]
+    api rootProject.ext.androidx["lifecycle-viewmodel"]
+    api rootProject.ext.androidx["lifecycle-livedata"]
+    api rootProject.ext.androidx["lifecycle-viewmodel-savestate"]
+    annotationProcessor rootProject.ext.androidx["lifecycle-compiler"]
     //Rx
     api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxandroid"]

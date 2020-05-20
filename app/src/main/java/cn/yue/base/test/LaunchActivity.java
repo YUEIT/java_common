@@ -65,7 +65,9 @@ public class LaunchActivity extends BaseActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                FRouter.getInstance().build("/app/test").navigation(LaunchActivity.this);
+                FRouter.getInstance()
+                        .build("/app/test")
+                        .navigation(LaunchActivity.this);
             }
         },2000);
 

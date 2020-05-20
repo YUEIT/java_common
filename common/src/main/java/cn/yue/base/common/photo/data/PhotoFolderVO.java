@@ -1,5 +1,6 @@
-package cn.yue.base.common.photo;
+package cn.yue.base.common.photo.data;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,12 +15,10 @@ public class PhotoFolderVO implements Parcelable{
     private String cover;
     private String name;
     private int count;
+    private String id;
+    private Uri coverUri;
 
-    public PhotoFolderVO(String path, String cover, String name, int count) {
-        this.path = path;
-        this.cover = cover;
-        this.name = name;
-        this.count = count;
+    public PhotoFolderVO() {
     }
 
     protected PhotoFolderVO(Parcel in) {
@@ -27,6 +26,8 @@ public class PhotoFolderVO implements Parcelable{
         cover = in.readString();
         name = in.readString();
         count = in.readInt();
+        id = in.readString();
+        coverUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
     public static final Creator<PhotoFolderVO> CREATOR = new Creator<PhotoFolderVO>() {
@@ -73,6 +74,22 @@ public class PhotoFolderVO implements Parcelable{
         this.count = count;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Uri getCoverUri() {
+        return coverUri;
+    }
+
+    public void setCoverUri(Uri coverUri) {
+        this.coverUri = coverUri;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -84,5 +101,7 @@ public class PhotoFolderVO implements Parcelable{
         dest.writeString(cover);
         dest.writeString(name);
         dest.writeInt(count);
+        dest.writeString(id);
+        dest.writeParcelable(coverUri, flags);
     }
 }

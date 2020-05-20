@@ -2,11 +2,13 @@ package cn.yue.base.common.photo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
@@ -18,6 +20,7 @@ import java.util.Map;
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.BaseFragmentActivity;
+import cn.yue.base.common.photo.data.MediaVO;
 
 /**
  * Description :
@@ -27,17 +30,21 @@ import cn.yue.base.common.activity.BaseFragmentActivity;
 @Route(path = "/common/selectPhoto")
 public class SelectPhotoActivity extends BaseFragmentActivity {
 
-    private int maxNum;
-    private List<String> photoList = new ArrayList<>();
+    private int maxNum = 1;
+    private List<MediaVO> photoList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             maxNum = getIntent().getIntExtra("maxNum", 1);
-            List<String> defaultList = getIntent().getStringArrayListExtra("photos");
+            List<Uri> defaultList = getIntent().getParcelableArrayListExtra("photos");
             if (defaultList != null) {
-                photoList.addAll(defaultList);
+                for (Uri uri: defaultList) {
+                    MediaVO mediaVO = new MediaVO();
+                    mediaVO.setUri(uri);
+                    photoList.add(mediaVO);
+                }
             }
         }
         changeFragment(SelectPhotoFragment.class.getName(), "最近照片");
@@ -78,7 +85,7 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                             if (photoList.isEmpty()) {
                                 finish();
                             } else {
-                                finishAllWithResult((ArrayList<String>) photoList);
+                                finishAllWithResult((ArrayList<MediaVO>) photoList);
                             }
                         }
                     });
@@ -114,9 +121,9 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         }
     }
 
-    public void changeToSelectPhotoFragment(String folderPath, String name) {
+    public void changeToSelectPhotoFragment(String folderId, String name) {
         changeFragment(SelectPhotoFragment.class.getName(), name);
-        ((SelectPhotoFragment) currentFragment).refresh(folderPath);
+        ((SelectPhotoFragment) currentFragment).refresh(folderId);
     }
 
     private String fragmentNames[] = new String[]{SelectPhotoFragment.class.getName(), SelectPhotoFolderFragment.class.getName()};
@@ -137,11 +144,11 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         return null;
     }
 
-    public List<String> getPhotoList() {
+    public List<MediaVO> getPhotoList() {
         return photoList;
     }
 
-    public void setPhotoList(List<String> photoList) {
+    public void setPhotoList(List<MediaVO> photoList) {
         this.photoList = photoList;
     }
 
@@ -158,9 +165,13 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
         }
     }
 
-    private void finishAllWithResult(ArrayList<String> selectList) {
+    private void finishAllWithResult(ArrayList<MediaVO> selectList) {
         Intent intent = new Intent();
-        intent.putStringArrayListExtra("photos", selectList);
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (MediaVO mediaVO : selectList) {
+            uris.add(mediaVO.getUri());
+        }
+        intent.putParcelableArrayListExtra("photos", uris);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

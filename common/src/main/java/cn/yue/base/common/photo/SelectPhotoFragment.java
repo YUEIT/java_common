@@ -5,20 +5,23 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.PermissionCallBack;
 import cn.yue.base.common.image.ImageLoader;
+import cn.yue.base.common.photo.data.MediaVO;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.code.ThreadPoolUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
@@ -34,8 +37,8 @@ import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 public class SelectPhotoFragment extends BaseFragment {
 
     private final int PAGE_COUNT = 50;
-    private CommonAdapter adapter;
-    private List<String> photoList = new ArrayList<>();
+    private CommonAdapter<MediaVO> adapter;
+    private List<MediaVO> photoList = new ArrayList<>();
     private int page;
     private boolean isCanLoadMore = true;
 
@@ -52,7 +55,7 @@ public class SelectPhotoFragment extends BaseFragment {
     protected void initView(Bundle savedInstanceState) {
         RecyclerView photoRV = findViewById(R.id.photoRV);
         photoRV.setLayoutManager(new GridLayoutManager(mActivity, 4));
-        photoRV.setAdapter(adapter = new CommonAdapter<String>(mActivity, photoList) {
+        photoRV.setAdapter(adapter = new CommonAdapter<MediaVO>(mActivity, photoList) {
 
             @Override
             public int getLayoutIdByType(int viewType) {
@@ -60,12 +63,12 @@ public class SelectPhotoFragment extends BaseFragment {
             }
 
             @Override
-            public void bindData(CommonViewHolder<String> holder, int position, final String s) {
+            public void bindData(CommonViewHolder<MediaVO> holder, int position, final MediaVO mediaVO) {
                 ImageView photoIV = holder.getView(R.id.photoIV);
                 final CheckBox checkIV = holder.getView(R.id.checkIV);
 
                 photoIV.setBackgroundColor(Color.parseColor("#ffffff"));
-                ImageLoader.getLoader().loadImageNoCache(photoIV, s);
+                ImageLoader.getLoader().loadImage(photoIV, mediaVO.getUri());
                 photoIV.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -73,11 +76,11 @@ public class SelectPhotoFragment extends BaseFragment {
                             return;
                         }
                         checkIV.setChecked(!checkIV.isChecked());
-                        addSelectList(s, checkIV.isChecked());
+                        addSelectList(mediaVO, checkIV.isChecked());
                         topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "/" + getMaxNum() +  "）");
                     }
                 });
-                if (getSelectList().contains(s)) {
+                if (contains(mediaVO)) {
                     checkIV.setChecked(true);
                 } else {
                     checkIV.setChecked(false);
@@ -104,8 +107,8 @@ public class SelectPhotoFragment extends BaseFragment {
         getPhotoList();
     }
 
-    public void refresh(String folderPath) {
-        this.folderPath = folderPath;
+    public void refresh(String folderId) {
+        this.folderId = folderId;
         allMedia = null;
         adapter.setList(null);
         page = 0;
@@ -113,7 +116,7 @@ public class SelectPhotoFragment extends BaseFragment {
         getPhotoList();
     }
 
-    private String folderPath;
+    private String folderId;
 
     private void getPhotoList() {
         RunTimePermissionUtil.requestPermissions(mActivity, RunTimePermissionUtil.REQUEST_CODE, new PermissionCallBack() {
@@ -124,11 +127,14 @@ public class SelectPhotoFragment extends BaseFragment {
                     @Override
                     public void run() {
                         if (allMedia == null) {
-                            if (TextUtils.isEmpty(folderPath)) {
+                            if (TextUtils.isEmpty(folderId)) {
                                 allMedia = PhotoUtils.getTheLastPhotos(mActivity, 100);
                             } else {
-                                allMedia = PhotoUtils.getAllPhotosPathByFolder(folderPath);
+                                allMedia = PhotoUtils.getPhotosByFolder(mActivity, false, folderId);
                             }
+                        }
+                        if (allMedia == null) {
+                            allMedia = new ArrayList<>();
                         }
                         int fromIndex = page * PAGE_COUNT;
                         if (fromIndex >= allMedia.size()) {
@@ -139,7 +145,7 @@ public class SelectPhotoFragment extends BaseFragment {
                         if (toIndex > allMedia.size()) {
                             toIndex = allMedia.size();
                         }
-                        List<String> list = allMedia.subList(fromIndex, toIndex);
+                        List<MediaVO> list = allMedia.subList(fromIndex, toIndex);
                         handler.sendMessage(Message.obtain(handler, 101, list));
                         page++;
                     }
@@ -153,14 +159,14 @@ public class SelectPhotoFragment extends BaseFragment {
         }, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
 
-    private List<String> allMedia;
+    private List<MediaVO> allMedia;
 
     Handler handler = new Handler(new Handler.Callback() {
 
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == 101) {
-                List<String> addList = (List<String>) msg.obj;
+                List<MediaVO> addList = (List<MediaVO>) msg.obj;
                 if (addList == null || addList.isEmpty()) {
                     isCanLoadMore = false;
                 } else {
@@ -173,9 +179,9 @@ public class SelectPhotoFragment extends BaseFragment {
         }
     });
 
-    private List<String> getSelectList() {
+    private List<MediaVO> getSelectList() {
         if (((SelectPhotoActivity)mActivity).getPhotoList() == null) {
-            ((SelectPhotoActivity)mActivity).setPhotoList(new ArrayList<String>());
+            ((SelectPhotoActivity)mActivity).setPhotoList(new ArrayList<>());
         }
         return ((SelectPhotoActivity)mActivity).getPhotoList();
     }
@@ -187,17 +193,31 @@ public class SelectPhotoFragment extends BaseFragment {
         return ((SelectPhotoActivity)mActivity).getMaxNum();
     }
 
-    private void addSelectList(String s, boolean checked) {
+    private void addSelectList(MediaVO mediaVO, boolean checked) {
         if (checked) {
-            for (String str : getSelectList()) {
-                if (str.equals(s)) {
+            for (MediaVO mediaVO1 : getSelectList()) {
+                if (MediaVO.equals(mediaVO, mediaVO1)) {
                     return;
                 }
             }
-            getSelectList().add(s);
+            getSelectList().add(mediaVO);
         } else {
-            getSelectList().remove(s);
+            for (Iterator iterator = getSelectList().iterator(); iterator.hasNext();) {
+                MediaVO mediaVO1 = (MediaVO)iterator.next();
+                if (MediaVO.equals(mediaVO, mediaVO1)) {
+                    iterator.remove();
+                    return;
+                }
+            }
         }
     }
 
+    private boolean contains(MediaVO mediaVO) {
+        for (MediaVO mediaVO1 : getSelectList()) {
+            if (MediaVO.equals(mediaVO, mediaVO1)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

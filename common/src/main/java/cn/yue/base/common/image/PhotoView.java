@@ -5,8 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -16,8 +15,12 @@ import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -25,6 +28,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
 import cn.yue.base.common.R;
+import cn.yue.base.common.photo.data.MimeType;
 
 /**
  * Description :
@@ -151,17 +155,21 @@ public class PhotoView extends androidx.appcompat.widget.AppCompatImageView {
         loadImage(1080, 1920, url);
     }
 
-    public void loadImage(int resizeX, int resizeY, String uri) {
+    public void loadImage(int resizeX, int resizeY, String url) {
         RequestOptions requestOptions = new RequestOptions()
                 .override(resizeX, resizeY)
                 .placeholder(R.drawable.drawable_default_big)
                 .error(R.drawable.drawable_default_big)
                 .fitCenter()
                 .priority(Priority.HIGH);
-
-        Glide.with(getContext())
-                .load(uri)
-                .apply(requestOptions)
+        RequestBuilder<Drawable> builder;
+        if (MimeType.isServerImage(url)) {
+            builder = Glide.with(getContext()).load(url);
+        } else {
+            Uri uri = MimeType.getMediaUriFromPath(getContext(), url);
+            builder = Glide.with(getContext()).load(uri);
+        }
+        builder.apply(requestOptions)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

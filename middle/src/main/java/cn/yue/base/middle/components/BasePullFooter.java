@@ -121,7 +121,7 @@ public class BasePullFooter extends RelativeLayout implements IStatusView {
         this.onReloadListener = onReloadListener;
     }
 
-    interface OnReloadListener {
+    public interface OnReloadListener {
         void onReload();
     }
 }

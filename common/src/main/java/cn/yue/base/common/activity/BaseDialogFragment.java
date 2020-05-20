@@ -2,16 +2,11 @@ package cn.yue.base.common.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +14,19 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.RxLifecycle;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.trello.rxlifecycle3.android.RxLifecycleAndroid;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,8 +60,13 @@ public abstract class BaseDialogFragment extends DialogFragment implements ILife
     protected LayoutInflater mInflater;
     protected Handler mHandler = new Handler();
     protected String requestTag = UUID.randomUUID().toString();
+// A -> B -> C -> D   MessageQueue null;  Looper loop; foreach 'D';  D out
+// D -> C -> B -> A   sPool D;
+// D                  DismissMessage reuse D; sPool C
 
-
+// C     send message C;  foreach 'C'; C out
+// B -> A  sPool B;
+// C -> B -> A;   sPool C
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -188,6 +196,89 @@ public abstract class BaseDialogFragment extends DialogFragment implements ILife
                 layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        boolean isShow = getShowsDialog();
+        setShowsDialog(false);
+        super.onActivityCreated(savedInstanceState);
+        setShowsDialog(isShow);
+        if (getDialog() == null) {
+            return;
+        }
+        View view = getView();
+        if (view != null) {
+            if (view.getParent() != null) {
+                throw new IllegalStateException(
+                        "DialogFragment can not be attached to a container view");
+            }
+            getDialog().setContentView(view);
+        }
+        final Activity activity = getActivity();
+        if (activity != null) {
+            getDialog().setOwnerActivity(activity);
+        }
+        getDialog().setCancelable(isCancelable());
+        // 使用静态内部类取代，防止message中持有fragment的引用而造成内存泄漏
+        getDialog().setOnCancelListener(onCancelListener);
+        getDialog().setOnDismissListener(onDismissListener);
+        if (savedInstanceState != null) {
+            Bundle dialogState = savedInstanceState.getBundle("android:savedDialogState");
+            if (dialogState != null) {
+                getDialog().onRestoreInstanceState(dialogState);
+            }
+        }
+    }
+
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+    }
+
+    private final OnCancelListener onCancelListener = new OnCancelListener(this);
+    public static class OnCancelListener implements DialogInterface.OnCancelListener {
+
+        private WeakReference<BaseDialogFragment> fragmentWeakReference;
+
+        public OnCancelListener(BaseDialogFragment fragment) {
+            fragmentWeakReference = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            if (fragmentWeakReference != null) {
+                BaseDialogFragment dialogFragment = fragmentWeakReference.get();
+                if (dialogFragment != null) {
+                    dialogFragment.onCancel(dialog);
+                }
+            }
+        }
+    }
+
+    private final OnDismissListener onDismissListener = new OnDismissListener(this);
+    public static class OnDismissListener implements DialogInterface.OnDismissListener {
+
+        private WeakReference<BaseDialogFragment> fragmentWeakReference;
+
+        public OnDismissListener(BaseDialogFragment fragment) {
+            fragmentWeakReference = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            if (fragmentWeakReference != null) {
+                BaseDialogFragment dialogFragment = fragmentWeakReference.get();
+                if (dialogFragment != null) {
+                    dialogFragment.onDismiss(dialog);
+                }
+            }
         }
     }
 
