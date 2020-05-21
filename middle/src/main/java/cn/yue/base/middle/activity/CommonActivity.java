@@ -1,4 +1,4 @@
-package cn.yue.base.common.activity;
+package cn.yue.base.middle.activity;
 
 import androidx.fragment.app.Fragment;
 
@@ -6,7 +6,10 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.callback.NavigationCallback;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import cn.yue.base.common.activity.BaseFragmentActivity;
+import cn.yue.base.common.activity.TransitionAnimation;
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.middle.router.FRouter;
 
 /**
  * Description :
@@ -27,12 +30,12 @@ public class CommonActivity extends BaseFragmentActivity {
         if (fRouter == null) {
             return null;
         }
-        transition = fRouter.getTransition();
+        transition = fRouter.getRouterCard().getTransition();
         try {
             return (Fragment) ARouter.getInstance()
-                    .build(fRouter.getPath())
+                    .build(fRouter.getRouterCard().getPath())
                     .with(getIntent().getExtras())
-                    .setTimeout(fRouter.getTimeout())
+                    .setTimeout(fRouter.getRouterCard().getTimeout())
 //                        .withTransition(fRouter.getEnterAnim(), fRouter.getExitAnim())
                     .navigation(this, new NavigationCallback() {
                         @Override

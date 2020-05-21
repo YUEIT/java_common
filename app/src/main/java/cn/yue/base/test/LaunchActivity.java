@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import cn.yue.base.common.activity.BaseActivity;
-import cn.yue.base.common.activity.FRouter;
+import cn.yue.base.middle.router.FRouter;
 
 /**
  * Description :

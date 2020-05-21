@@ -37,7 +37,6 @@ public abstract class CommonApplication extends Application {
     private void initUtils() {
         Utils.init(this);
         initPhotoError();
-        FRouter.init(this);
         init();
     }
 

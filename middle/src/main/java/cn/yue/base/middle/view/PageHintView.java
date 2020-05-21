@@ -1,16 +1,17 @@
 package cn.yue.base.middle.view;
 
 import android.content.Context;
-import androidx.annotation.LayoutRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import cn.yue.base.common.activity.FRouter;
+import androidx.annotation.LayoutRes;
+
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.router.FRouter;
 
 /**
  * Description :

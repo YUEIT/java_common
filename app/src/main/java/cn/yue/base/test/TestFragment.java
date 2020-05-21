@@ -19,12 +19,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.common.activity.FRouter;
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.utils.file.AndroidQFileUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.router.FRouter;
 
 /**
  * Description :
