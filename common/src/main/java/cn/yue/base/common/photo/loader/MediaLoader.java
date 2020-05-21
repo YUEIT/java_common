@@ -135,7 +135,6 @@ public class MediaLoader {
         Cursor result = ContentResolverCompat.query(context.getContentResolver(),
                 QUERY_URI, PROJECTION, getSelection(isAll, mediaType), getSelectionArgs(isAll, folderId, mediaType), ORDER_BY,
                 new CancellationSignal());
-
         MatrixCursor dummy = new MatrixCursor(PROJECTION);
 //        dummy.addRow(new Object[]{ITEM_ID_CAPTURE, ITEM_DISPLAY_NAME_CAPTURE, "", 0, 0});
         return new MergeCursor(new Cursor[]{dummy, result});

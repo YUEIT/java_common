@@ -129,6 +129,8 @@ public class SelectPhotoFragment extends BaseFragment {
                         if (allMedia == null) {
                             if (TextUtils.isEmpty(folderId)) {
                                 allMedia = PhotoUtils.getTheLastPhotos(mActivity, 100);
+                            } else if (Integer.parseInt(folderId) == -1){
+                                allMedia = PhotoUtils.getPhotosByFolder(mActivity, true, folderId);
                             } else {
                                 allMedia = PhotoUtils.getPhotosByFolder(mActivity, false, folderId);
                             }

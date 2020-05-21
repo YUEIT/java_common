@@ -37,12 +37,12 @@ public class BitmapFileUtil {
     //private static Context application;
 
     public static void init(Context application) {
-        File file = new File(Constant.CACHE_PATH);
+        File file = new File(Constant.getCachePath());
         if (file != null && !file.exists()) {
             file.mkdirs();
         }
 
-        file = new File(Constant.IMAGE_PATH);
+        file = new File(Constant.getImagePath());
         if (file != null && !file.exists()) {
             file.mkdirs();
         }
@@ -50,11 +50,11 @@ public class BitmapFileUtil {
 
 
     public static void clearCache() {
-        File file = new File(Constant.CACHE_PATH);
+        File file = new File(Constant.getCachePath());
         if (file.exists()) {
             file.deleteOnExit();
         }
-        file = new File(Constant.IMAGE_PATH);
+        file = new File(Constant.getImagePath());
         if (file.exists()) {
             file.deleteOnExit();
         }
@@ -62,17 +62,17 @@ public class BitmapFileUtil {
 
 
     public static String getPhotoCameraPath() {
-        return Constant.IMAGE_PATH;
+        return Constant.getImagePath();
     }
 
     public static String getCacheFilePath() {
-        return Constant.CACHE_PATH;
+        return Constant.getCachePath();
     }
 
 
     private static String getSaveBitmapPath() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Constant.IMAGE_PATH);
+        sb.append(Constant.getImagePath());
         sb.append(UUID.randomUUID().toString());
         sb.append(".jpg");
         return sb.toString();
@@ -210,7 +210,7 @@ public class BitmapFileUtil {
             if (fileDir != null && !fileDir.exists()) {
                 fileDir.mkdirs();
             }
-            File fileDir1 = new File(Constant.IMAGE_PATH);
+            File fileDir1 = new File(Constant.getImagePath());
             if (fileDir1 != null && !fileDir1.exists()) {
                 fileDir1.mkdirs();
             }
@@ -396,20 +396,20 @@ public class BitmapFileUtil {
     }
 
     public static File createRandomFile() {
-        String storePath = Constant.CACHE_PATH;
+        String storePath = Constant.getCachePath();
         File appDir = new File(storePath);
         if (!appDir.exists()) {
             appDir.mkdirs();
         }
         String uuid = UUID.randomUUID().toString();
-        File tempFile = new File(Constant.CACHE_PATH, uuid + ".jpg");
+        File tempFile = new File(Constant.getCachePath(), uuid + ".jpg");
         return tempFile;
     }
 
     //保存文件到指定路径
     public static boolean saveImageToGallery(Context context, Bitmap bmp) {
         // 首先保存图片
-        String storePath = Constant.IMAGE_PATH;
+        String storePath = Constant.getImagePath();
         File appDir = new File(storePath);
         if (!appDir.exists()) {
             appDir.mkdirs();
@@ -444,7 +444,7 @@ public class BitmapFileUtil {
     //保存文件到指定路径
     public static String saveBitmapToFile(Context context, Bitmap bmp) {
         // 首先保存图片
-        String storePath = Constant.IMAGE_PATH;
+        String storePath = Constant.getImagePath();
         File appDir = new File(storePath);
         if (!appDir.exists()) {
             appDir.mkdirs();
