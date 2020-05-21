@@ -11,25 +11,17 @@ import android.os.Parcelable;
 
 public class MediaVO implements Parcelable {
 
-    private long modifyTime;
-
-    private String url;
     private String id;
     private String mimeType;
     private Uri uri;
     private long size;
     private long duration;
+    private String url;
 
     public MediaVO() {
     }
 
-    public MediaVO(long modifyTime, String url) {
-        this.modifyTime = modifyTime;
-        this.url = url;
-    }
-
     protected MediaVO(Parcel in) {
-        modifyTime = in.readLong();
         url = in.readString();
         id = in.readString();
         mimeType = in.readString();
@@ -49,14 +41,6 @@ public class MediaVO implements Parcelable {
             return new MediaVO[size];
         }
     };
-
-    public long getModifyTime() {
-        return modifyTime;
-    }
-
-    public void setModifyTime(long modifyTime) {
-        this.modifyTime = modifyTime;
-    }
 
     public String getUrl() {
         return url;
@@ -113,7 +97,6 @@ public class MediaVO implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(modifyTime);
         dest.writeString(url);
         dest.writeString(id);
         dest.writeString(mimeType);

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
 import cn.yue.base.common.activity.FRouter;
 import cn.yue.base.common.image.ImageLoader;
-import cn.yue.base.common.photo.data.MimeType;
+import cn.yue.base.common.utils.file.AndroidQFileUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
@@ -41,8 +42,15 @@ public class TestFragment extends BaseHintFragment{
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
-        TextView testTV = findViewById(R.id.testTV);
-        testTV.setOnClickListener(new View.OnClickListener() {
+        TextView option1TV = findViewById(R.id.option1TV);
+        option1TV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
+            }
+        });
+        TextView option2TV = findViewById(R.id.option2TV);
+        option2TV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
@@ -64,7 +72,7 @@ public class TestFragment extends BaseHintFragment{
                     @Override
                     public void onItemClick(int position, Uri uri1) {
                         ArrayList<String> list = new ArrayList<>();
-                        String path = MimeType.getPath(mActivity.getContentResolver(), uri1);
+                        String path = AndroidQFileUtils.getPath(uri1);
                         list.add(path);
                         Log.d("luobiao", "onItemClick: " + path);
                         FRouter.getInstance().build("/common/viewPhoto").withStringArrayList("list", list).navigation(mActivity);
@@ -72,7 +80,10 @@ public class TestFragment extends BaseHintFragment{
                 });
             }
         });
+        testImage = findViewById(R.id.testImage);
     }
+    ImageView testImage;
+
 
     private void hookOnClickListener(View view) {
         try {
@@ -108,7 +119,7 @@ public class TestFragment extends BaseHintFragment{
             }
         }
     }
-
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

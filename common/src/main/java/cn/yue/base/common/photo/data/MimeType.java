@@ -1,11 +1,7 @@
 package cn.yue.base.common.photo.data;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -13,8 +9,11 @@ import androidx.collection.ArraySet;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+
+import cn.yue.base.common.utils.file.AndroidQFileUtils;
 
 /**
  * MIME Type enumeration to restrict selectable media on the selection activity. Matisse only supports images and
@@ -75,6 +74,16 @@ public enum MimeType {
     )),
     AVI("video/avi", arraySetOf(
             "avi"
+    )),
+    APK("application/vnd.android.package-archive", arraySetOf(
+            "apk"
+    )),
+    TEXT("text/plain", arraySetOf(
+            "txt",
+            "log"
+    )),
+    ZIP("application/x-zip-compressed", arraySetOf(
+            "zip"
     ));
 
     private final String mMimeTypeName;
@@ -124,6 +133,14 @@ public enum MimeType {
         return mimeType.equals(MimeType.GIF.toString());
     }
 
+    public static boolean isAudio(String mimeType) {
+        return mimeType.startsWith("audio");
+    }
+
+    public static boolean isFile(String mimeType) {
+        return mimeType.startsWith("text");
+    }
+
     private static Set<String> arraySetOf(String... suffixes) {
         return new ArraySet<>(Arrays.asList(suffixes));
     }
@@ -131,6 +148,34 @@ public enum MimeType {
     @Override
     public String toString() {
         return mMimeTypeName;
+    }
+
+    public String getMimeTypeName() {
+        return mMimeTypeName;
+    }
+
+    public static String getMimeType(String fileName) {
+        if (fileName == null) {
+            return "";
+        }
+        String suffix;
+        String[] str = fileName.split(".");
+        if (str.length > 1) {
+            suffix = str[str.length-1];
+        } else {
+            return "";
+        }
+        for (Iterator<MimeType> iterator = ofAll ().iterator(); iterator.hasNext();) {
+            MimeType mimeType = iterator.next();
+            if (mimeType.getExtensions().contains(suffix)) {
+                return mimeType.mMimeTypeName;
+            }
+        }
+        return "";
+    }
+
+    public Set<String> getExtensions() {
+        return mExtensions;
     }
 
     public boolean checkType(ContentResolver resolver, Uri uri) {
@@ -148,7 +193,7 @@ public enum MimeType {
             }
             if (!pathParsed) {
                 // we only resolve the path for one time
-                path = getPath(resolver, uri);
+                path = AndroidQFileUtils.getPath(uri);
                 if (!TextUtils.isEmpty(path)) {
                     path = path.toLowerCase(Locale.US);
                 }
@@ -160,48 +205,6 @@ public enum MimeType {
         }
         return false;
     }
-
-    private static final String SCHEME_CONTENT = "content";
-    public static String getPath(ContentResolver resolver, Uri uri) {
-        if (uri == null) {
-            return null;
-        }
-
-        if (SCHEME_CONTENT.equals(uri.getScheme())) {
-            Cursor cursor = null;
-            try {
-                cursor = resolver.query(uri, new String[]{MediaStore.Images.ImageColumns.DATA},
-                        null, null, null);
-                if (cursor == null || !cursor.moveToFirst()) {
-                    return null;
-                }
-                return cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-        }
-        return uri.getPath();
-    }
-
-    public static Uri getMediaUriFromPath(Context context, String path) {
-        Uri mediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = context.getContentResolver().query(mediaUri,
-                null,
-                MediaStore.Images.Media.DISPLAY_NAME + "= ?",
-                new String[] {path.substring(path.lastIndexOf("/") + 1)},
-                null);
-
-        Uri uri = null;
-        if(cursor.moveToFirst()) {
-            uri = ContentUris.withAppendedId(mediaUri,
-                    cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID)));
-        }
-        cursor.close();
-        return uri;
-    }
-
 
     public static boolean isServerImage(String url) {
         return url.startsWith("http");

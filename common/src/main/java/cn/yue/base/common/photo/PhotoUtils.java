@@ -12,11 +12,14 @@ import java.util.List;
 import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MediaVO;
 import cn.yue.base.common.photo.data.MimeType;
-import cn.yue.base.common.photo.data.PhotoFolderVO;
+import cn.yue.base.common.photo.data.MediaFolderVO;
 import cn.yue.base.common.photo.loader.MediaFolderLoader;
 import cn.yue.base.common.photo.loader.MediaLoader;
 
+import static cn.yue.base.common.photo.loader.MediaFolderLoader.COLUMN_BUCKET_DISPLAY_NAME;
+import static cn.yue.base.common.photo.loader.MediaFolderLoader.COLUMN_BUCKET_ID;
 import static cn.yue.base.common.photo.loader.MediaFolderLoader.COLUMN_COUNT;
+import static cn.yue.base.common.photo.loader.MediaFolderLoader.COLUMN_DATA;
 import static cn.yue.base.common.photo.loader.MediaFolderLoader.COLUMN_URI;
 
 /**
@@ -88,7 +91,7 @@ public class PhotoUtils {
         Cursor cursor = MediaLoader.load(context, isAll, folderId, mediaType);
         while (cursor.moveToNext()) {
             MediaVO mediaVO = new MediaVO();
-            String id = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID));
+            String id = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
             mediaVO.setId(id);
             String mimeType = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE));
             mediaVO.setMimeType(mimeType);
@@ -104,6 +107,8 @@ public class PhotoUtils {
                 contentUri = MediaStore.Files.getContentUri("external");
             }
             mediaVO.setUri(ContentUris.withAppendedId(contentUri, Long.parseLong(id)));
+            String data = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
+            mediaVO.setUrl(data);
             list.add(mediaVO);
         }
         return list;
@@ -114,7 +119,7 @@ public class PhotoUtils {
      * @param context
      * @return
      */
-    public static List<PhotoFolderVO> getAllPhotosFolder(Context context) {
+    public static List<MediaFolderVO> getAllPhotosFolder(Context context) {
         return getAllMediaFolder(context, MediaType.PHOTO);
     }
 
@@ -123,16 +128,17 @@ public class PhotoUtils {
      * @param context
      * @return
      */
-    public static List<PhotoFolderVO> getAllMediaFolder(Context context, MediaType mediaType) {
-        List<PhotoFolderVO> list = new ArrayList<PhotoFolderVO>();
+    public static List<MediaFolderVO> getAllMediaFolder(Context context, MediaType mediaType) {
+        List<MediaFolderVO> list = new ArrayList<MediaFolderVO>();
         Cursor cursor = MediaFolderLoader.load(context, mediaType);
         while (cursor.moveToNext()) {
             String column = cursor.getString(cursor.getColumnIndex(COLUMN_URI));
-            PhotoFolderVO folderVO = new PhotoFolderVO();
-            folderVO.setId(cursor.getString(cursor.getColumnIndex("bucket_id")));
-            folderVO.setName(cursor.getString(cursor.getColumnIndex("bucket_display_name")));
+            MediaFolderVO folderVO = new MediaFolderVO();
+            folderVO.setId(cursor.getString(cursor.getColumnIndex(COLUMN_BUCKET_ID)));
+            folderVO.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BUCKET_DISPLAY_NAME)));
             folderVO.setCount(cursor.getInt(cursor.getColumnIndex(COLUMN_COUNT)));
             folderVO.setCoverUri(Uri.parse(column != null ? column : ""));
+            folderVO.setPath(cursor.getString(cursor.getColumnIndex(COLUMN_DATA)));
             list.add(folderVO);
         }
         cursor.close();

@@ -29,6 +29,7 @@ import com.bumptech.glide.request.target.Target;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.photo.data.MimeType;
+import cn.yue.base.common.utils.file.AndroidQFileUtils;
 
 /**
  * Description :
@@ -166,7 +167,7 @@ public class PhotoView extends androidx.appcompat.widget.AppCompatImageView {
         if (MimeType.isServerImage(url)) {
             builder = Glide.with(getContext()).load(url);
         } else {
-            Uri uri = MimeType.getMediaUriFromPath(getContext(), url);
+            Uri uri = AndroidQFileUtils.getMediaUriFromName(url.substring(url.lastIndexOf("/") + 1), MimeType.getMimeType(url));
             builder = Glide.with(getContext()).load(uri);
         }
         builder.apply(requestOptions)

@@ -11,17 +11,19 @@ import androidx.core.content.ContentResolverCompat;
 import androidx.core.os.CancellationSignal;
 
 import cn.yue.base.common.photo.data.MediaType;
-import cn.yue.base.common.photo.data.MimeTypeConfig;
 
 public class MediaLoader {
 
+    private static final String COLUMN_DATA = "_data";
     private static final Uri QUERY_URI = MediaStore.Files.getContentUri("external");
     private static final String[] PROJECTION = {
             MediaStore.Files.FileColumns._ID,
             MediaStore.MediaColumns.DISPLAY_NAME,
             MediaStore.MediaColumns.MIME_TYPE,
             MediaStore.MediaColumns.SIZE,
-            "duration"};
+            MediaStore.MediaColumns.DURATION,
+            COLUMN_DATA
+    };
 
     // === params for album ALL && showSingleMediaType: false ===
     private static final String SELECTION_ALL =
@@ -77,17 +79,17 @@ public class MediaLoader {
 
     private static String getSelection(boolean isAll, MediaType mediaType) {
         if (isAll) {
-            if (MimeTypeConfig.onlyShowImages(mediaType)) {
+            if (MediaType.onlyShowImages(mediaType)) {
                 return SELECTION_ALL_FOR_SINGLE_MEDIA_TYPE;
-            } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+            } else if (MediaType.onlyShowVideos(mediaType)) {
                 return SELECTION_ALL_FOR_SINGLE_MEDIA_TYPE;
             } else {
                 return SELECTION_ALL;
             }
         } else {
-            if (MimeTypeConfig.onlyShowImages(mediaType)) {
+            if (MediaType.onlyShowImages(mediaType)) {
                 return SELECTION_ALBUM_FOR_SINGLE_MEDIA_TYPE;
-            } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+            } else if (MediaType.onlyShowVideos(mediaType)) {
                 return SELECTION_ALBUM_FOR_SINGLE_MEDIA_TYPE;
             } else {
                 return SELECTION_ALBUM;
@@ -97,21 +99,21 @@ public class MediaLoader {
 
     private static String[] getSelectionArgs(boolean isAll, String folderId, MediaType mediaType) {
         if (isAll) {
-            if (MimeTypeConfig.onlyShowImages(mediaType)) {
+            if (MediaType.onlyShowImages(mediaType)) {
                 return getSelectionArgsForSingleMediaType(
                                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
-            } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+            } else if (MediaType.onlyShowVideos(mediaType)) {
                 return getSelectionArgsForSingleMediaType(
                                 MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
             } else {
                 return SELECTION_ALL_ARGS;
             }
         } else {
-            if (MimeTypeConfig.onlyShowImages(mediaType)) {
+            if (MediaType.onlyShowImages(mediaType)) {
                 return getSelectionAlbumArgsForSingleMediaType(
                                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE,
                         folderId);
-            } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+            } else if (MediaType.onlyShowVideos(mediaType)) {
                 return getSelectionAlbumArgsForSingleMediaType(
                         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO,
                         folderId);

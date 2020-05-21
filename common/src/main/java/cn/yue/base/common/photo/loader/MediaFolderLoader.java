@@ -19,14 +19,14 @@ import java.util.Set;
 
 import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MimeType;
-import cn.yue.base.common.photo.data.MimeTypeConfig;
 
 public class MediaFolderLoader {
 
-    private static final String COLUMN_BUCKET_ID = "bucket_id";
-    private static final String COLUMN_BUCKET_DISPLAY_NAME = "bucket_display_name";
+    public static final String COLUMN_BUCKET_ID = "bucket_id";
+    public static final String COLUMN_BUCKET_DISPLAY_NAME = "bucket_display_name";
     public static final String COLUMN_URI = "uri";
     public static final String COLUMN_COUNT = "count";
+    public static final String COLUMN_DATA = "_data";
     private static final Uri QUERY_URI = MediaStore.Files.getContentUri("external");
 
     private static final String[] COLUMNS = {
@@ -35,20 +35,25 @@ public class MediaFolderLoader {
             COLUMN_BUCKET_DISPLAY_NAME,
             MediaStore.MediaColumns.MIME_TYPE,
             COLUMN_URI,
-            COLUMN_COUNT};
+            COLUMN_COUNT,
+            COLUMN_DATA};
 
     private static final String[] PROJECTION = {
             MediaStore.Files.FileColumns._ID,
             COLUMN_BUCKET_ID,
             COLUMN_BUCKET_DISPLAY_NAME,
             MediaStore.MediaColumns.MIME_TYPE,
-            "COUNT(*) AS " + COLUMN_COUNT};
+            "COUNT(*) AS " + COLUMN_COUNT,
+            COLUMN_DATA
+    };
 
     private static final String[] PROJECTION_29 = {
             MediaStore.Files.FileColumns._ID,
             COLUMN_BUCKET_ID,
             COLUMN_BUCKET_DISPLAY_NAME,
-            MediaStore.MediaColumns.MIME_TYPE};
+            MediaStore.MediaColumns.MIME_TYPE,
+            COLUMN_DATA
+    };
 
     // === params for showSingleMediaType: false ===
     private static final String SELECTION =
@@ -83,10 +88,10 @@ public class MediaFolderLoader {
     // =============================================
 
     private static String getSelection(MediaType mediaType) {
-        if (MimeTypeConfig.onlyShowImages(mediaType)) {
+        if (MediaType.onlyShowImages(mediaType)) {
             return beforeAndroidTen()
                     ? SELECTION_FOR_SINGLE_MEDIA_TYPE : SELECTION_FOR_SINGLE_MEDIA_TYPE_29;
-        } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+        } else if (MediaType.onlyShowVideos(mediaType)) {
             return beforeAndroidTen()
                     ? SELECTION_FOR_SINGLE_MEDIA_TYPE : SELECTION_FOR_SINGLE_MEDIA_TYPE_29;
         } else {
@@ -95,10 +100,10 @@ public class MediaFolderLoader {
     }
 
     private static String[] getSelectionArgs(MediaType mediaType) {
-        if (MimeTypeConfig.onlyShowImages(mediaType)) {
+        if (MediaType.onlyShowImages(mediaType)) {
             return getSelectionArgsForSingleMediaType(
                     MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
-        } else if (MimeTypeConfig.onlyShowVideos(mediaType)) {
+        } else if (MediaType.onlyShowVideos(mediaType)) {
             return getSelectionArgsForSingleMediaType(
                     MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
         } else {
@@ -135,11 +140,15 @@ public class MediaFolderLoader {
                             albums.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE));
                     Uri uri = getUri(albums);
                     int count = albums.getInt(albums.getColumnIndex(COLUMN_COUNT));
-
+                    String _data = albums.getString(albums.getColumnIndex(COLUMN_DATA));
                     otherAlbums.addRow(new String[]{
                             Long.toString(fileId),
-                            Long.toString(bucketId), bucketDisplayName, mimeType, uri.toString(),
-                            String.valueOf(count)});
+                            Long.toString(bucketId),
+                            bucketDisplayName,
+                            mimeType,
+                            uri.toString(),
+                            String.valueOf(count),
+                            _data});
                     totalCount += count;
                 }
                 if (albums.moveToFirst()) {
@@ -150,7 +159,7 @@ public class MediaFolderLoader {
             allAlbum.addRow(new String[]{
                     ALBUM_ID_ALL, ALBUM_ID_ALL, ALBUM_NAME_ALL, null,
                     allAlbumCoverUri == null ? null : allAlbumCoverUri.toString(),
-                    String.valueOf(totalCount)});
+                    String.valueOf(totalCount), ""});
 
             return new MergeCursor(new Cursor[]{allAlbum, otherAlbums});
         } else {
@@ -195,14 +204,15 @@ public class MediaFolderLoader {
                                 albums.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE));
                         Uri uri = getUri(albums);
                         long count = countMap.get(bucketId);
-
+                        String _data = albums.getString(albums.getColumnIndex(COLUMN_DATA));
                         otherAlbums.addRow(new String[]{
                                 Long.toString(fileId),
                                 Long.toString(bucketId),
                                 bucketDisplayName,
                                 mimeType,
                                 uri.toString(),
-                                String.valueOf(count)});
+                                String.valueOf(count),
+                                _data});
                         done.add(bucketId);
 
                         totalCount += count;
@@ -212,9 +222,13 @@ public class MediaFolderLoader {
 
             allAlbum.addRow(new String[]{
                     ALBUM_ID_ALL,
-                    ALBUM_ID_ALL, ALBUM_NAME_ALL, null,
+                    ALBUM_ID_ALL,
+                    ALBUM_NAME_ALL,
+                    null,
                     allAlbumCoverUri == null ? null : allAlbumCoverUri.toString(),
-                    String.valueOf(totalCount)});
+                    String.valueOf(totalCount),
+                    ""
+            });
 
             return new MergeCursor(new Cursor[]{allAlbum, otherAlbums});
         }

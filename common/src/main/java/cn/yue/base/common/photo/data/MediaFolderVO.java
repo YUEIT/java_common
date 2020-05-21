@@ -9,36 +9,35 @@ import android.os.Parcelable;
  * Created by yue on 2019/3/11
  */
 
-public class PhotoFolderVO implements Parcelable{
+public class MediaFolderVO implements Parcelable{
 
-    private String path;
-    private String cover;
+    private String id;
     private String name;
     private int count;
-    private String id;
     private Uri coverUri;
 
-    public PhotoFolderVO() {
+    private String path;
+
+    public MediaFolderVO() {
     }
 
-    protected PhotoFolderVO(Parcel in) {
+    protected MediaFolderVO(Parcel in) {
         path = in.readString();
-        cover = in.readString();
         name = in.readString();
         count = in.readInt();
         id = in.readString();
         coverUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
-    public static final Creator<PhotoFolderVO> CREATOR = new Creator<PhotoFolderVO>() {
+    public static final Creator<MediaFolderVO> CREATOR = new Creator<MediaFolderVO>() {
         @Override
-        public PhotoFolderVO createFromParcel(Parcel in) {
-            return new PhotoFolderVO(in);
+        public MediaFolderVO createFromParcel(Parcel in) {
+            return new MediaFolderVO(in);
         }
 
         @Override
-        public PhotoFolderVO[] newArray(int size) {
-            return new PhotoFolderVO[size];
+        public MediaFolderVO[] newArray(int size) {
+            return new MediaFolderVO[size];
         }
     };
 
@@ -48,14 +47,6 @@ public class PhotoFolderVO implements Parcelable{
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
     }
 
     public String getName() {
@@ -98,7 +89,6 @@ public class PhotoFolderVO implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(path);
-        dest.writeString(cover);
         dest.writeString(name);
         dest.writeInt(count);
         dest.writeString(id);
