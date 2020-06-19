@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -23,7 +25,6 @@ import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
-import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.BasePullFooter;
 import cn.yue.base.middle.mvp.IBaseView;
 import cn.yue.base.middle.mvp.IStatusView;
@@ -39,8 +40,9 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullListVMFragment<VM extends PullListViewModel> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
+public abstract class BasePullListVMFragment<T extends ViewDataBinding, VM extends PullListViewModel> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
 
+    protected T binding;
     private CommonAdapter adapter;
     private BasePullFooter footer;
     private boolean isFirstLoading = true;
@@ -48,11 +50,6 @@ public abstract class BasePullListVMFragment<VM extends PullListViewModel> exten
     private RecyclerView baseRV;
     protected PageHintView hintView;
     private PhotoHelper photoHelper;
-
-    @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_base_pull_page_vm;
-    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -65,6 +62,7 @@ public abstract class BasePullListVMFragment<VM extends PullListViewModel> exten
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        binding = DataBindingUtil.bind(cacheView);
         initViewMode();
         hintView = getPageHintView();
         hintView.setOnReloadListener(new PageHintView.OnReloadListener() {

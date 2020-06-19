@@ -5,10 +5,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import cn.yue.base.common.activity.BaseActivity;
+import cn.yue.base.middle.init.InitConstant;
 import cn.yue.base.middle.router.FRouter;
 
 /**
@@ -61,15 +63,20 @@ public class LaunchActivity extends BaseActivity {
     }
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
+
     private void toStart() {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+
+                Log.d("luobiao", "requestSuccess: " + InitConstant.getDeviceId());
                 FRouter.getInstance()
                         .build("/app/test")
                         .navigation(LaunchActivity.this);
+                finish();
+
             }
-        },2000);
+        }, 2000);
 
     }
 

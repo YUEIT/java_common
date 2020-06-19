@@ -128,4 +128,57 @@ public class TestFragment extends BaseHintFragment{
             commonAdapter.setList(uris);
         }
     }
+
+    String json = "{\n" +
+            "\t\"orderList\":[\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"id\": 1,\n" +
+            "\t\t\t\"image\": \"xxxx\",\n" +
+            "\t\t\t\"title\" : \"sssss\",\n" +
+            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
+            "\t\t}\n" +
+            "\t]\n" +
+            "}";
 }

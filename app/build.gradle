@@ -40,7 +40,7 @@ dependencies {
     implementation rootProject.ext.androidx["appcompat"]
     implementation rootProject.ext.androidx["constraintlayout"]
 
-    api project(':middle')
+    implementation 'cn.yue.base:middle:1.0'
     //aRouter
     api rootProject.ext.dependencies["arouter-api"]
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]

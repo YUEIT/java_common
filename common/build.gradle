@@ -58,3 +58,16 @@ dependencies {
     api rootProject.ext.dependencies["rxandroid"]
     api rootProject.ext.dependencies["rxlifecycle"]
 }
+
+//apply plugin: 'maven'
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.groupId = 'cn.yue.base'
+//            pom.artifactId = "common"
+//            pom.version = "1.0"
+//            pom.packaging = 'aar'
+//            repository(url: uri("${rootProject.projectDir}/repo"))
+//        }
+//    }
+//}

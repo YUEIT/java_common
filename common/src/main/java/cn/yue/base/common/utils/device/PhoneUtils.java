@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -386,5 +387,9 @@ public class PhoneUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getAndroidId() {
+        return Settings.System.getString(Utils.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

@@ -8,11 +8,13 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.RxLifecycle;
 
+import cn.yue.base.middle.mvp.PageStatus;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -22,6 +24,8 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 public class BaseViewModel extends AndroidViewModel implements LifecycleObserver {
+
+    public MutableLiveData<PageStatus> status = new MutableLiveData<>(PageStatus.STATUS_NORMAL);
 
     public BaseViewModel(@NonNull Application application) {
         super(application);

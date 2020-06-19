@@ -36,7 +36,7 @@ dependencies {
     androidTestImplementation rootProject.ext.androidx["junit-test"]
     androidTestImplementation rootProject.ext.androidx["espresso-test"]
 
-    api project(':common')
+    api 'cn.yue.base:common:1.0'
     api rootProject.ext.androidx["multidex"]
     api rootProject.ext.androidx["lifecycle-viewmodel"]
     api rootProject.ext.androidx["lifecycle-livedata"]
@@ -58,3 +58,4 @@ dependencies {
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
     api rootProject.ext.dependencies["tkrefreshlayout"]
 }
+

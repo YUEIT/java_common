@@ -62,7 +62,7 @@ public class InitConstant {
 
     public static String getDeviceId() {
         if (InitConstant.deviceId == null) {
-            deviceId = PhoneUtils.getIMEI();
+            deviceId = PhoneUtils.getAndroidId();
         }
         return deviceId = DeviceUtils.getNullDeviceId(deviceId);
     }
