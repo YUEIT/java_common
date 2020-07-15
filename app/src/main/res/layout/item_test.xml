@@ -13,8 +13,4 @@
         android:textSize="15sp"
         android:text="hello"/>
 
-    <cn.yue.base.test.CustomRecyclerView
-        android:id="@+id/customRV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 </LinearLayout>

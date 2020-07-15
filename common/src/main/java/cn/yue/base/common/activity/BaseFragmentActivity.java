@@ -18,34 +18,31 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import com.trello.rxlifecycle3.android.ActivityEvent;
-import com.trello.rxlifecycle3.components.support.RxFragmentActivity;
+import androidx.lifecycle.Lifecycle;
 
 import java.util.List;
 import java.util.UUID;
 
 import cn.yue.base.common.R;
+import cn.yue.base.common.activity.rx.ILifecycleProvider;
+import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.dialog.HintDialog;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Description :
  * Created by yue on 2019/3/11
  */
 
-public abstract class BaseFragmentActivity extends RxFragmentActivity implements ILifecycleProvider<ActivityEvent>{
+public abstract class BaseFragmentActivity extends FragmentActivity {
 
+    private RxLifecycleProvider lifecycleProvider;
     private TopBar topBar;
     private FrameLayout topFL;
     private FrameLayout content;
@@ -57,11 +54,17 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lifecycleProvider = new RxLifecycleProvider();
+        getLifecycle().addObserver(lifecycleProvider);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setSystemBar(false, true, Color.WHITE);
         setContentView(getContentViewLayoutId());
         initView();
         replace(getFragment(), null, false);
+    }
+
+    public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
+        return lifecycleProvider;
     }
 
     protected int getContentViewLayoutId() {
@@ -262,34 +265,6 @@ public abstract class BaseFragmentActivity extends RxFragmentActivity implements
                 }
             }
         }
-    }
-
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(ActivityEvent.DESTROY))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
-    }
-
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(ActivityEvent activityEvent) {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(activityEvent))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
     }
 
     /**

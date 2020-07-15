@@ -2,16 +2,18 @@ package cn.yue.base.middle.components;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.utils.debug.ToastUtils;
@@ -20,10 +22,12 @@ import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.components.load.LoadStatus;
+import cn.yue.base.middle.components.load.Loader;
+import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IBaseView;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvp.IWaitView;
-import cn.yue.base.middle.mvp.PageStatus;
 import cn.yue.base.middle.mvp.photo.IPhotoView;
 import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.net.NetworkConfig;
@@ -38,16 +42,15 @@ import io.reactivex.Single;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
+public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
 
     private String pageNt = "1";
     private String lastNt = "1";
     protected List<S> dataList = new ArrayList<>();
     protected int total;    //当接口返回总数时，为返回数量；接口未返回数量，为统计数量；
     private CommonAdapter<S> adapter;
-    private BasePullFooter footer;
-    private PageStatus status = PageStatus.STATUS_NORMAL;
-    private boolean isFirstLoading = true;
+    private BaseFooter footer;
+    private Loader loader = new Loader();
     private IRefreshLayout refreshL;
     private RecyclerView baseRV;
     protected PageHintView hintView;
@@ -65,22 +68,14 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
-                    mActivity.recreateFragment(BasePullListFragment.this.getClass().getName());
+                    if (autoRefresh()) {
+                        refresh();
+                    }
                 } else {
                     ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
                 }
             }
 
-            @Override
-            public void onRefresh() {
-                if (NetworkUtils.isConnected()) {
-                    if (autoRefresh()) {
-                        refreshWithLoading();
-                    }
-                } else {
-                    showStatusView(PageStatus.STATUS_ERROR_NET);
-                }
-            }
         });
 
         refreshL = findViewById(R.id.refreshL);
@@ -97,7 +92,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         }
         footer = getFooter();
         if (footer != null) {
-            footer.setOnReloadListener(new BasePullFooter.OnReloadListener() {
+            footer.setOnReloadListener(new BaseFooter.OnReloadListener() {
                 @Override
                 public void onReload() {
                     loadData();
@@ -128,9 +123,10 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
                         }
                     }
                 }
-                if (isTheLast && status == PageStatus.STATUS_SUCCESS) {
-                    status = PageStatus.STATUS_LOADING_ADD;
-                    footer.showStatusView(status);
+                if (isTheLast
+                        && loader.getPageStatus() == PageStatus.NORMAL
+                        && loader.getLoadStatus() == LoadStatus.NORMAL) {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.LOADING));
                     loadData();
                 }
             }
@@ -142,10 +138,10 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         super.initOther();
         if (NetworkUtils.isConnected()) {
             if (autoRefresh()) {
-                refreshWithLoading();
+                refresh();
             }
         } else {
-            showStatusView(PageStatus.STATUS_ERROR_NET);
+            showStatusView(loader.setPageStatus(PageStatus.NO_NET));
         }
     }
 
@@ -161,7 +157,7 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         baseRV.setLayoutManager(getLayoutManager());
         baseRV.setAdapter(adapter = getAdapter());
         adapter.addFooterView(footer);
-        footer.showStatusView(status);
+        footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
     }
 
     protected RecyclerView.LayoutManager getLayoutManager() {
@@ -208,39 +204,33 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
      */
     protected abstract void bindItemData(CommonViewHolder<S> holder, int position, S s);
 
-    protected BasePullFooter getFooter() {
+    protected BaseFooter getFooter() {
         if (footer == null) {
-            footer = new BasePullFooter(mActivity);
+            footer = new BaseFooter(mActivity);
         }
         return footer;
     }
 
     /**
-     * 刷新 loading动画
-     */
-    public void refreshWithLoading() {
-        baseRV.setVisibility(View.GONE);
-        showPageHintLoading();
-        refresh(false);
-    }
-
-    /**
-     * 刷新 swipe动画
+     * 刷新
      */
     public void refresh() {
-        refresh(true);
+        refresh(loader.isFirstLoad());
     }
 
     /**
-     * 刷新 选择是否有swipe动画
-     * @param hasRefreshAnim
+     * 刷新 选择是否页面加载动画
      */
-    public void refresh(boolean hasRefreshAnim) {
-        if (status == PageStatus.STATUS_LOADING_ADD || status == PageStatus.STATUS_LOADING_REFRESH) {
+    public void refresh(boolean isPageRefreshAnim) {
+        if (loader.getPageStatus() == PageStatus.LOADING
+                || loader.getLoadStatus() == LoadStatus.LOADING
+                || loader.getLoadStatus() == LoadStatus.REFRESH) {
             return;
         }
-        status = PageStatus.STATUS_LOADING_REFRESH;
-        if (hasRefreshAnim) {
+        if (isPageRefreshAnim) {
+            showStatusView(loader.setPageStatus(PageStatus.LOADING));
+        } else {
+            loader.setLoadStatus(LoadStatus.REFRESH);
             refreshL.startRefresh();
         }
         pageNt = initPageNt();
@@ -258,15 +248,16 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
             return;
         }
         getRequestSingle(pageNt)
-//                .delay(1000, TimeUnit.MILLISECONDS)
-                .compose(this.<P>toBindLifecycle())
+                .delay(1000, TimeUnit.MILLISECONDS)
+                .compose(this.getLifecycleProvider().<P>toBindLifecycle())
                 .subscribe(new BaseNetSingleObserver<P>() {
 
                     private boolean isLoadingRefresh = false;
                     @Override
                     protected void onStart() {
                         super.onStart();
-                        if (status == PageStatus.STATUS_LOADING_REFRESH) {
+                        if (loader.getPageStatus() == PageStatus.LOADING
+                                || loader.getLoadStatus() == LoadStatus.REFRESH) {
                             isLoadingRefresh = true;
                         } else {
                             isLoadingRefresh = false;
@@ -316,8 +307,8 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
     }
 
     protected void loadSuccess(P p) {
-        showStatusView(PageStatus.STATUS_SUCCESS);
-        footer.showStatusView(status);
+        showStatusView(loader.setPageStatus(PageStatus.NORMAL));
+        footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
         if (TextUtils.isEmpty(p.getPageNt())) {
             try {
                 if (p.getPageNo() == 0) {
@@ -343,28 +334,39 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
 
     protected void loadFailed(ResultException e) {
         pageNt = lastNt;
-        if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-            if (this.status == PageStatus.STATUS_LOADING_REFRESH) {
-                showStatusView(PageStatus.STATUS_ERROR_NET);
-            } else if (this.status == PageStatus.STATUS_LOADING_ADD) {
-                footer.showStatusView(status);
+        if (loader.isFirstLoad()) {
+            if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
+                showStatusView(loader.setPageStatus(PageStatus.NO_NET));
+            } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
+                showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
+            } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
+                showStatusView(loader.setPageStatus(PageStatus.ERROR));
+            } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
+                showStatusView(loader.setPageStatus(PageStatus.ERROR));
+                ToastUtils.showShortToast(e.getMessage());
+            } else {
+                showStatusView(loader.setPageStatus(PageStatus.ERROR));
+                ToastUtils.showShortToast(e.getMessage());
             }
-        } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
-        } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_SUCCESS);
-            footer.showStatusView(PageStatus.STATUS_SUCCESS);
-        } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_OPERATION);
-            ToastUtils.showShortToast(e.getMessage());
         } else {
-            showStatusView(PageStatus.STATUS_ERROR_SERVER);
-            ToastUtils.showShortToast(e.getMessage());
+            if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_NET));
+            } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+            } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+            } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                ToastUtils.showShortToast(e.getMessage());
+            } else {
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                ToastUtils.showShortToast(e.getMessage());
+            }
         }
     }
 
     protected void loadNoMore() {
-        showStatusView(PageStatus.STATUS_END);
+        footer.showStatusView(loader.setLoadStatus(LoadStatus.END));
     }
 
     protected void loadEmpty() {
@@ -372,10 +374,10 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
         dataList.clear();
         notifyDataSetChanged();
         if (showSuccessWithNoData()) {
-            showStatusView(PageStatus.STATUS_SUCCESS);
-            footer.showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+            showStatusView(loader.setPageStatus(PageStatus.NORMAL));
+            footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_DATA));
         } else {
-            showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
+            showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
         }
     }
 
@@ -401,74 +403,21 @@ public abstract class BasePullListFragment<P extends BaseListBean<S>, S> extends
 
     @Override
     public void showStatusView(PageStatus status) {
-        this.status = status;
-        switch (status) {
-            case STATUS_LOADING_REFRESH:
-                showPageHintLoading();
-                break;
-            case STATUS_SUCCESS:
-                showPageHintSuccess();
-                break;
-            case STATUS_END:
-                showPageHintSuccess();
-                footer.showStatusView(status);
-                break;
-            case STATUS_ERROR_NET:
-                showPageHintErrorNet();
-                break;
-            case STATUS_ERROR_NO_DATA:
-                showPageHintErrorNoData();
-                break;
-            case STATUS_ERROR_OPERATION:
-                showPageHintErrorOperation();
-                break;
-            case STATUS_ERROR_SERVER:
-                showPageHintErrorServer();
-                break;
-        }
-    }
-
-    private void showPageHintLoading() {
         if (hintView != null) {
-            hintView.showLoading();
-        }
-    }
-
-    private void showPageHintSuccess() {
-        if (baseRV != null) {
-            baseRV.setVisibility(View.VISIBLE);
-        }
-        if (hintView != null) {
-            hintView.showSuccess();
-        }
-        isFirstLoading = false;
-    }
-
-    private void showPageHintErrorNet() {
-        if (hintView != null) {
-            if (isFirstLoading) {
-                hintView.showErrorNet();
+            if (loader.isFirstLoad()) {
+                hintView.show(status);
+                if (loader.getPageStatus() == PageStatus.NORMAL) {
+                    baseRV.setVisibility(View.VISIBLE);
+                } else {
+                    baseRV.setVisibility(View.GONE);
+                }
             } else {
-                ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                hintView.show(PageStatus.NORMAL);
+                baseRV.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    private void showPageHintErrorNoData() {
-        if (hintView != null) {
-            hintView.showErrorNoData();
-        }
-    }
-
-    private void showPageHintErrorOperation() {
-        if (hintView != null && isFirstLoading) {
-            hintView.showErrorOperation();
-        }
-    }
-
-    private void showPageHintErrorServer() {
-        if (hintView != null && isFirstLoading) {
-            hintView.showErrorOperation();
+        if (status == PageStatus.NORMAL) {
+            loader.setFirstLoad(false);
         }
     }
 

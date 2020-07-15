@@ -1,12 +1,10 @@
 package cn.yue.base.middle.net.upload;
 
-
-import com.trello.rxlifecycle3.LifecycleProvider;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.utils.file.BitmapFileUtil;
 import cn.yue.base.middle.init.BaseUrlAddress;
 import cn.yue.base.middle.init.InitConstant;
@@ -32,7 +30,7 @@ public class UploadUtils {
     public static UploadServer getUploadServer() {
         return uploadServer;
     }
-    public static <E> void upload(List<String> files, LifecycleProvider<E> lifecycleProvider, BaseUploadObserver uploadObserver) {
+    public static <E> void upload(List<String> files, ILifecycleProvider<E> lifecycleProvider, BaseUploadObserver uploadObserver) {
         UploadUtils.getCompressFileList(files)
                 .subscribeOn(Schedulers.io())
                 .flatMap(new Function<List<File>, SingleSource<ImageResultListData>>() {

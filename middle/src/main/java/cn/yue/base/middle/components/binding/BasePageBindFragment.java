@@ -1,4 +1,4 @@
-package cn.yue.base.middle.components;
+package cn.yue.base.middle.components.binding;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
@@ -7,13 +7,14 @@ import java.util.ArrayList;
 
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
+import cn.yue.base.middle.components.BaseListFragment;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 
 /**
  * Description :
  * Created by yue on 2019/3/11
  */
-public abstract class BasePullPageDBFragment<DB extends ViewDataBinding, S> extends BasePullListFragment<BaseListBean<S>, S> {
+public abstract class BasePageBindFragment<DB extends ViewDataBinding, S> extends BaseListFragment<BaseListBean<S>, S> {
 
     protected DB binding;
     @Override

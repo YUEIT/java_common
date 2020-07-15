@@ -7,33 +7,33 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.Window;
 
-import com.trello.rxlifecycle3.android.ActivityEvent;
-import com.trello.rxlifecycle3.components.RxActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
 
+import cn.yue.base.common.activity.rx.ILifecycleProvider;
+import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.widget.dialog.HintDialog;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Description :
  * Created by yue on 2019/3/11
  */
 
-public abstract class BaseActivity extends RxActivity implements ILifecycleProvider<ActivityEvent>{
+public abstract class BaseActivity extends FragmentActivity {
 
+    private ILifecycleProvider<Lifecycle.Event> lifecycleProvider;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lifecycleProvider = initLifecycleProvider();
+        getLifecycle().addObserver(lifecycleProvider);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         if (hasContentView()) {
             setContentView(getLayoutId());
@@ -42,6 +42,10 @@ public abstract class BaseActivity extends RxActivity implements ILifecycleProvi
             initBundle(getIntent().getExtras());
         }
         initView();
+    }
+
+    protected ILifecycleProvider<Lifecycle.Event> initLifecycleProvider() {
+        return new RxLifecycleProvider();
     }
 
     protected boolean hasContentView() {
@@ -69,32 +73,8 @@ public abstract class BaseActivity extends RxActivity implements ILifecycleProvi
         }
     }
 
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(ActivityEvent.DESTROY))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
-    }
-
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(ActivityEvent activityEvent) {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(activityEvent))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
+    public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
+        return lifecycleProvider;
     }
 
     public void requestPermission(String permission, PermissionCallBack permissionCallBack) {

@@ -5,9 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+    <cn.yue.base.middle.view.refresh.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal">
         <TextView
             android:id="@+id/option1TV"
@@ -28,15 +31,5 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/testImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="50dp"
-        android:layout_gravity="center_horizontal"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/testRV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    </cn.yue.base.middle.view.refresh.SwipeRefreshLayout>
 </LinearLayout>

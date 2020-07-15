@@ -6,9 +6,9 @@ import androidx.annotation.NonNull;
 
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 
-public abstract class PullPageViewModel<S> extends PullListViewModel<BaseListBean<S>, S> {
+public abstract class PageViewModel<S> extends ListViewModel<BaseListBean<S>, S> {
 
-    public PullPageViewModel(@NonNull Application application) {
+    public PageViewModel(@NonNull Application application) {
         super(application);
     }
 }

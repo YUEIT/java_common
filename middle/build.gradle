@@ -36,7 +36,7 @@ dependencies {
     androidTestImplementation rootProject.ext.androidx["junit-test"]
     androidTestImplementation rootProject.ext.androidx["espresso-test"]
 
-    api 'cn.yue.base:common:1.0'
+    api project(":common")
     api rootProject.ext.androidx["multidex"]
     api rootProject.ext.androidx["lifecycle-viewmodel"]
     api rootProject.ext.androidx["lifecycle-livedata"]
@@ -45,7 +45,7 @@ dependencies {
     //Rx
     api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxandroid"]
-    api rootProject.ext.dependencies["rxlifecycle"]
+//    api rootProject.ext.dependencies["rxlifecycle"]
     //okhttp
     api rootProject.ext.dependencies["okhttp"]
     api rootProject.ext.dependencies["okhttp-log"]

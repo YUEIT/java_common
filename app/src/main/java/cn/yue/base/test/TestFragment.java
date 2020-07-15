@@ -3,26 +3,18 @@ package cn.yue.base.test;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.common.image.ImageLoader;
-import cn.yue.base.common.utils.file.AndroidQFileUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
-import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.middle.router.FRouter;
 
@@ -46,41 +38,23 @@ public class TestFragment extends BaseHintFragment{
         option1TV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
+                FRouter.getInstance()
+                        .build("/app/testPullList")
+                        .navigation(mActivity);
+//                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }
         });
         TextView option2TV = findViewById(R.id.option2TV);
         option2TV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
+                FRouter.getInstance()
+                        .build("/app/testPullVM")
+                        .navigation(mActivity);
+//                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }
         });
-        RecyclerView testRV = findViewById(R.id.testRV);
-        testRV.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.HORIZONTAL, false));
-        testRV.setAdapter(commonAdapter = new CommonAdapter<Uri>(mActivity) {
 
-            @Override
-            public int getLayoutIdByType(int viewType) {
-                return R.layout.item_test_photo;
-            }
-
-            @Override
-            public void bindData(CommonViewHolder<Uri> holder, int position, Uri uri) {
-                ImageLoader.getLoader().loadImage(holder.getView(R.id.itemIV), uri);
-                holder.setOnItemClickListener(position, uri, new CommonViewHolder.OnItemClickListener<Uri>() {
-                    @Override
-                    public void onItemClick(int position, Uri uri1) {
-                        ArrayList<String> list = new ArrayList<>();
-                        String path = AndroidQFileUtils.getPath(uri1);
-                        list.add(path);
-                        Log.d("luobiao", "onItemClick: " + path);
-                        FRouter.getInstance().build("/common/viewPhoto").withStringArrayList("list", list).navigation(mActivity);
-                    }
-                });
-            }
-        });
-        testImage = findViewById(R.id.testImage);
     }
     ImageView testImage;
 
@@ -129,56 +103,4 @@ public class TestFragment extends BaseHintFragment{
         }
     }
 
-    String json = "{\n" +
-            "\t\"orderList\":[\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t},\n" +
-            "\t\t{\n" +
-            "\t\t\t\"id\": 1,\n" +
-            "\t\t\t\"image\": \"xxxx\",\n" +
-            "\t\t\t\"title\" : \"sssss\",\n" +
-            "\t\t\t\"des\": \"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn\"\n" +
-            "\t\t}\n" +
-            "\t]\n" +
-            "}";
 }

@@ -1,22 +1,13 @@
-package cn.yue.base.middle.mvvm;
-
-import android.app.Application;
-import android.content.Intent;
+package cn.yue.base.common.activity.rx;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Lifecycle.Event;
+import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import cn.yue.base.common.activity.rx.ILifecycleProvider;
-import cn.yue.base.common.activity.rx.LifecycleTransformer;
-import cn.yue.base.common.activity.rx.RxLifecycle;
-import cn.yue.base.common.activity.rx.RxLifecycleAndroid;
-import cn.yue.base.middle.mvp.IWaitView;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -25,14 +16,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class BaseViewModel extends AndroidViewModel implements ILifecycleProvider<Event>, IWaitView {
-
-    public LoaderLiveData loader = new LoaderLiveData();
-    public MutableLiveData<String> showWait = new MutableLiveData<>("");
-
-    public BaseViewModel(@NonNull Application application) {
-        super(application);
-    }
+public class RxLifecycleProvider implements ILifecycleProvider<Event>, LifecycleObserver {
 
     private final BehaviorSubject<Event> lifecycleSubject = BehaviorSubject.create();
 
@@ -83,49 +67,38 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-    protected void onAny(LifecycleOwner owner, Lifecycle.Event event) {
+    void onAny(LifecycleOwner owner, Lifecycle.Event event) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_ANY);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    protected void onCreate() {
+    void onCreate() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_CREATE);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    protected void onDestroy() {
+    void onDestroy() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_DESTROY);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    protected void onStart() {
+    void onStart() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_START);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    protected void onStop() {
+    void onStop() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_STOP);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    protected void onResume() {
+    void onResume() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_RESUME);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    protected void onPause() {
+    void onPause() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_PAUSE);
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {}
-
-    @Override
-    public void showWaitDialog(String title) {
-        showWait.postValue(title);
-    }
-
-    @Override
-    public void dismissWaitDialog() {
-        showWait.postValue("");
-    }
 }

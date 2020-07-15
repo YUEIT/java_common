@@ -13,14 +13,15 @@ import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.components.load.LoadStatus;
+import cn.yue.base.middle.components.load.Loader;
+import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IBaseView;
+import cn.yue.base.middle.mvp.IPullView;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvp.IWaitView;
-import cn.yue.base.middle.mvp.PageStatus;
 import cn.yue.base.middle.mvp.photo.IPhotoView;
 import cn.yue.base.middle.mvp.photo.PhotoHelper;
-import cn.yue.base.middle.net.NetworkConfig;
-import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
@@ -28,10 +29,9 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullFragment extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
+public abstract class BasePullFragment extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView, IPullView {
 
-    private boolean isFirstLoading = true;
-    protected PageStatus status = PageStatus.STATUS_NORMAL;
+    protected Loader loader = new Loader();
     protected IRefreshLayout refreshL;
     protected PageHintView hintView;
     private ViewStub baseVS;
@@ -49,28 +49,17 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
-                    mActivity.recreateFragment(BasePullFragment.this.getClass().getName());
+                    refresh();
                 } else {
                     ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
                 }
             }
-
-            @Override
-            public void onRefresh() {
-                if (NetworkUtils.isConnected()) {
-                    refresh();
-                } else {
-                    showPageHintErrorNet();
-                }
-            }
         });
-
         refreshL = findViewById(R.id.refreshL);
         refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refresh();
-                refreshL.finishRefreshing();
             }
         });
         refreshL.setEnabled(canPullDown());
@@ -88,126 +77,83 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
         baseVS.inflate();
     }
 
-    protected void stubInflate(ViewStub stub, View inflated) {
-    }
+    protected void stubInflate(ViewStub stub, View inflated) { }
 
     @Override
     protected void initOther() {
         if (NetworkUtils.isConnected()) {
-            showLoadingView();
             refresh();
         } else {
-            showPageHintErrorNet();
+            showStatusView(loader.setPageStatus(PageStatus.NO_NET));
         }
     }
 
     protected abstract int getContentLayoutId();
 
     //回调继承 BasePullSingleObserver 以适应加载逻辑
-    protected abstract void refresh();
+    protected abstract void loadData();
 
     protected boolean canPullDown() {
         return true;
     }
 
-    public void stopRefreshAnim() {
+    /**
+     * 刷新 swipe动画
+     */
+    public void refresh() {
+        refresh(loader.isFirstLoad());
+    }
+
+    /**
+     * 刷新 选择是否页面加载动画
+     */
+    public void refresh(boolean isPageRefreshAnim) {
+        if (loader.getPageStatus() == PageStatus.LOADING
+                || loader.getLoadStatus() == LoadStatus.REFRESH) {
+            return;
+        }
+        if (isPageRefreshAnim) {
+            baseVS.setVisibility(View.GONE);
+            showStatusView(loader.setPageStatus(PageStatus.LOADING));
+        } else {
+            startRefresh();
+        }
+        loadData();
+    }
+
+    private void startRefresh() {
+        loader.setLoadStatus(LoadStatus.REFRESH);
+        refreshL.startRefresh();
+    }
+
+    @Override
+    public void finishRefresh() {
+        loader.setLoadStatus(LoadStatus.NORMAL);
         refreshL.finishRefreshing();
     }
 
-    public void showLoadingView() {
-        if (isFirstLoading) {
-            baseVS.setVisibility(View.GONE);
-            showStatusView(PageStatus.STATUS_LOADING_REFRESH);
-        } else {
-            refreshL.startRefresh();
-        }
+    @Override
+    public void loadComplete(PageStatus status) {
+        showStatusView(loader.setPageStatus(status));
     }
-
-    public void showFailedView(ResultException e) {
-        if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_NET);
-        } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_NO_DATA);
-        } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-            showStatusView(PageStatus.STATUS_ERROR_OPERATION);
-            ToastUtils.showShortToast(e.getMessage());
-        } else {
-            showStatusView(PageStatus.STATUS_ERROR_SERVER);
-            ToastUtils.showShortToast(e.getMessage());
-        }
-    }
-
 
     @Override
     public void showStatusView(PageStatus status) {
-        this.status = status;
-        switch (status) {
-            case STATUS_NORMAL:
-            case STATUS_SUCCESS:
-                showPageHintSuccess();
-                break;
-            case STATUS_LOADING_REFRESH:
-                showPageHintLoading();
-                break;
-            case STATUS_END:
-                showPageHintSuccess();
-                break;
-            case STATUS_ERROR_NET:
-                showPageHintErrorNet();
-                break;
-            case STATUS_ERROR_NO_DATA:
-                showPageHintErrorNoData();
-                break;
-            case STATUS_ERROR_OPERATION:
-                showPageHintErrorOperation();
-                break;
-            case STATUS_ERROR_SERVER:
-                showPageHintErrorServer();
-                break;
-        }
-    }
-
-    private void showPageHintLoading() {
         if (hintView != null) {
-            hintView.showLoading();
-        }
-    }
-
-    private void showPageHintSuccess() {
-        if (baseVS != null) {
-            baseVS.setVisibility(View.VISIBLE);
-        }
-        if (hintView != null) {
-            hintView.showSuccess();
-        }
-        isFirstLoading = false;
-    }
-
-    private void showPageHintErrorNet() {
-        if (hintView != null) {
-            if (isFirstLoading) {
-                hintView.showErrorNet();
+            if (loader.isFirstLoad()) {
+                hintView.show(status);
+                if (loader.getPageStatus() == PageStatus.NORMAL) {
+                    baseVS.setVisibility(View.VISIBLE);
+                } else {
+                    baseVS.setVisibility(View.GONE);
+                }
             } else {
-                ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                hintView.show(PageStatus.NORMAL);
+                baseVS.setVisibility(View.VISIBLE);
             }
         }
-    }
-
-    private void showPageHintErrorNoData() {
-        if (hintView != null) {
-            hintView.showErrorNoData();
-        }
-    }
-
-    private void showPageHintErrorOperation() {
-        if (hintView != null && isFirstLoading) {
-            hintView.showErrorOperation();
-        }
-    }
-
-    private void showPageHintErrorServer() {
-        if (hintView != null && isFirstLoading) {
-            hintView.showErrorOperation();
+        if (status == PageStatus.NORMAL) {
+            loader.setFirstLoad(false);
         }
     }
 

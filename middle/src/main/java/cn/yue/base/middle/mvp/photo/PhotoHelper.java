@@ -171,7 +171,7 @@ public class PhotoHelper {
     }
 
     public void upload(List<String> imageList) {
-        UploadUtils.upload(imageList, iPhotoView, new BaseUploadObserver() {
+        UploadUtils.upload(imageList, iPhotoView.getLifecycleProvider(), new BaseUploadObserver() {
 
             @Override
             protected void onStart() {

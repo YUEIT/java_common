@@ -40,9 +40,9 @@ dependencies {
     implementation rootProject.ext.androidx["appcompat"]
     implementation rootProject.ext.androidx["constraintlayout"]
 
-    implementation 'cn.yue.base:middle:1.0'
+    implementation project(":middle")
     //aRouter
-    api rootProject.ext.dependencies["arouter-api"]
+    implementation rootProject.ext.dependencies["arouter-api"]
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
 
     implementation 'fm.jiecao:jiecaovideoplayer:5.5.4'

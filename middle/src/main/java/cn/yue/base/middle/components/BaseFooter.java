@@ -8,23 +8,24 @@ import android.widget.RelativeLayout;
 
 import cn.yue.base.common.widget.dialog.AppProgressBar;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.mvp.IStatusView;
-import cn.yue.base.middle.mvp.PageStatus;
+import cn.yue.base.middle.components.load.LoadStatus;
+
+import static cn.yue.base.middle.components.load.LoadStatus.*;
 
 /**
  * Description :
  * Created by yue on 2019/3/7
  */
-public class BasePullFooter extends RelativeLayout implements IStatusView {
+public class BaseFooter extends RelativeLayout {
 
-    private PageStatus status = PageStatus.STATUS_LOADING_ADD;
+    private LoadStatus loadStatus;
     private OnReloadListener onReloadListener;
     private AppProgressBar progressBar;
     private LinearLayout loadingLL;
     private LinearLayout endLL;
     private LinearLayout errorLL;
     private LinearLayout emptyLL;
-    public BasePullFooter(Context context) {
+    public BaseFooter(Context context) {
         super(context);
         View.inflate(context, R.layout.layout_footer_base_pull, this);
         progressBar = findViewById(R.id.progress);
@@ -34,58 +35,84 @@ public class BasePullFooter extends RelativeLayout implements IStatusView {
         errorLL.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (status == PageStatus.STATUS_ERROR_NET && onReloadListener != null) {
+                if (loadStatus == NO_NET && onReloadListener != null) {
                     onReloadListener.onReload();
                 }
             }
         });
         emptyLL = findViewById(R.id.emptyLL);
-        showStatusView(PageStatus.STATUS_NORMAL);
+        showNormal();
     }
 
-    @Override
-    public void showStatusView(PageStatus status) {
-        this.status = status;
-        switch (status) {
-            case STATUS_NORMAL:
-            case STATUS_LOADING_ADD:
-            case STATUS_SUCCESS:
-                loadingLL.setVisibility(VISIBLE);
-                endLL.setVisibility(GONE);
-                errorLL.setVisibility(GONE);
-                emptyLL.setVisibility(GONE);
-                if (progressBar != null) {
-                    progressBar.setProgressBarBackgroundColor(Color.parseColor("#EFEFEF"));
-                    progressBar.startAnimation();
-                }
+    public void showStatusView(LoadStatus loadStatus) {
+        this.loadStatus = loadStatus;
+        switch (loadStatus) {
+            case NORMAL:
+                showNormal();
                 break;
-            case STATUS_END:
-                loadingLL.setVisibility(GONE);
-                endLL.setVisibility(VISIBLE);
-                errorLL.setVisibility(GONE);
-                emptyLL.setVisibility(GONE);
-                if (progressBar != null) {
-                    progressBar.stopAnimation();
-                }
+            case LOADING:
+                showLoading();
                 break;
-            case STATUS_ERROR_NET:
-                loadingLL.setVisibility(GONE);
-                endLL.setVisibility(GONE);
-                errorLL.setVisibility(VISIBLE);
-                emptyLL.setVisibility(GONE);
-                if (progressBar != null) {
-                    progressBar.stopAnimation();
-                }
+            case END:
+                showEnd();
                 break;
-            case STATUS_ERROR_NO_DATA:
-                loadingLL.setVisibility(GONE);
-                endLL.setVisibility(GONE);
-                errorLL.setVisibility(GONE);
-                emptyLL.setVisibility(VISIBLE);
-                if (progressBar != null) {
-                    progressBar.stopAnimation();
-                }
+            case NO_DATA:
+                showNoData();
                 break;
+            case NO_NET:
+                showNoNet();
+                break;
+        }
+    }
+
+    private void showNormal() {
+        loadingLL.setVisibility(GONE);
+        endLL.setVisibility(GONE);
+        errorLL.setVisibility(GONE);
+        emptyLL.setVisibility(GONE);
+        if (progressBar != null) {
+            progressBar.stopAnimation();
+        }
+    }
+
+    private void showLoading() {
+        loadingLL.setVisibility(VISIBLE);
+        endLL.setVisibility(GONE);
+        errorLL.setVisibility(GONE);
+        emptyLL.setVisibility(GONE);
+        if (progressBar != null) {
+            progressBar.setProgressBarBackgroundColor(Color.parseColor("#EFEFEF"));
+            progressBar.startAnimation();
+        }
+    }
+
+    private void showEnd() {
+        loadingLL.setVisibility(GONE);
+        endLL.setVisibility(VISIBLE);
+        errorLL.setVisibility(GONE);
+        emptyLL.setVisibility(GONE);
+        if (progressBar != null) {
+            progressBar.stopAnimation();
+        }
+    }
+
+    private void showNoNet() {
+        loadingLL.setVisibility(GONE);
+        endLL.setVisibility(GONE);
+        errorLL.setVisibility(VISIBLE);
+        emptyLL.setVisibility(GONE);
+        if (progressBar != null) {
+            progressBar.stopAnimation();
+        }
+    }
+
+    private void showNoData() {
+        loadingLL.setVisibility(GONE);
+        endLL.setVisibility(GONE);
+        errorLL.setVisibility(GONE);
+        emptyLL.setVisibility(VISIBLE);
+        if (progressBar != null) {
+            progressBar.stopAnimation();
         }
     }
 

@@ -1,5 +1,6 @@
 package cn.yue.base.middle.mvvm;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -56,5 +57,18 @@ public class MutableListLiveData<T> extends MutableLiveData<ArrayList<T>> {
         }
         list.clear();
         postValue(list);
+    }
+
+    @Nullable
+    @Override
+    public ArrayList<T> getValue() {
+        return super.getValue();
+    }
+
+    public int size() {
+        if (getValue() != null) {
+            return getValue().size();
+        }
+        return 0;
     }
 }

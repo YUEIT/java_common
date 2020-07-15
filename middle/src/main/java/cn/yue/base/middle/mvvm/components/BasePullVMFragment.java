@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 
 import androidx.annotation.Nullable;
@@ -20,16 +21,30 @@ import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.components.load.LoadStatus;
 import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.mvvm.BaseViewModel;
+import cn.yue.base.middle.mvvm.PullViewModel;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
-public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseFragment implements IStatusView, IWaitView {
+/**
+ * Description :
+ * Created by yue on 2019/3/7
+ */
+public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseFragment implements IStatusView, IWaitView {
 
     protected VM viewModel;
+    protected IRefreshLayout refreshL;
     protected PageHintView hintView;
+    private View contentView;
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_base_pull;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,19 +69,12 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
     }
 
     protected VM getViewModel() {
-        return null;
+        return viewModel;
     }
 
     public VM createViewModel(Class<VM> cls) {
         return new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(mActivity.getApplication())).get(cls);
     }
-
-    @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_base_hint;
-    }
-
-    protected abstract int getContentLayoutId();
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -75,17 +83,29 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
-                    mActivity.recreateFragment(BaseHintVMFragment.this.getClass().getName());
+                    viewModel.refresh();
                 } else {
                     ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
                 }
             }
         });
+        refreshL = findViewById(R.id.refreshL);
+        refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                viewModel.refresh();
+            }
+        });
+        refreshL.setEnabled(canPullDown());
+        if (canPullDown()) {
+            hintView.setRefreshTarget((ViewGroup) refreshL);
+        }
         ViewStub baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());
         baseVS.setOnInflateListener(new ViewStub.OnInflateListener() {
             @Override
             public void onInflate(ViewStub stub, View inflated) {
+                contentView = inflated;
                 bindLayout(inflated);
             }
         });
@@ -96,9 +116,8 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
 
     @Override
     protected void initOther() {
-        super.initOther();
         if (NetworkUtils.isConnected()) {
-            viewModel.loader.setPageStatus(PageStatus.NORMAL);
+            viewModel.refresh();
         } else {
             viewModel.loader.setPageStatus(PageStatus.NO_NET);
         }
@@ -118,12 +137,38 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
                 showStatusView(pageStatus);
             }
         });
+        viewModel.loader.observeLoad(this, new Observer<LoadStatus>() {
+            @Override
+            public void onChanged(LoadStatus loadStatus) {
+                if (loadStatus == LoadStatus.REFRESH) {
+                    refreshL.startRefresh();
+                } else {
+                    refreshL.finishRefreshing();
+                }
+            }
+        });
+    }
+
+    protected abstract int getContentLayoutId();
+
+    protected boolean canPullDown() {
+        return true;
     }
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null && viewModel.loader.isFirstLoad()) {
-            hintView.show(status);
+        if (hintView != null) {
+            if (viewModel.loader.isFirstLoad()) {
+                hintView.show(status);
+                if (status == PageStatus.NORMAL) {
+                    contentView.setVisibility(View.VISIBLE);
+                } else {
+                    contentView.setVisibility(View.GONE);
+                }
+            } else {
+                hintView.show(PageStatus.NORMAL);
+                contentView.setVisibility(View.VISIBLE);
+            }
         }
         if (status == PageStatus.NORMAL) {
             viewModel.loader.setFirstLoad(false);
@@ -131,6 +176,7 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
     }
 
     private WaitDialog waitDialog;
+
     @Override
     public void showWaitDialog(String title) {
         if (waitDialog == null) {
@@ -144,12 +190,6 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseF
         if (waitDialog != null && waitDialog.isShowing()) {
             waitDialog.cancel();
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getLifecycle().removeObserver(viewModel);
     }
 
     @Override

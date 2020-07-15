@@ -14,31 +14,21 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
-import com.trello.rxlifecycle3.LifecycleTransformer;
-import com.trello.rxlifecycle3.RxLifecycle;
-import com.trello.rxlifecycle3.android.FragmentEvent;
-import com.trello.rxlifecycle3.android.RxLifecycleAndroid;
+import androidx.lifecycle.Lifecycle;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 
 import cn.yue.base.common.R;
+import cn.yue.base.common.activity.rx.ILifecycleProvider;
+import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.widget.dialog.WaitDialog;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 
 import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_BOTTOM;
 import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_CENTER;
@@ -51,8 +41,9 @@ import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_TOP;
  * Created by yue on 2019/3/11
  */
 
-public abstract class BaseDialogFragment extends DialogFragment implements ILifecycleProvider<FragmentEvent> {
+public abstract class BaseDialogFragment extends DialogFragment {
 
+    private ILifecycleProvider<Lifecycle.Event> lifecycleProvider;
     protected View cacheView;
     protected FragmentManager mFragmentManager;
     protected BaseFragmentActivity mActivity;
@@ -60,17 +51,9 @@ public abstract class BaseDialogFragment extends DialogFragment implements ILife
     protected LayoutInflater mInflater;
     protected Handler mHandler = new Handler();
     protected String requestTag = UUID.randomUUID().toString();
-// A -> B -> C -> D   MessageQueue null;  Looper loop; foreach 'D';  D out
-// D -> C -> B -> A   sPool D;
-// D                  DismissMessage reuse D; sPool C
-
-// C     send message C;  foreach 'C'; C out
-// B -> A  sPool B;
-// C -> B -> A;   sPool C
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        lifecycleSubject.onNext(FragmentEvent.ATTACH);
         if (null == context || !(context instanceof BaseFragmentActivity)) {
             throw new RuntimeException("BaseFragment必须与BaseActivity配合使用");
         }
@@ -82,15 +65,23 @@ public abstract class BaseDialogFragment extends DialogFragment implements ILife
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lifecycleSubject.onNext(FragmentEvent.CREATE);
+        lifecycleProvider = initLifecycleProvider();
+        getLifecycle().addObserver(lifecycleProvider);
         bundle = getArguments();
         setStyle(STYLE_NO_TITLE, 0);
+    }
+
+    protected ILifecycleProvider<Lifecycle.Event> initLifecycleProvider() {
+        return new RxLifecycleProvider();
+    }
+
+    public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
+        return lifecycleProvider;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        lifecycleSubject.onNext(FragmentEvent.CREATE_VIEW);
         initEnterStyle();
         if (!hasCache) {
             initView(savedInstanceState);
@@ -296,101 +287,6 @@ public abstract class BaseDialogFragment extends DialogFragment implements ILife
             waitDialog.cancel();
         }
     }
-
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(FragmentEvent.DESTROY))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
-    }
-
-    @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(FragmentEvent fragmentEvent) {
-        return new SingleTransformer<T, T>() {
-
-            @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(fragmentEvent))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
-    }
-
-    private final BehaviorSubject<FragmentEvent> lifecycleSubject = BehaviorSubject.create();
-
-    @Override
-    @NonNull
-    @CheckResult
-    public final Observable<FragmentEvent> lifecycle() {
-        return lifecycleSubject.hide();
-    }
-
-    @Override
-    @NonNull
-    @CheckResult
-    public final <T> LifecycleTransformer<T> bindUntilEvent(@NonNull FragmentEvent event) {
-        return RxLifecycle.bindUntilEvent(lifecycleSubject, event);
-    }
-
-    @Override
-    @NonNull
-    @CheckResult
-    public final <T> LifecycleTransformer<T> bindToLifecycle() {
-        return RxLifecycleAndroid.bindFragment(lifecycleSubject);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        lifecycleSubject.onNext(FragmentEvent.START);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        lifecycleSubject.onNext(FragmentEvent.RESUME);
-    }
-
-    @Override
-    public void onPause() {
-        lifecycleSubject.onNext(FragmentEvent.PAUSE);
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        lifecycleSubject.onNext(FragmentEvent.STOP);
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView() {
-        lifecycleSubject.onNext(FragmentEvent.DESTROY_VIEW);
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        lifecycleSubject.onNext(FragmentEvent.DESTROY);
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach() {
-        lifecycleSubject.onNext(FragmentEvent.DETACH);
-        super.onDetach();
-        mHandler.removeCallbacksAndMessages(null);
-    }
-
 
     public boolean onFragmentBackPressed() {
         return false;

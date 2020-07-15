@@ -56,7 +56,7 @@ dependencies {
     //Rx
     api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxandroid"]
-    api rootProject.ext.dependencies["rxlifecycle"]
+//    api rootProject.ext.dependencies["rxlifecycle"]
 }
 
 //apply plugin: 'maven'

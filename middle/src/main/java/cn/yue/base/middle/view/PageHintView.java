@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes;
 
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
+import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.router.FRouter;
 
 /**
@@ -70,7 +71,7 @@ public class PageHintView extends RelativeLayout{
             @Override
             public void onClick(View v) {
                 if (onReloadListener != null) {
-                    onReloadListener.onRefresh();
+                    onReloadListener.onReload();
                 }
             }
         });
@@ -91,7 +92,6 @@ public class PageHintView extends RelativeLayout{
 
     public abstract static class OnReloadListener {
         public abstract void onReload();
-        public void onRefresh(){}
     }
 
     public void setNoNetView(View noNetView) {
@@ -130,6 +130,26 @@ public class PageHintView extends RelativeLayout{
         return view;
     }
 
+    public void show(PageStatus status) {
+        switch (status) {
+            case NORMAL:
+                showSuccess();
+                break;
+            case LOADING:
+                showLoading();
+                break;
+            case NO_NET:
+                showErrorNet();
+                break;
+            case NO_DATA:
+                showErrorNoData();
+                break;
+            case ERROR:
+                showErrorOperation();
+                break;
+        }
+    }
+
     public void showLoading() {
         if (loadingView != null) {
             setVisibility(View.VISIBLE);
@@ -149,7 +169,7 @@ public class PageHintView extends RelativeLayout{
             setVisibility(View.VISIBLE);
             removeAllViews();
             addView(noNetView);
-            setRefreshEnable(false);
+            setRefreshEnable(true);
         }
     }
 
@@ -167,7 +187,6 @@ public class PageHintView extends RelativeLayout{
             setVisibility(View.VISIBLE);
             removeAllViews();
             addView(serverErrorView);
-            setRefreshEnable(false);
         }
     }
 
@@ -176,7 +195,7 @@ public class PageHintView extends RelativeLayout{
         this.refreshLayout = refreshLayout;
     }
 
-    public void setRefreshEnable(boolean enable) {
+    private void setRefreshEnable(boolean enable) {
         if (refreshLayout != null) {
             refreshLayout.setEnabled(enable);
         }
