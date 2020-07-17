@@ -427,9 +427,9 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    protected void setVisable(View view,boolean visable){
+    protected void setVisible(View view,boolean visible){
         if(null!=view){
-            if(visable){
+            if(visible){
                 view.setVisibility(View.VISIBLE);
             }else{
                 view.setVisibility(View.GONE);

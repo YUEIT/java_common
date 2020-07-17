@@ -2,6 +2,7 @@ package cn.yue.base.middle.mvvm;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
@@ -12,11 +13,18 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.LifecycleTransformer;
 import cn.yue.base.common.activity.rx.RxLifecycle;
 import cn.yue.base.common.activity.rx.RxLifecycleAndroid;
 import cn.yue.base.middle.mvp.IWaitView;
+import cn.yue.base.middle.mvvm.data.FinishModel;
+import cn.yue.base.middle.mvvm.data.LoaderLiveData;
+import cn.yue.base.middle.mvvm.data.RouterModel;
+import cn.yue.base.middle.router.RouterCard;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -28,10 +36,18 @@ import io.reactivex.subjects.BehaviorSubject;
 public class BaseViewModel extends AndroidViewModel implements ILifecycleProvider<Event>, IWaitView {
 
     public LoaderLiveData loader = new LoaderLiveData();
-    public MutableLiveData<String> showWait = new MutableLiveData<>("");
+    public MutableLiveData<String> waitEvent = new MutableLiveData<>();
+    public MutableLiveData<RouterModel> routerEvent = new MutableLiveData<>();
+    public MutableLiveData<FinishModel> finishEvent = new MutableLiveData<>();
+
+    public List<BaseViewModel> childViewModels = new ArrayList<>();
 
     public BaseViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public void addLifecycle(BaseViewModel childViewModel) {
+        childViewModels.add(childViewModel);
     }
 
     private final BehaviorSubject<Event> lifecycleSubject = BehaviorSubject.create();
@@ -44,13 +60,13 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
 
     @NonNull
     @CheckResult
-    public final <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
+    private <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
         return RxLifecycle.bindUntilEvent(this.lifecycleSubject, event);
     }
 
     @NonNull
     @CheckResult
-    public final <T> LifecycleTransformer<T> bindToLifecycle() {
+    private <T> LifecycleTransformer<T> bindToLifecycle() {
         return RxLifecycleAndroid.bind(this.lifecycleSubject);
     }
 
@@ -85,47 +101,116 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
     @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
     protected void onAny(LifecycleOwner owner, Lifecycle.Event event) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_ANY);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onAny(owner, event);
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     protected void onCreate() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_CREATE);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onCreate();
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     protected void onDestroy() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_DESTROY);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onDestroy();
+            }
+        }
+        childViewModels.clear();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     protected void onStart() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_START);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onStart();
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     protected void onStop() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_STOP);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onStop();
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     protected void onResume() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_RESUME);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onResume();
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     protected void onPause() {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_PAUSE);
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onPause();
+            }
+        }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {}
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!childViewModels.isEmpty()) {
+            for (BaseViewModel childViewModel : childViewModels) {
+                childViewModel.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
 
     @Override
     public void showWaitDialog(String title) {
-        showWait.postValue(title);
+        waitEvent.postValue(title);
     }
 
     @Override
     public void dismissWaitDialog() {
-        showWait.postValue("");
+        waitEvent.postValue("");
+    }
+
+    public void navigation(RouterCard routerCard) {
+        navigation(routerCard, 0);
+    }
+
+    public void navigation(RouterCard routerCard, int requestCode) {
+       navigation(routerCard, requestCode, null);
+    }
+
+    public void navigation(RouterCard routerCard, int requestCode, String toActivity) {
+        RouterModel routerModel = new RouterModel();
+        routerModel.setRouterCard(routerCard);
+        routerModel.setRequestCode(requestCode);
+        routerModel.setToActivity(toActivity);
+        routerEvent.postValue(routerModel);
+    }
+
+    public void finish() {
+        finishEvent.postValue(new FinishModel());
+    }
+
+    public void finishForResult(int resultCode, Bundle bundle) {
+        FinishModel finishModel = new FinishModel();
+        finishModel.setResultCode(resultCode);
+        finishModel.setBundle(bundle);
+        finishEvent.postValue(finishModel);
     }
 }

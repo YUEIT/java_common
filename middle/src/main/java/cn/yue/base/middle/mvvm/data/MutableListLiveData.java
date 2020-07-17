@@ -1,4 +1,4 @@
-package cn.yue.base.middle.mvvm;
+package cn.yue.base.middle.mvvm.data;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;

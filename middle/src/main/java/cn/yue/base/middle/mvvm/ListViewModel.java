@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.middle.components.load.LoadStatus;
 import cn.yue.base.middle.components.load.PageStatus;
+import cn.yue.base.middle.mvvm.data.MutableListLiveData;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetSingleObserver;
@@ -31,7 +32,8 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
     private String lastNt = "1";
     public int total = 0;    //当接口返回总数时，为返回数量；接口未返回数量，为统计数量；
     
-    public MutableListLiveData<S> dataList = new MutableListLiveData<S>();
+    public MutableListLiveData<S> dataLiveData = new MutableListLiveData<S>();
+    private ArrayList<S> dataList = new ArrayList<>();
 
     protected String initPageNt() {
         return "1";
@@ -89,7 +91,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
                     @Override
                     public void onSuccess(P p) {
                         if (isLoadingRefresh) {
-                            dataList.setValue(new ArrayList<>());
+                            dataList.clear();
                         }
                         if (isLoadingRefresh && p.getCurrentPageTotal() == 0) {
                             loadEmpty();
@@ -97,7 +99,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
                             loadSuccess(p);
                             if (p.getCurrentPageTotal() < p.getPageSize()) {
                                 loadNoMore();
-                            } else if (p.getTotal() > 0 && p.getTotal() <= dataList.getValue().size()) {
+                            } else if (p.getTotal() > 0 && p.getTotal() <= dataList.size()) {
                                 loadNoMore();
                             } else if (p.getCurrentPageTotal() == 0) {
                                 loadNoMore();
@@ -149,6 +151,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
         }
         lastNt = pageNt;
         dataList.addAll(p.getList() == null? new ArrayList<S>() : p.getList());
+        dataLiveData.postValue(dataList);
     }
 
     protected void loadFailed(ResultException e) {
@@ -193,6 +196,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
     protected void loadEmpty() {
         total = 0;
         dataList.clear();
+        dataLiveData.postValue(dataList);
         if (showSuccessWithNoData()) {
             loader.setPageStatus(PageStatus.NORMAL);
             loader.setLoadStatus(LoadStatus.NO_DATA);

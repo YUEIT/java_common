@@ -7,13 +7,13 @@ import androidx.annotation.NonNull;
 
 public interface INavigation {
 
-    void bindRouterCard(RouterCard routerCard);
+    INavigation bindRouterCard(RouterCard routerCard);
 
     void navigation(Context context);
 
-    void navigation(@NonNull Context context, Class toActivity);
+    void navigation(@NonNull Context context, String toActivity);
 
     void navigation(Activity context, int requestCode);
 
-    void navigation(@NonNull Activity context, Class toActivity, int requestCode);
+    void navigation(@NonNull Activity context, String toActivity, int requestCode);
 }

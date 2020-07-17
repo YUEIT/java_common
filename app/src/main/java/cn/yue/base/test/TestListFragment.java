@@ -25,10 +25,10 @@ public class TestListFragment extends BaseListFragment<BaseListBean<TestItemBean
         super.initView(savedInstanceState);
     }
 
-    @Override
-    protected int getLayoutId() {
-        return R.layout.test_fragment_base_pull_page;
-    }
+//    @Override
+//    protected int getLayoutId() {
+//        return R.layout.test_fragment_base_pull_page;
+//    }
 
     @Override
     protected int getItemLayoutId(int viewType) {
@@ -46,7 +46,7 @@ public class TestListFragment extends BaseListFragment<BaseListBean<TestItemBean
         listBean.setPageSize(20);
         listBean.setTotal(22);
         List<TestItemBean> list = new ArrayList<>();
-        for (int i=0; i < 10; i++) {
+        for (int i=0; i < 20; i++) {
             TestItemBean testItemBean = new TestItemBean();
             testItemBean.setName("this is " + i);
             list.add(testItemBean);

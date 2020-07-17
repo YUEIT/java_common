@@ -28,13 +28,13 @@ public class RxLifecycleProvider implements ILifecycleProvider<Event>, Lifecycle
 
     @NonNull
     @CheckResult
-    public final <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
+    private <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
         return RxLifecycle.bindUntilEvent(this.lifecycleSubject, event);
     }
 
     @NonNull
     @CheckResult
-    public final <T> LifecycleTransformer<T> bindToLifecycle() {
+    private <T> LifecycleTransformer<T> bindToLifecycle() {
         return RxLifecycleAndroid.bind(this.lifecycleSubject);
     }
 

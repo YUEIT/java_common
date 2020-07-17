@@ -46,7 +46,7 @@ public class UploadUtils {
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
-                .compose(lifecycleProvider.<ImageResultListData>bindToLifecycle())
+                .compose(lifecycleProvider.<ImageResultListData>toBindLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uploadObserver);
     }

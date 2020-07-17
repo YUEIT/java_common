@@ -8,12 +8,13 @@ import androidx.databinding.ViewDataBinding;
 
 import cn.yue.base.middle.mvvm.PullViewModel;
 import cn.yue.base.middle.mvvm.components.BasePullVMFragment;
+import cn.yue.base.middle.mvvm.data.BR;
 
 /**
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullVMBindFragment<T extends ViewDataBinding, VM extends PullViewModel> extends BasePullVMFragment<VM> {
+public abstract class BasePullVMBindFragment<VM extends PullViewModel, T extends ViewDataBinding> extends BasePullVMFragment<VM> {
 
     protected T binding;
 
@@ -23,7 +24,9 @@ public abstract class BasePullVMBindFragment<T extends ViewDataBinding, VM exten
         binding.setVariable(getVariableId(), viewModel);
     }
 
-    public abstract int getVariableId();
+    public int getVariableId() {
+        return BR.viewModel;
+    }
 
     @Override
     protected void bindLayout(View inflated) {

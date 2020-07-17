@@ -1,4 +1,4 @@
-package cn.yue.base.middle.mvvm;
+package cn.yue.base.middle.mvvm.data;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
@@ -19,7 +19,7 @@ public class LoaderLiveData {
     }
 
     public void setPageStatus(PageStatus pageStatus) {
-        pageStatusLiveData.postValue(pageStatus);
+        pageStatusLiveData.setValue(pageStatus);
     }
 
     public PageStatus getPageStatus() {
@@ -27,7 +27,7 @@ public class LoaderLiveData {
     }
 
     public void setLoadStatus(LoadStatus loadStatus) {
-        loadStatusLiveData.postValue(loadStatus);
+        loadStatusLiveData.setValue(loadStatus);
     }
 
     public LoadStatus getLoadStatus() {

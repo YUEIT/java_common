@@ -39,7 +39,7 @@ public class TestFragment extends BaseHintFragment{
             @Override
             public void onClick(View v) {
                 FRouter.getInstance()
-                        .build("/app/testPullList")
+                        .build("/app/testPull")
                         .navigation(mActivity);
 //                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }
@@ -49,7 +49,7 @@ public class TestFragment extends BaseHintFragment{
             @Override
             public void onClick(View v) {
                 FRouter.getInstance()
-                        .build("/app/testPullVM")
+                        .build("/app/testPageVM")
                         .navigation(mActivity);
 //                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }

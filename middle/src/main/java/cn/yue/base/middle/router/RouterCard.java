@@ -35,12 +35,12 @@ public class RouterCard implements INavigation, Parcelable{
     private boolean isInterceptLogin; //是否登录拦截
     private INavigation navigation;
 
-    public RouterCard(@NonNull INavigation navigation) {
-        this.flags = -1;
-        this.timeout = 300;
-        this.mBundle = new Bundle();
-        this.isInterceptLogin = false;
-        this.transition = 0;
+    public RouterCard() {
+        clear();
+    }
+
+    public RouterCard(INavigation navigation) {
+        clear();
         this.navigation = navigation;
     }
 
@@ -401,8 +401,8 @@ public class RouterCard implements INavigation, Parcelable{
     };
 
     @Override
-    public void bindRouterCard(RouterCard routerCard) {
-
+    public INavigation bindRouterCard(RouterCard routerCard) {
+        return null;
     }
 
     @Override
@@ -413,7 +413,7 @@ public class RouterCard implements INavigation, Parcelable{
     }
 
     @Override
-    public void navigation(@NonNull Context context, Class toActivity) {
+    public void navigation(@NonNull Context context, String toActivity) {
         if (navigation != null) {
             navigation.navigation(context, toActivity);
         }
@@ -427,7 +427,7 @@ public class RouterCard implements INavigation, Parcelable{
     }
 
     @Override
-    public void navigation(@NonNull Activity context, Class toActivity, int requestCode) {
+    public void navigation(@NonNull Activity context, String toActivity, int requestCode) {
         if (navigation != null) {
             navigation.navigation(context, toActivity, requestCode);
         }

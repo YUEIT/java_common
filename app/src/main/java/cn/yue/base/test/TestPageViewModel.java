@@ -25,6 +25,7 @@ public class TestPageViewModel extends PageViewModel<TestItemBean> {
         List<TestItemBean> list = new ArrayList<>();
         for (int i=0; i < 20; i++) {
             TestItemBean testItemBean = new TestItemBean();
+            testItemBean.setIndex(i);
             testItemBean.setName("this is " + i);
             list.add(testItemBean);
         }

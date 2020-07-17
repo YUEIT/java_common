@@ -111,8 +111,10 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     @Override
-    public void bindRouterCard(RouterCard routerCard) {
+    public INavigation bindRouterCard(RouterCard routerCard) {
         this.routerCard = routerCard;
+        this.routerCard.setNavigationImpl(this);
+        return this;
     }
 
     @Override
@@ -121,7 +123,7 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     @Override
-    public void navigation(@NonNull Context context, Class toActivity) {
+    public void navigation(@NonNull Context context, String toActivity) {
         if (routerCard.isInterceptLogin() && interceptLogin(context)) {
             return;
         }
@@ -140,7 +142,7 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     @Override
-    public void navigation(@NonNull Activity context, Class toActivity, int requestCode) {
+    public void navigation(@NonNull Activity context, String toActivity, int requestCode) {
         if (routerCard.isInterceptLogin() && interceptLogin(context)) {
             return;
         }
@@ -176,11 +178,11 @@ public class FRouter implements INavigation, Parcelable {
         jumpToFragment(context, null);
     }
 
-    private void jumpToFragment(Context context, Class toActivity) {
+    private void jumpToFragment(Context context, String toActivity) {
         jumpToFragment(context, toActivity, -1);
     }
 
-    private void jumpToFragment(Context context, Class toActivity, int requestCode) {
+    private void jumpToFragment(Context context, String toActivity, int requestCode) {
         Intent intent = new Intent();
         intent.putExtra(TAG, this);
         intent.putExtras(routerCard.getExtras());
@@ -192,7 +194,7 @@ public class FRouter implements INavigation, Parcelable {
                 intent.setClass(context, targetActivity);
             }
         } else {
-            intent.setClass(context, toActivity);
+            intent.setClassName(context, toActivity);
         }
         if (requestCode <= 0) {
             context.startActivity(intent);

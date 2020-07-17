@@ -19,7 +19,8 @@ public abstract class BaseNetSingleObserver<T> extends DisposableSingleObserver<
         ResultException resultException;
         if (e instanceof ResultException) {
             resultException = (ResultException) e;
-            if (NetworkConfig.ERROR_TOKEN_INVALID.equals(resultException.getCode()) || NetworkConfig.ERROR_LOGIN_INVALID.equals(resultException.getCode())) {
+            if (NetworkConfig.ERROR_TOKEN_INVALID.equals(resultException.getCode())
+                    || NetworkConfig.ERROR_LOGIN_INVALID.equals(resultException.getCode())) {
                 onLoginInvalid();
                 return;
             }

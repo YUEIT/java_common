@@ -8,17 +8,20 @@ import androidx.databinding.ViewDataBinding;
 
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.components.BaseHintVMFragment;
+import cn.yue.base.middle.mvvm.data.BR;
 
-public abstract class BaseHintVMBindFragment<T extends ViewDataBinding, VM extends BaseViewModel> extends BaseHintVMFragment<VM> {
+public abstract class BaseHintVMBindFragment<VM extends BaseViewModel, T extends ViewDataBinding> extends BaseHintVMFragment<VM> {
 
     protected T binding;
-
-    public abstract int getVariableId();
 
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         binding.setVariable(getVariableId(), viewModel);
+    }
+
+    public int getVariableId() {
+        return BR.viewModel;
     }
 
     @Override
