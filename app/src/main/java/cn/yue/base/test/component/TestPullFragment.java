@@ -1,4 +1,4 @@
-package cn.yue.base.test;
+package cn.yue.base.test.component;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.middle.components.BasePullFragment;
 import cn.yue.base.middle.net.observer.BasePullSingleObserver;
+import cn.yue.base.test.R;
 import io.reactivex.Single;
 
 @Route(path = "/app/testPull")

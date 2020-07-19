@@ -49,7 +49,7 @@ public class TestFragment extends BaseHintFragment{
             @Override
             public void onClick(View v) {
                 FRouter.getInstance()
-                        .build("/app/testPageVM")
+                        .build("/app/parent2")
                         .navigation(mActivity);
 //                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
             }

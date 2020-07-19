@@ -1,4 +1,4 @@
-package cn.yue.base.test;
+package cn.yue.base.test.component;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 

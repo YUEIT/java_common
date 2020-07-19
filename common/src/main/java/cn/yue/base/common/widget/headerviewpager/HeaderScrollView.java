@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -12,6 +11,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import cn.yue.base.common.R;
 
@@ -22,7 +23,7 @@ import cn.yue.base.common.R;
  * 时间：2016/10/26.
  */
 
-public class HeaderViewPager extends LinearLayout {
+public class HeaderScrollView extends LinearLayout {
 
     private static final int DIRECTION_UP = 1;
     private static final int DIRECTION_DOWN = 2;
@@ -55,19 +56,19 @@ public class HeaderViewPager extends LinearLayout {
         this.onScrollListener = onScrollListener;
     }
 
-    public HeaderViewPager(Context context) {
+    public HeaderScrollView(Context context) {
         this(context, null);
     }
 
-    public HeaderViewPager(Context context, AttributeSet attrs) {
+    public HeaderScrollView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public HeaderViewPager(Context context, AttributeSet attrs, int defStyleAttr) {
+    public HeaderScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.HeaderViewPager);
-        topOffset = a.getDimensionPixelSize(a.getIndex(R.styleable.HeaderViewPager_hvp_topOffset), topOffset);
+        setOrientation(VERTICAL);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.HeaderScrollView);
+        topOffset = a.getDimensionPixelSize(a.getIndex(R.styleable.HeaderScrollView_hvp_topOffset), topOffset);
         a.recycle();
 
         mScroller = new Scroller(context);
@@ -103,10 +104,6 @@ public class HeaderViewPager extends LinearLayout {
         mDisallowIntercept = disallowIntercept;
     }
 
-    private float mDownX;  //第一次按下的x坐标
-    private float mDownY;  //第一次按下的y坐标
-    private float mLastY;  //最后一次移动的Y坐标
-    private boolean verticalScrollFlag = false;   //是否允许垂直滚动
     //解决SwipeRefreshLayout与其滑动冲突
     private SwipeRefreshLayout refreshLayout;
     public void setSwipeRefreshLayout(SwipeRefreshLayout refreshLayout){
@@ -128,6 +125,16 @@ public class HeaderViewPager extends LinearLayout {
      * super.dispatchTouchEvent(ev);
      * return true;
      */
+
+    private float mDownX;  //第一次按下的x坐标
+    private float mDownY;  //第一次按下的y坐标
+    private float mLastX;  //最后一次移动的X坐标
+    private float mLastY;  //最后一次移动的Y坐标
+    private int scrollFlag = SCROLL_NULL;   //是否允许垂直滚动
+    private static final int SCROLL_NULL = 0;
+    private static final int SCROLL_HORIZONTAL = 1;
+    private static final int SCROLL_VERTICAL = 2;
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if(mScrollable.getScrollableView() == null){
@@ -137,15 +144,17 @@ public class HeaderViewPager extends LinearLayout {
         float currentY = ev.getY();                   //当前手指相对于当前view的Y坐标
         float shiftX = Math.abs(currentX - mDownX);   //当前触摸位置与第一次按下位置的X偏移量
         float shiftY = Math.abs(currentY - mDownY);   //当前触摸位置与第一次按下位置的Y偏移量
+        float deltaX;
         float deltaY;                                 //滑动的偏移量，即连续两次进入Move的偏移量
         obtainVelocityTracker(ev);                    //初始化速度追踪器
         switch (ev.getAction()) {
             //Down事件主要初始化变量
             case MotionEvent.ACTION_DOWN:
                 mDisallowIntercept = false;
-                verticalScrollFlag = false;
+                scrollFlag = SCROLL_NULL;
                 mDownX = currentX;
                 mDownY = currentY;
+                mLastX = currentX;
                 mLastY = currentY;
                 checkIsClickHead((int) currentY, mHeadHeight, getScrollY());
                 mScroller.abortAnimation();
@@ -159,29 +168,40 @@ public class HeaderViewPager extends LinearLayout {
                     }
                 }
                 if (mDisallowIntercept) break;
-                deltaY = mLastY - currentY; //连续两次进入move的偏移量
+                deltaY = mLastY - currentY;
+                deltaX = mLastX - currentX;
+                mLastX = currentX;
                 mLastY = currentY;
-                if (shiftX > mTouchSlop && shiftX > shiftY) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     //水平滑动
-                    verticalScrollFlag = false;
-                } else if (shiftY > mTouchSlop && shiftY > shiftX) {
+                    if (scrollFlag == SCROLL_NULL) {
+                        scrollFlag = SCROLL_HORIZONTAL;
+                    }
+                } else if (Math.abs(deltaY) >= Math.abs(deltaX)) {
                     //垂直滑动
-                    verticalScrollFlag = true;
+                    if (scrollFlag == SCROLL_NULL) {
+                        scrollFlag = SCROLL_VERTICAL;
+                    }
                 }
-                /**
-                 * 这里要注意，对于垂直滑动来说，给出以下三个条件
-                 * 头部没有固定，允许滑动的View处于第一条可见，当前按下的点在头部区域
-                 * 三个条件满足一个即表示需要滚动当前布局，否者不处理，将事件交给子View去处理
+                /*
+                    对于垂直滑动来说
+                    上滑时（当前优先） 如果当前没有置顶先滑动当前；如果已经置顶，当前不滑动，事件交给child
+                    下滑时（child优先） 如果child没有置顶，先滑动child，然后滑动当前
                  */
-                if (verticalScrollFlag && (!isStickied() || mScrollable.isTop() || isClickHead)) {
-                    //如果是向下滑，则deltaY小于0，对于scrollBy来说
-                    //正值为向上和向左滑，负值为向下和向右滑，这里要注意
-                    scrollBy(0, (int) (deltaY + 0.5));
+                if (scrollFlag == SCROLL_VERTICAL) {
+                    if (mScrollable.isTop() || deltaY > 0 || isClickHead) {
+                        //如果是向下滑，则deltaY小于0，对于scrollBy来说
+                        //正值为向上和向左滑，负值为向下和向右滑，这里要注意
+                        // 将置顶向上滑，置底向下滑排除
+                        if (!(deltaY < 0 && isInEnd()) || !(deltaY > 0 && isInTop())) {
+                            scrollBy(0, (int) (deltaY + 0.5));
+                        }
+                    }
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (verticalScrollFlag) {
+                if (scrollFlag == SCROLL_VERTICAL) {
                     mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity); //1000表示单位，每1000毫秒允许滑过的最大距离是mMaximumVelocity
                     float yVelocity = mVelocityTracker.getYVelocity();  //获取当前的滑动速度
                     mDirection = yVelocity > 0 ? DIRECTION_DOWN : DIRECTION_UP;  //下滑速度大于0，上滑速度小于0
@@ -192,7 +212,7 @@ public class HeaderViewPager extends LinearLayout {
                     invalidate();  //更新界面，该行代码会导致computeScroll中的代码执行
                     //阻止快读滑动的时候点击事件的发生，滑动的时候，将Up事件改为Cancel就不会发生点击了
                     if ((shiftX > mTouchSlop || shiftY > mTouchSlop)) {
-                        if (isClickHead || (!isStickied() && !isRefreshLayoutOverTop)) {
+                        if (isClickHead || (!isInTop() && !isRefreshLayoutOverTop)) {
                             int action = ev.getAction();
                             ev.setAction(MotionEvent.ACTION_CANCEL);
                             boolean dd = super.dispatchTouchEvent(ev);
@@ -210,7 +230,14 @@ public class HeaderViewPager extends LinearLayout {
                 break;
         }
         //手动将事件传递给子View，让子View自己去处理事件
-        super.dispatchTouchEvent(ev);
+        if (scrollFlag == SCROLL_VERTICAL) {
+            //防止垂直滑动时，触发侧滑
+            MotionEvent interceptEvent = MotionEvent.obtain(ev.getDownTime(), ev.getEventTime(),
+                    ev.getAction(), mDownX, ev.getY(), ev.getMetaState());
+            super.dispatchTouchEvent(interceptEvent);
+        } else {
+            super.dispatchTouchEvent(ev);
+        }
         //消费事件，返回True表示当前View需要消费事件，就是事件的TargetView
         return true;
     }
@@ -239,7 +266,7 @@ public class HeaderViewPager extends LinearLayout {
             final int currY = mScroller.getCurrY();
             if (mDirection == DIRECTION_UP) {
                 // 手势向上划
-                if (isStickied()) {
+                if (isInTop()) {
                     //这里主要是将快速滚动时的速度对接起来，让布局看起来滚动连贯
                     int distance = mScroller.getFinalY() - currY;    //除去布局滚动消耗的时间后，剩余的时间
                     int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed()); //除去布局滚动的距离后，剩余的距离
@@ -257,10 +284,17 @@ public class HeaderViewPager extends LinearLayout {
                     int deltaY = (currY - mLastScrollerY);
                     int toY = getScrollY() + deltaY;
                     scrollTo(0, toY);
-                    if (mCurY <= minY) {
+                    if (isInEnd()) {
                         mScroller.abortAnimation();
                         return;
                     }
+                    invalidate();
+                } else {
+                    //这里主要是将快速滚动时的速度对接起来，让布局看起来滚动连贯
+                    int distance = mScroller.getFinalY() - currY;    //除去布局滚动消耗的时间后，剩余的时间
+                    int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed()); //除去布局滚动的距离后，剩余的距离
+                    int velocity = -getScrollerVelocity(distance, duration);
+                    mScrollable.smoothScrollBy(velocity, distance, duration);
                 }
                 //向下滑动时，初始状态可能不在顶部，所以要一直重绘，让computeScroll一直调用
                 //确保代码能进入上面的if判断
@@ -310,9 +344,14 @@ public class HeaderViewPager extends LinearLayout {
         super.scrollTo(x, y);
     }
 
-    /** 头部是否已经固定 */
-    public boolean isStickied() {
-        return mCurY == maxY;
+    /** 头部置顶 最大层度隐藏 */
+    public boolean isInTop() {
+        return mCurY >= maxY;
+    }
+
+    /** 头部置底 完全显示 */
+    public boolean isInEnd() {
+        return mCurY <= minY;
     }
 
     private int calcDuration(int duration, int timepass) {
@@ -329,7 +368,7 @@ public class HeaderViewPager extends LinearLayout {
 
     /** 是否允许下拉，与PTR结合使用 */
     public boolean canPtr() {
-        return verticalScrollFlag && mCurY == minY && mScrollable.isTop();
+        return scrollFlag == SCROLL_VERTICAL && mCurY == minY && mScrollable.isTop();
     }
 
     public void setTopOffset(int topOffset) {

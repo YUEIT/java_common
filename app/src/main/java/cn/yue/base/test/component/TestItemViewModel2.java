@@ -1,4 +1,4 @@
-package cn.yue.base.test;
+package cn.yue.base.test.component;
 
 import androidx.databinding.ObservableField;
 
@@ -6,6 +6,7 @@ import cn.yue.base.common.binding.action.BindingAction;
 import cn.yue.base.common.binding.action.BindingCommand;
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.ItemViewModel;
+import cn.yue.base.test.R;
 
 public class TestItemViewModel2 extends ItemViewModel {
 

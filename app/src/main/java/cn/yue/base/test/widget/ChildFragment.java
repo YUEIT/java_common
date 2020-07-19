@@ -1,34 +1,16 @@
-package cn.yue.base.test;
-
-import android.os.Bundle;
-
-import com.alibaba.android.arouter.facade.annotation.Route;
+package cn.yue.base.test.widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.components.BaseListFragment;
+import cn.yue.base.middle.components.BasePageFragment;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.test.R;
+import cn.yue.base.test.component.TestItemBean;
 import io.reactivex.Single;
 
-/**
- * Description :
- * Created by yue on 2019/6/11
- */
-
-@Route(path = "/app/testPullList")
-public class TestListFragment extends BaseListFragment<BaseListBean<TestItemBean>, TestItemBean> {
-
-    @Override
-    protected void initView(Bundle savedInstanceState) {
-        super.initView(savedInstanceState);
-    }
-
-//    @Override
-//    protected int getLayoutId() {
-//        return R.layout.test_fragment_base_pull_page;
-//    }
+public class ChildFragment extends BasePageFragment<TestItemBean> {
 
     @Override
     protected int getItemLayoutId(int viewType) {
@@ -48,11 +30,11 @@ public class TestListFragment extends BaseListFragment<BaseListBean<TestItemBean
         List<TestItemBean> list = new ArrayList<>();
         for (int i=0; i < 20; i++) {
             TestItemBean testItemBean = new TestItemBean();
+            testItemBean.setIndex(i);
             testItemBean.setName("this is " + i);
             list.add(testItemBean);
         }
         listBean.setList(list);
         return Single.just(listBean);
     }
-
 }

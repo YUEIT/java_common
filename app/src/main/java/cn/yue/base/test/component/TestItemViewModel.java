@@ -1,7 +1,8 @@
-package cn.yue.base.test;
+package cn.yue.base.test.component;
 
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.ItemViewModel;
+import cn.yue.base.test.R;
 
 public class TestItemViewModel extends ItemViewModel {
 
