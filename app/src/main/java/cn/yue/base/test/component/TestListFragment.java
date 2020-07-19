@@ -26,10 +26,10 @@ public class TestListFragment extends BaseListFragment<BaseListBean<TestItemBean
         super.initView(savedInstanceState);
     }
 
-//    @Override
-//    protected int getLayoutId() {
-//        return R.layout.test_fragment_base_pull_page;
-//    }
+    @Override
+    protected int getLayoutId() {
+        return R.layout.test_fragment_base_pull_page;
+    }
 
     @Override
     protected int getItemLayoutId(int viewType) {

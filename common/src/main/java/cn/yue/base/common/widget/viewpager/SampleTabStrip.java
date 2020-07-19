@@ -1,4 +1,4 @@
-package cn.yue.base.common.widget.headerviewpager;
+package cn.yue.base.common.widget.viewpager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -37,8 +37,18 @@ public class SampleTabStrip extends HorizontalScrollView {
 
     public interface LayoutTabProvider {
 
+        /**
+         * 创建一个 tab item
+         * @param position
+         * @return
+         */
         View createTabView(int position);
 
+        /**
+         * viewPager切换时，回调所有的item
+         * @param v
+         * @param isSelect
+         */
         void changeTabStyle(View v, boolean isSelect);
 
     }
@@ -100,13 +110,13 @@ public class SampleTabStrip extends HorizontalScrollView {
         scrollOffset = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, scrollOffset, dm);
         tabPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, tabPadding, dm);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PagerSlidingTabStrip);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SampleTabStrip);
 
-        tabPadding = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsTabPaddingLeftRight, tabPadding);
-        tabBackgroundResId = a.getResourceId(R.styleable.PagerSlidingTabStrip_pstsTabBackground, tabBackgroundResId);
-        shouldExpand = a.getBoolean(R.styleable.PagerSlidingTabStrip_pstsShouldExpand, shouldExpand);
-        scrollOffset = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsScrollOffset, scrollOffset);
-        textAllCaps = a.getBoolean(R.styleable.PagerSlidingTabStrip_pstsTextAllCaps, textAllCaps);
+        tabPadding = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsTabPaddingLeftRight, tabPadding);
+        tabBackgroundResId = a.getResourceId(R.styleable.SampleTabStrip_stsTabBackground, tabBackgroundResId);
+        shouldExpand = a.getBoolean(R.styleable.SampleTabStrip_stsShouldExpand, shouldExpand);
+        scrollOffset = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsScrollOffset, scrollOffset);
+        textAllCaps = a.getBoolean(R.styleable.SampleTabStrip_stsTextAllCaps, textAllCaps);
         a.recycle();
 
         rectPaint = new Paint();
@@ -126,43 +136,36 @@ public class SampleTabStrip extends HorizontalScrollView {
         if (pager.getAdapter() == null) {
             throw new IllegalStateException("ViewPager does not have adapter instance.");
         }
-        pager.setOnPageChangeListener(pageListener);
+        pager.addOnPageChangeListener(pageListener);
 
         notifyDataSetChanged();
     }
-    public void setPageListenerNull(){
-        pager.setOnPageChangeListener(null);
-    }
 
-    public void setViewPagerAutoRefresh(ViewPager viewPager, boolean autoRefresh){
-        if(autoRefresh) {
-            if (pager != null) {
-                if (pageListener != null) {
-                    pager.removeOnPageChangeListener(pageListener);
-                }
-                if (mAdapterChangeListener != null) {
-                    pager.removeOnAdapterChangeListener(mAdapterChangeListener);
-                }
+    public void setViewPagerAutoRefresh(ViewPager viewPager) {
+        if (pager != null) {
+            if (pageListener != null) {
+                pager.removeOnPageChangeListener(pageListener);
             }
-            if (viewPager != null) {
-                pager = viewPager;
-                pager.addOnPageChangeListener(pageListener);
-                final PagerAdapter adapter = viewPager.getAdapter();
-                if (adapter != null) {
-                    // Now we'll populate ourselves from the pager adapter, adding an observer if
-                    // autoRefresh is enabled
-                    setPagerAdapter(adapter, true);
-                }
+            if (mAdapterChangeListener != null) {
+                pager.removeOnAdapterChangeListener(mAdapterChangeListener);
+            }
+        }
+        if (viewPager != null) {
+            pager = viewPager;
+            pager.addOnPageChangeListener(pageListener);
+            final PagerAdapter adapter = viewPager.getAdapter();
+            if (adapter != null) {
+                // Now we'll populate ourselves from the pager adapter, adding an observer if
+                // autoRefresh is enabled
+                setPagerAdapter(adapter, true);
+            }
 
-                // Add a listener so that we're notified of any adapter changes
-                if (mAdapterChangeListener == null) {
-                    mAdapterChangeListener = new AdapterChangeListener();
-                }
-                mAdapterChangeListener.setAutoRefresh(true);
-                viewPager.addOnAdapterChangeListener(mAdapterChangeListener);
+            // Add a listener so that we're notified of any adapter changes
+            if (mAdapterChangeListener == null) {
+                mAdapterChangeListener = new AdapterChangeListener();
             }
-        }else{
-            setViewPager(viewPager);
+            mAdapterChangeListener.setAutoRefresh(true);
+            viewPager.addOnAdapterChangeListener(mAdapterChangeListener);
         }
     }
 
@@ -193,8 +196,8 @@ public class SampleTabStrip extends HorizontalScrollView {
             final int adapterCount = mPagerAdapter.getCount();
             tabCount = adapterCount;
             for (int i = 0; i < adapterCount; i++) {
-                if(pager.getAdapter() instanceof LayoutTabProvider){
-                    addTab(i, ((LayoutTabProvider)pager.getAdapter()).createTabView(i));
+                if (pager.getAdapter() instanceof LayoutTabProvider) {
+                    addTab(i, ((LayoutTabProvider) pager.getAdapter()).createTabView(i));
                 }
 
             }
@@ -230,8 +233,8 @@ public class SampleTabStrip extends HorizontalScrollView {
         tabsContainer.removeAllViews();
         tabCount = pager.getAdapter().getCount();
         for (int i = 0; i < tabCount; i++) {
-            if(pager.getAdapter() instanceof LayoutTabProvider) {
-                addTab(i, ((LayoutTabProvider)pager.getAdapter()).createTabView(i));
+            if (pager.getAdapter() instanceof LayoutTabProvider) {
+                addTab(i, ((LayoutTabProvider) pager.getAdapter()).createTabView(i));
             }
         }
 
@@ -274,7 +277,7 @@ public class SampleTabStrip extends HorizontalScrollView {
         for (int i = 0; i < tabCount; i++) {
             View v = tabsContainer.getChildAt(i);
             v.setBackgroundResource(tabBackgroundResId);
-            if(pager.getAdapter() instanceof LayoutTabProvider){
+            if (pager.getAdapter() instanceof LayoutTabProvider) {
                 ((LayoutTabProvider) pager.getAdapter()).changeTabStyle(v, i == currentPosition);
             }
         }
@@ -321,9 +324,9 @@ public class SampleTabStrip extends HorizontalScrollView {
             lineLeft = (currentPositionOffset * nextTabLeft + (1f - currentPositionOffset) * lineLeft);
             lineRight = (currentPositionOffset * nextTabRight + (1f - currentPositionOffset) * lineRight);
         }
-        lineLeft += (float) currentTab.getMeasuredWidth()/ 2;
-        lineRight -= (float)currentTab.getMeasuredWidth()/ 2;
-        canvas.drawRect(lineLeft , height, lineRight , height, rectPaint);
+        lineLeft += (float) currentTab.getMeasuredWidth() / 2;
+        lineRight -= (float) currentTab.getMeasuredWidth() / 2;
+        canvas.drawRect(lineLeft, height, lineRight, height, rectPaint);
     }
 
     private class PagerAdapterObserver extends DataSetObserver {
@@ -344,7 +347,8 @@ public class SampleTabStrip extends HorizontalScrollView {
     private class AdapterChangeListener implements ViewPager.OnAdapterChangeListener {
         private boolean mAutoRefresh;
 
-        AdapterChangeListener() { }
+        AdapterChangeListener() {
+        }
 
         @Override
         public void onAdapterChanged(@NonNull ViewPager viewPager,
@@ -365,7 +369,7 @@ public class SampleTabStrip extends HorizontalScrollView {
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             currentPosition = position;
             currentPositionOffset = positionOffset;
-            if(position < tabsContainer.getChildCount()) {
+            if (position < tabsContainer.getChildCount()) {
                 scrollToChild(position, (int) (positionOffset * tabsContainer.getChildAt(position).getWidth()));
                 updateTabStyles();
                 invalidate();

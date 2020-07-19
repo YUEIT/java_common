@@ -4,17 +4,20 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
+import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.middle.router.FRouter;
 
@@ -30,33 +33,93 @@ public class TestFragment extends BaseHintFragment{
         return R.layout.fragment_test;
     }
 
-    private CommonAdapter commonAdapter;
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
-        TextView option1TV = findViewById(R.id.option1TV);
-        option1TV.setOnClickListener(new View.OnClickListener() {
+        RecyclerView recyclerView = findViewById(R.id.rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+        List<Object> list = new ArrayList<>();
+        for (int i=0; i < 6; i++) {
+            list.add(new Object());
+        }
+        recyclerView.setAdapter(new CommonAdapter(mActivity, list) {
             @Override
-            public void onClick(View v) {
-                FRouter.getInstance()
-                        .build("/app/testPull")
-                        .navigation(mActivity);
-//                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
+            public int getLayoutIdByType(int viewType) {
+                return R.layout.item_test;
             }
-        });
-        TextView option2TV = findViewById(R.id.option2TV);
-        option2TV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FRouter.getInstance()
-                        .build("/app/parent2")
-                        .navigation(mActivity);
-//                FRouter.getInstance().build("/common/selectPhoto").navigation(mActivity, 1);
-            }
-        });
 
+            @Override
+            public void bindData(CommonViewHolder holder, int position, Object o) {
+                if (position == 0) {
+                    holder.setText(R.id.testTV, "pull");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/testPull")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+                if (position == 1) {
+                    holder.setText(R.id.testTV, "pull-VM");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/testPull")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+                if (position == 2) {
+                    holder.setText(R.id.testTV, "page");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/testPullList")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+                if (position == 3) {
+                    holder.setText(R.id.testTV, "page-VM");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/testPullVM")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+                if (position == 4) {
+                    holder.setText(R.id.testTV, "Header-viewPager");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/parent")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+                if (position == 5) {
+                    holder.setText(R.id.testTV, "Header-viewPager2");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FRouter.getInstance()
+                                    .build("/app/parent2")
+                                    .navigation(mActivity);
+                        }
+                    });
+                }
+            }
+        });
     }
-    ImageView testImage;
+
 
 
     private void hookOnClickListener(View view) {
@@ -99,7 +162,6 @@ public class TestFragment extends BaseHintFragment{
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && data != null) {
             List<Uri> uris = data.getParcelableArrayListExtra("photos");
-            commonAdapter.setList(uris);
         }
     }
 

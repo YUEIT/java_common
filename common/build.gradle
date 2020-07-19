@@ -41,6 +41,7 @@ dependencies {
     api rootProject.ext.androidx["gridlayout"]
     api rootProject.ext.androidx["recyclerview"]
     api rootProject.ext.androidx["cardview"]
+    api rootProject.ext.androidx["viewpager2"]
     api rootProject.ext.androidx["design"]
     api rootProject.ext.androidx["legacy"]
 
@@ -57,6 +58,7 @@ dependencies {
     api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxandroid"]
 //    api rootProject.ext.dependencies["rxlifecycle"]
+
 }
 
 //apply plugin: 'maven'

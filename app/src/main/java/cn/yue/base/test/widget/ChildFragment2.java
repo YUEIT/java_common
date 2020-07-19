@@ -5,7 +5,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.common.widget.headerviewpager.HeaderScrollHelper;
+import cn.yue.base.common.widget.viewpager.HeaderScrollHelper;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BasePageFragment;
 import cn.yue.base.middle.net.wrapper.BaseListBean;

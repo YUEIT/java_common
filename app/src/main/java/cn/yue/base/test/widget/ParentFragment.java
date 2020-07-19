@@ -9,16 +9,19 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.common.widget.headerviewpager.SampleTabStrip;
+import cn.yue.base.common.widget.viewpager.SampleTabStrip;
+import cn.yue.base.common.widget.viewpager.SampleTabStrip2;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.test.R;
 
@@ -31,15 +34,48 @@ public class ParentFragment extends BaseHintFragment {
     }
 
 
-    MyPageAdapter pageAdapter;
+    MyPageAdapter2 pageAdapter;
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
-        pageAdapter = new MyPageAdapter(mActivity, mFragmentManager);
-        ViewPager viewPager = findViewById(R.id.viewPager);
+        pageAdapter = new MyPageAdapter2(mActivity);
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(pageAdapter);
-        SampleTabStrip tab = findViewById(R.id.tabs);
-        tab.setViewPagerAutoRefresh(viewPager, true);
+        SampleTabStrip2 tab = findViewById(R.id.tabs);
+        tab.setViewPager(viewPager);
+    }
+
+    class  MyPageAdapter2 extends FragmentStateAdapter implements SampleTabStrip2.LayoutTabProvider {
+
+        public MyPageAdapter2(@NonNull FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return new ChildFragment();
+        }
+
+        @Override
+        public int getItemCount() {
+            return 3;
+        }
+
+        @Override
+        public View createTabView() {
+            return View.inflate(mActivity, R.layout.item_viewpager_test, null);
+        }
+
+        @Override
+        public void bindTabView(View view, int position, boolean isSelected) {
+            TextView tab = view.findViewById(R.id.itemTV);
+            if (isSelected) {
+                tab.setTextColor(Color.parseColor("#ff0000"));
+            } else {
+                tab.setTextColor(Color.parseColor("#00ff00"));
+            }
+        }
     }
 
     class MyPageAdapter extends FragmentPagerAdapter implements SampleTabStrip.LayoutTabProvider {

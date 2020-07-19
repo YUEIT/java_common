@@ -26,6 +26,18 @@
         <attr name="pstsIndicatorGradientEndColor" format="color"/>
     </declare-styleable>
 
+    <declare-styleable name="SampleTabStrip">
+        <attr name="stsTabPaddingLeftRight" format="dimension"/>
+        <attr name="stsScrollOffset" format="dimension"/>
+        <attr name="stsTabBackground" format="reference"/>
+        <attr name="stsShouldExpand" format="boolean"/>
+        <attr name="stsTextAllCaps" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="SampleTabStrip2">
+        <attr name="sts2ShouldExpand" format="boolean"/>
+    </declare-styleable>
+
     <declare-styleable name="RoundImageView">
         <attr name="border_radius" format="dimension" />
         <attr name="border_color" format="color" />

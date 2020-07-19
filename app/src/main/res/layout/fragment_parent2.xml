@@ -4,7 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <cn.yue.base.common.widget.headerviewpager.HeaderScrollView
+    <cn.yue.base.middle.view.refresh.OverRefreshLayout
+        android:id="@+id/refreshL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <cn.yue.base.common.widget.viewpager.HeaderScrollView
         android:id="@+id/headerViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,17 +18,17 @@
             android:layout_height="400dp"
             android:background="#00fff0"/>
 
-        <cn.yue.base.common.widget.headerviewpager.SampleTabStrip
+        <cn.yue.base.common.widget.viewpager.SampleTabStrip
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            app:pstsShouldExpand="true"/>
+            app:stsShouldExpand="true"/>
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </cn.yue.base.common.widget.headerviewpager.HeaderScrollView>
-
+    </cn.yue.base.common.widget.viewpager.HeaderScrollView>
+    </cn.yue.base.middle.view.refresh.OverRefreshLayout>
 </FrameLayout>

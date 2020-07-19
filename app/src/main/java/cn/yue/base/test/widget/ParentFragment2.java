@@ -1,27 +1,23 @@
 package cn.yue.base.test.widget;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.yue.base.common.widget.headerviewpager.HeaderScrollHelper;
-import cn.yue.base.common.widget.headerviewpager.HeaderScrollView;
-import cn.yue.base.common.widget.headerviewpager.SampleTabStrip;
+import cn.yue.base.common.widget.viewpager.HeaderScrollHelper;
+import cn.yue.base.common.widget.viewpager.HeaderScrollView;
+import cn.yue.base.common.widget.viewpager.SampleFragmentPagerAdapter;
+import cn.yue.base.common.widget.viewpager.SampleTabStrip;
 import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.view.refresh.OverRefreshLayout;
 import cn.yue.base.test.R;
 
 @Route(path = "/app/parent2")
@@ -38,42 +34,24 @@ public class ParentFragment2 extends BaseHintFragment {
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
+        OverRefreshLayout refreshL = findViewById(R.id.refreshL);
+        refreshL.setEnableLoadmore(false);
+        refreshL.setEnableOverScroll(false);
         headerScrollView = findViewById(R.id.headerViewPager);
 //        headerViewPager.setTopOffset(DisplayUtils.dip2px(50));
-        pageAdapter = new MyPageAdapter(mActivity, mFragmentManager);
+        pageAdapter = new MyPageAdapter(mFragmentManager);
         ViewPager viewPager = findViewById(R.id.viewPager);
-        viewPager.setOffscreenPageLimit(5);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(pageAdapter);
         viewPager.setCurrentItem(0);
         SampleTabStrip tab = findViewById(R.id.tabs);
-        tab.setViewPagerAutoRefresh(viewPager, true);
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                HeaderScrollHelper.ScrollableContainer container = (HeaderScrollHelper.ScrollableContainer) pageAdapter.getFragment(position);
-                headerScrollView.setCurrentScrollableContainer(container);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        tab.setViewPagerAutoRefresh(viewPager);
     }
 
-    class MyPageAdapter extends FragmentPagerAdapter implements SampleTabStrip.LayoutTabProvider {
+    class MyPageAdapter extends SampleFragmentPagerAdapter implements SampleTabStrip.LayoutTabProvider {
 
-        private List<Fragment> mFragments = new ArrayList<>();
-        private Context context;
-        public MyPageAdapter(Context context,  @NonNull FragmentManager fm) {
+        public MyPageAdapter(@NonNull FragmentManager fm) {
             super(fm);
-            this.context = context;
         }
 
         @NonNull
@@ -82,29 +60,22 @@ public class ParentFragment2 extends BaseHintFragment {
             return new ChildFragment2();
         }
 
-        public Fragment getFragment(int position) {
-            return mFragments.get(position);
-        }
-
-        @NonNull
-        @Override
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            Fragment fragment =  (Fragment) super.instantiateItem(container, position);
-            while (mFragments.size() <= position) {
-                mFragments.add(null);
-            }
-            mFragments.set(position, fragment);
-            return fragment;
-        }
-
         @Override
         public int getCount() {
-            return 3;
+            return 5;
+        }
+
+        @Override
+        public void onFragmentSelected(Fragment fragment, int position) {
+            if (fragment instanceof HeaderScrollHelper.ScrollableContainer) {
+                HeaderScrollHelper.ScrollableContainer scrollContainer = (HeaderScrollHelper.ScrollableContainer)fragment;
+                headerScrollView.setCurrentScrollableContainer(scrollContainer);
+            }
         }
 
         @Override
         public View createTabView(int position) {
-            return View.inflate(context, R.layout.item_viewpager_test, null);
+            return View.inflate(mActivity, R.layout.item_viewpager_test, null);
         }
 
         @Override
@@ -117,15 +88,5 @@ public class ParentFragment2 extends BaseHintFragment {
             }
         }
 
-        boolean isFirst = true;
-        @Override
-        public void finishUpdate(@NonNull ViewGroup container) {
-            super.finishUpdate(container);
-            if (isFirst) {
-                HeaderScrollHelper.ScrollableContainer icontainer = (HeaderScrollHelper.ScrollableContainer) pageAdapter.getFragment(0);
-                headerScrollView.setCurrentScrollableContainer(icontainer);
-                isFirst = false;
-            }
-        }
     }
 }
