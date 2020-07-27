@@ -1,10 +1,12 @@
 package cn.yue.base.test;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -52,8 +54,28 @@ public class LaunchActivity extends BaseActivity {
             }
         }
         // [END handle_data_extras]
+        handleIntent(getIntent());
+
         toStart();
+        // ATTENTION: This was auto-generated to handle app links.
     }
+
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        String appLinkAction = intent.getAction();
+        Uri appLinkData = intent.getData();
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+            String recipeId = appLinkData.getLastPathSegment();
+            Uri appData = Uri.parse("content://192.168.10.135:8080/").buildUpon()
+                    .appendPath(recipeId).build();
+            Log.d("luobiao", "handleIntent: " + appData);
+        }
+    }
+
 
     @Override
     protected boolean hasContentView() {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/motionL"
+    app:layoutDescription="@xml/fragment_test_motion_editor_scene">
+
+   <TextView
+       android:id="@+id/textView"
+       android:layout_width="50dp"
+       android:layout_height="50dp"
+       android:layout_marginStart="16dp"
+       android:layout_marginTop="16dp"
+       android:text="motion"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

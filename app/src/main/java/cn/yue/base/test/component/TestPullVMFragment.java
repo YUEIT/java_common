@@ -5,12 +5,13 @@ import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import cn.yue.base.middle.mvvm.components.BasePullVMFragment;
+import cn.yue.base.middle.mvvm.components.binding.BasePullVMBindFragment;
 import cn.yue.base.middle.router.RouterCard;
 import cn.yue.base.test.R;
+import cn.yue.base.test.databinding.FragmentTestPullVmBinding;
 
 @Route(path = "/app/testPullVM")
-public class TestPullVMFragment extends BasePullVMFragment<TestPullViewModel> {
+public class TestPullVMFragment extends BasePullVMBindFragment<TestPullViewModel ,FragmentTestPullVmBinding> {
 
     @Override
     protected int getContentLayoutId() {

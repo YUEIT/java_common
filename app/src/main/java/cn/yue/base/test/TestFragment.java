@@ -1,11 +1,13 @@
 package cn.yue.base.test;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,9 +41,10 @@ public class TestFragment extends BaseHintFragment{
         RecyclerView recyclerView = findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         List<Object> list = new ArrayList<>();
-        for (int i=0; i < 6; i++) {
+        for (int i=0; i < 7; i++) {
             list.add(new Object());
         }
+
         recyclerView.setAdapter(new CommonAdapter(mActivity, list) {
             @Override
             public int getLayoutIdByType(int viewType) {
@@ -67,7 +70,7 @@ public class TestFragment extends BaseHintFragment{
                         @Override
                         public void onClick(View v) {
                             FRouter.getInstance()
-                                    .build("/app/testPull")
+                                    .build("/app/testPullVM")
                                     .navigation(mActivity);
                         }
                     });
@@ -89,7 +92,7 @@ public class TestFragment extends BaseHintFragment{
                         @Override
                         public void onClick(View v) {
                             FRouter.getInstance()
-                                    .build("/app/testPullVM")
+                                    .build("/app/testPageVM")
                                     .navigation(mActivity);
                         }
                     });
@@ -116,11 +119,44 @@ public class TestFragment extends BaseHintFragment{
                         }
                     });
                 }
+                if (position == 6) {
+                    holder.setText(R.id.testTV, "Motion Layout");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                            FRouter.getInstance()
+//                                    .build("/app/testMotion")
+//                                    .navigation(mActivity);
+                            startLive();
+                        }
+                    });
+                }
             }
         });
     }
 
 
+    private void startLive() {
+        showActivity("com.iqoo.secure");
+    }
+
+    /**
+     * 跳转到指定应用的首页
+     */
+    private void showActivity(@NonNull String packageName) {
+        Intent intent = mActivity.getPackageManager().getLaunchIntentForPackage(packageName);
+        startActivity(intent);
+    }
+
+    /**
+     * 跳转到指定应用的指定页面
+     */
+    private void showActivity(@NonNull String packageName, @NonNull String activityDir) {
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName(packageName, activityDir));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
     private void hookOnClickListener(View view) {
         try {

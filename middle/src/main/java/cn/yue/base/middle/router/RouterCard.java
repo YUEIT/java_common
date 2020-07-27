@@ -19,6 +19,10 @@ import java.util.Map;
 import cn.yue.base.common.activity.TransitionAnimation;
 import cn.yue.base.common.utils.debug.LogUtils;
 
+/**
+ * Description : 路由数据
+ * Created by yue on 2020/4/22
+ */
 public class RouterCard implements INavigation, Parcelable{
 
     private Uri uri;

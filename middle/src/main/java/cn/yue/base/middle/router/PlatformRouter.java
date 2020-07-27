@@ -8,6 +8,10 @@ import androidx.annotation.NonNull;
 import cn.yue.base.middle.module.IFlutterModule;
 import cn.yue.base.middle.module.manager.ModuleManager;
 
+/**
+ * Description : 跨平台路由 支持Flutter页面跳转
+ * Created by yue on 2020/4/22
+ */
 public class PlatformRouter implements INavigation {
 
     private static class PlatformRouterHolder {
