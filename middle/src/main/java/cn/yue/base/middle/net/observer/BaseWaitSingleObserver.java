@@ -1,6 +1,6 @@
 package cn.yue.base.middle.net.observer;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.net.ResultException;
 
@@ -32,7 +32,7 @@ public abstract class BaseWaitSingleObserver<T> extends BaseNetSingleObserver<T>
 
     @Override
     public void onException(ResultException e) {
-        ToastUtils.showShortToast(e.getMessage());
+        ToastUtils.showShort(e.getMessage());
         if (iBaseView != null) {
             iBaseView.dismissWaitDialog();
         }

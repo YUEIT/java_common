@@ -307,11 +307,10 @@ public abstract class BaseDialogFragment extends DialogFragment {
     public void onNewIntent(Bundle bundle) {
         if (mFragmentManager != null) {
             List<Fragment> fragments = mFragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null && fragment.isAdded() && fragment instanceof BaseDialogFragment && fragment.isVisible()) {
-                        ((BaseDialogFragment) fragment).onNewIntent(bundle);
-                    }
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isAdded()
+                        && fragment instanceof BaseDialogFragment && fragment.isVisible()) {
+                    ((BaseDialogFragment) fragment).onNewIntent(bundle);
                 }
             }
         }
@@ -321,26 +320,13 @@ public abstract class BaseDialogFragment extends DialogFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mFragmentManager != null) {
             List<Fragment> fragments = mFragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null && fragment.isAdded() && fragment.isVisible() && fragment.getUserVisibleHint()) {
-                        fragment.onActivityResult(requestCode, resultCode, data);
-                    }
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isAdded()
+                        && fragment.isVisible() && fragment.getUserVisibleHint()) {
+                    fragment.onActivityResult(requestCode, resultCode, data);
                 }
             }
         }
-    }
-
-    public final void jumpFragment(BaseDialogFragment fragment, String tag) {
-        mActivity.replace(fragment, tag, true);
-    }
-
-    public final void jumpFragment(BaseDialogFragment fragment) {
-        mActivity.replace(fragment, getClass().getSimpleName(), true);
-    }
-
-    public final void jumpFragmentNoBack(BaseDialogFragment fragment) {
-        mActivity.replace(fragment, null, false);
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -392,102 +378,13 @@ public abstract class BaseDialogFragment extends DialogFragment {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<Fragment> fragments = getChildFragmentManager().getFragments();
-        if (fragments != null) {
-            for (Fragment fragment : fragments) {
-                if (fragment != null) {
-                    fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                }
+        for (Fragment fragment : fragments) {
+            if (fragment != null) {
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
     }
 
-    /*****************************************************************/
-    /*********************    操作子fragment开始*************************/
-    /*****************************************************************/
-
-    public final void replace(int contaninViewId, Fragment fragment) {
-        if (null != fragment && null != mFragmentManager) {
-            mFragmentManager
-                    .beginTransaction()
-                    .replace(contaninViewId, fragment)
-                    .commitAllowingStateLoss();
-        }
-    }
-
-    public final void replace(int contaninViewId, Fragment fragment, String tag) {
-        if (null != fragment) {
-            mFragmentManager
-                    .beginTransaction()
-                    .replace(contaninViewId, fragment, tag)
-                    .commitAllowingStateLoss();
-        }
-    }
-
-
-    public void removeFragment(Fragment fragment) {
-        mFragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
-    }
-
-    public void removeFragment(String tag) {
-        Fragment fragment = mFragmentManager.findFragmentByTag(tag);
-        if (fragment != null) {
-            removeFragment(fragment);
-        }
-    }
-
-
-    public boolean attachFragment(Fragment fragment) {
-        if (fragment != null && fragment.isDetached()) {
-            mFragmentManager.beginTransaction().attach(fragment).commitAllowingStateLoss();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean attachFragment(String tag) {
-        Fragment fragment = findFragmentByTag(tag);
-        return attachFragment(fragment);
-    }
-
-    public boolean isAddFragment(String tag) {
-        Fragment fragment = findFragmentByTag(tag);
-        return fragment != null && fragment.isAdded();
-    }
-
-    public boolean detachFragment(Fragment fragment) {
-        if (fragment != null && fragment.isAdded()) {
-            mFragmentManager.beginTransaction().detach(fragment).commitAllowingStateLoss();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean detachFragment(String tag) {
-        Fragment fragment = findFragmentByTag(tag);
-        return detachFragment(fragment);
-    }
-
-    public Fragment findFragmentByTag(String tag) {
-        return mFragmentManager.findFragmentByTag(tag);
-    }
-
-    public void addFragment(int containerId, Fragment fragment, String tag) {
-        mFragmentManager.beginTransaction()
-                .add(containerId, fragment, tag)
-                .commitAllowingStateLoss();
-    }
-
-    public void hideFragment(Fragment fragment) {
-        mFragmentManager.beginTransaction()
-                .hide(fragment)
-                .commitAllowingStateLoss();
-    }
-
-    public void showFragment(Fragment fragment) {
-        mFragmentManager.beginTransaction()
-                .show(fragment)
-                .commitAllowingStateLoss();
-    }
 
     public static BaseDialogFragment instance(Context context, Class<? extends BaseDialogFragment> clazz, Bundle bundle) {
         return (BaseDialogFragment) Fragment.instantiate(context, clazz.getName(), bundle);

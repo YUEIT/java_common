@@ -18,7 +18,7 @@ import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.dialog.HintDialog;
 
 /**
@@ -123,7 +123,7 @@ public abstract class BaseActivity extends FragmentActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
-                        ToastUtils.showShortToast("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
+                        ToastUtils.showShort("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }

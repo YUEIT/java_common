@@ -45,6 +45,4 @@ dependencies {
     implementation rootProject.ext.dependencies["arouter-api"]
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
 
-    implementation 'fm.jiecao:jiecaovideoplayer:5.5.4'
-    implementation 'com.xujinyang.BiuEditText:library:1.4.1'
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -31,7 +30,7 @@ import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.dialog.HintDialog;
 
@@ -96,35 +95,23 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 
     public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
         try {
-            BarUtils.setStyle(this, isFillUpTop, isDarkIcon, bgColor);
+            BarUtils.setStyle(this, true, isDarkIcon, bgColor);
         }catch (Exception e) {
             e.printStackTrace();
         }
-        if (isFillUpTop) {
-            setFillUpTopLayout(isFillUpTop);
-        }
+        setFillUpTopLayout(isFillUpTop);
     }
 
-    public void setFillUpTopLayout(boolean isFillUpTop) {
-        int systemBarPadding;
-        int subject;
-        if (isFillUpTop) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                systemBarPadding = 0;
-            } else {
-                systemBarPadding = Math.max(BarUtils.getStatusBarHeight(this), getResources().getDimensionPixelOffset(R.dimen.q50));
-            }
-            subject = 0;
-            if (getTopBar() != null) {
-                getTopBar().setBgColor(Color.TRANSPARENT);
-            }
-        } else {
-            systemBarPadding = 0;
-            subject = R.id.topBar;
+    private void setFillUpTopLayout(boolean isFillUpTop) {
+        if (getTopBar() == null) {
+            return;
         }
-
+        int subject = R.id.topBar;
+        if (isFillUpTop) {
+            subject = 0;
+            getTopBar().setBgColor(Color.TRANSPARENT);
+        }
         RelativeLayout.LayoutParams topBarLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        topBarLayoutParams.topMargin = systemBarPadding;
         topFL.setLayoutParams(topBarLayoutParams);
         RelativeLayout.LayoutParams contentLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         contentLayoutParams.addRule(RelativeLayout.BELOW, subject);
@@ -310,7 +297,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
-                        ToastUtils.showShortToast("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
+                        ToastUtils.showShort("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }

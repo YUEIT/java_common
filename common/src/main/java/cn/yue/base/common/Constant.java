@@ -23,9 +23,9 @@ public class Constant {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             return Environment.getExternalStorageDirectory() + File.separator + COMMON_NAME;
         } else {
-            File filesDir = Utils.getContext().getExternalFilesDir("");
+            File filesDir = Utils.getApp().getExternalFilesDir("");
             if (filesDir == null) {
-                return Utils.getContext().getFilesDir() + File.separator + COMMON_NAME;
+                return Utils.getApp().getFilesDir() + File.separator + COMMON_NAME;
             }
             return filesDir.getPath() + File.separator + COMMON_NAME;
         }

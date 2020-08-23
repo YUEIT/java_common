@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.BaseFooter;
@@ -52,7 +52,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
                         viewModel.refresh();
                     }
                 } else {
-                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
                 }
             }
         });
@@ -115,7 +115,6 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
         viewModel.loader.observeLoad(this, new Observer<LoadStatus>() {
             @Override
             public void onChanged(LoadStatus loadStatus) {
-                Log.d("luobiao", "onChanged: " + loadStatus);
                 if (loadStatus == LoadStatus.REFRESH) {
                     refreshL.startRefresh();
                 } else {

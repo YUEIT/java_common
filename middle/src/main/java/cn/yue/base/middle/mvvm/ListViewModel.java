@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.components.load.LoadStatus;
 import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvvm.data.MutableListLiveData;
@@ -163,13 +163,13 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
                 loader.setPageStatus(PageStatus.NO_DATA);
             } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
                 loader.setPageStatus(PageStatus.NO_NET);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
                 loader.setPageStatus(PageStatus.ERROR);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else {
                 loader.setPageStatus(PageStatus.ERROR);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             }
         } else {
             if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
@@ -178,13 +178,13 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
                 loader.setLoadStatus(LoadStatus.NO_DATA);
             } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
                 loader.setLoadStatus(LoadStatus.NORMAL);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
                 loader.setLoadStatus(LoadStatus.NORMAL);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else {
                 loader.setLoadStatus(LoadStatus.NORMAL);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             }
         }
     }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BasePullFragment;
@@ -66,7 +66,7 @@ public class TestPullFragment extends BasePullFragment {
                 .subscribe(new BasePullSingleObserver<String>(this) {
                     @Override
                     public void onNext(String s) {
-                        ToastUtils.showShortToast(s);
+                        ToastUtils.showShort(s);
                     }
                 });
     }

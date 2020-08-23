@@ -7,8 +7,10 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import cn.yue.base.common.Constant;
 import cn.yue.base.common.utils.device.KeyboardUtils;
 
 
@@ -121,7 +123,7 @@ public abstract class BaseKeyboardLayout extends RelativeLayout implements IKeyb
 
     @Override
     public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
-        if (KeyboardUtils.isFullScreen((Activity) getContext())) {
+        if (isFullScreen((Activity) getContext())) {
             return false;
         }
         return super.requestFocus(direction, previouslyFocusedRect);
@@ -129,10 +131,13 @@ public abstract class BaseKeyboardLayout extends RelativeLayout implements IKeyb
 
     @Override
     public void requestChildFocus(View child, View focused) {
-        if (KeyboardUtils.isFullScreen((Activity) getContext())) {
+        if (isFullScreen((Activity) getContext())) {
             return;
         }
         super.requestChildFocus(child, focused);
     }
 
+    private boolean isFullScreen(Activity context) {
+        return (context.getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
 }

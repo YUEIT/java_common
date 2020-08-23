@@ -1,13 +1,16 @@
 package cn.yue.base.common.activity;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.StrictMode;
 
-import cn.yue.base.common.utils.Utils;
-import cn.yue.base.common.utils.code.ProcessUtils;
+import java.util.List;
+
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.device.ProcessUtils;
+import cn.yue.base.common.utils.Utils;
 
 /**
  * Description :
@@ -36,20 +39,9 @@ public abstract class CommonApplication extends Application {
 
     private void initUtils() {
         Utils.init(this);
-        initPhotoError();
         init();
     }
 
     protected abstract void init();
 
-    /**
-     *  android 7.0系统解决拍照的问题
-     */
-    private void initPhotoError() {
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            builder.detectFileUriExposure();
-        }
-    }
 }

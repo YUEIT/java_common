@@ -50,7 +50,7 @@ public class PageHintView extends RelativeLayout{
         noDataView = inflate(context, R.layout.layout_page_hint_no_data, null);
         serverErrorView = inflate(context, R.layout.layout_page_hint_server_error, null);
         ImageView loadingIV = loadingView.findViewById(R.id.loadingIV);
-        ImageLoader.getLoader().loadGif(loadingIV, R.drawable.icon_page_loading);
+        ImageLoader.getLoader().loadGif(loadingIV, R.drawable.app_icon_wait);
 
         noNetView.findViewById(R.id.reloadTV).setOnClickListener(new OnClickListener() {
             @Override

@@ -159,8 +159,8 @@ public class PhotoView extends androidx.appcompat.widget.AppCompatImageView {
     public void loadImage(int resizeX, int resizeY, String url) {
         RequestOptions requestOptions = new RequestOptions()
                 .override(resizeX, resizeY)
-                .placeholder(R.drawable.drawable_default_big)
-                .error(R.drawable.drawable_default_big)
+                .placeholder(R.drawable.drawable_default)
+                .error(R.drawable.drawable_default)
                 .fitCenter()
                 .priority(Priority.HIGH);
         RequestBuilder<Drawable> builder;

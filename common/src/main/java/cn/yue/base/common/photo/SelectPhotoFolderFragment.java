@@ -10,13 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.photo.data.MediaFolderVO;
 import cn.yue.base.common.photo.data.MediaVO;
-import cn.yue.base.common.utils.code.ThreadPoolUtils;
+import cn.yue.base.common.utils.code.ThreadUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
@@ -67,8 +68,8 @@ public class SelectPhotoFolderFragment extends BaseFragment {
     private List<MediaFolderVO> allFolder = new ArrayList<>();
 
     private void getAllPhotoFolder() {
-        ThreadPoolUtils threadPoolUtils = new ThreadPoolUtils(ThreadPoolUtils.Type.SingleThread, 1);
-        threadPoolUtils.execute(new Runnable() {
+        ExecutorService executorService = ThreadUtils.getSinglePool();
+        executorService.execute(new Runnable() {
             @Override
             public void run() {
                 List<MediaFolderVO> allFolder = PhotoUtils.getAllPhotosFolder(mActivity);

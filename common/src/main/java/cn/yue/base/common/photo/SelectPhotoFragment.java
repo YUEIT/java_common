@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
@@ -23,7 +24,7 @@ import cn.yue.base.common.activity.PermissionCallBack;
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.photo.data.MediaVO;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
-import cn.yue.base.common.utils.code.ThreadPoolUtils;
+import cn.yue.base.common.utils.code.ThreadUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
@@ -122,8 +123,8 @@ public class SelectPhotoFragment extends BaseFragment {
         RunTimePermissionUtil.requestPermissions(mActivity, RunTimePermissionUtil.REQUEST_CODE, new PermissionCallBack() {
             @Override
             public void requestSuccess(String permission) {
-                ThreadPoolUtils threadPoolUtils = new ThreadPoolUtils(ThreadPoolUtils.Type.SingleThread, 1);
-                threadPoolUtils.execute(new Runnable() {
+                ExecutorService executorService = ThreadUtils.getSinglePool();
+                executorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         if (allMedia == null) {

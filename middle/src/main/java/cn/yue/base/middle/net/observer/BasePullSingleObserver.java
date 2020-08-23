@@ -1,7 +1,7 @@
 package cn.yue.base.middle.net.observer;
 
 
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IPullView;
 import cn.yue.base.middle.net.NetworkConfig;
@@ -43,10 +43,10 @@ public abstract class BasePullSingleObserver<T> extends BaseNetSingleObserver<T>
                 iPullView.loadComplete(PageStatus.NO_DATA);
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
                 iPullView.loadComplete(PageStatus.ERROR);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else {
                 iPullView.loadComplete(PageStatus.ERROR);
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             }
             iPullView.finishRefresh();
         }

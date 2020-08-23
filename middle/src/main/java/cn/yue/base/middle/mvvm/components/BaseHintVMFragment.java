@@ -6,8 +6,8 @@ import android.view.ViewStub;
 
 import androidx.lifecycle.Observer;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IStatusView;
@@ -34,7 +34,7 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseV
                 if (NetworkUtils.isConnected()) {
                     mActivity.recreateFragment(BaseHintVMFragment.this.getClass().getName());
                 } else {
-                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
                 }
             }
         });

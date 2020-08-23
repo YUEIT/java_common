@@ -49,7 +49,7 @@ public class AndroidQFileUtils {
         }
         try {
             ParcelFileDescriptor fileDescriptor =
-                    Utils.getContext().getContentResolver().openFileDescriptor(uri, "r");
+                    Utils.getApp().getContentResolver().openFileDescriptor(uri, "r");
             if (fileDescriptor != null) {
                 return fileDescriptor.getFileDescriptor().valid();
             }
@@ -63,7 +63,7 @@ public class AndroidQFileUtils {
     public static Bitmap getBitmapFromUri(Uri uri) {
         try {
             ParcelFileDescriptor parcelFileDescriptor =
-                    Utils.getContext().getContentResolver().openFileDescriptor(uri, "r");
+                    Utils.getApp().getContentResolver().openFileDescriptor(uri, "r");
             if (parcelFileDescriptor != null) {
                 FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
                 Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
@@ -80,7 +80,7 @@ public class AndroidQFileUtils {
         try {
             StringBuilder stringBuilder = new StringBuilder();
             InputStream inputStream =
-                    Utils.getContext().getContentResolver().openInputStream(uri);
+                    Utils.getApp().getContentResolver().openInputStream(uri);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(Objects.requireNonNull(inputStream)));
             String line;
@@ -113,7 +113,7 @@ public class AndroidQFileUtils {
         contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
         contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
         Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver contentResolver = Utils.getContext().getContentResolver();
+        ContentResolver contentResolver = Utils.getApp().getContentResolver();
         Uri resultUri = contentResolver.insert(contentUri, contentValues);
         try {
             if (resultUri != null) {
@@ -143,7 +143,7 @@ public class AndroidQFileUtils {
         contentValues.put(MediaStore.Video.Media.MIME_TYPE, mimeType);
         contentValues.put(MediaStore.Files.FileColumns.RELATIVE_PATH, relativePath);
         Uri contentUri = MediaStore.Files.getContentUri("external");
-        ContentResolver contentResolver = Utils.getContext().getContentResolver();
+        ContentResolver contentResolver = Utils.getApp().getContentResolver();
         Uri resultUri = contentResolver.insert(contentUri, contentValues);
         try {
             if (resultUri != null) {
@@ -180,7 +180,7 @@ public class AndroidQFileUtils {
         contentValues.put(MediaStore.Video.Media.MIME_TYPE, mimeType);
         contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, relativePath);
         Uri contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver contentResolver = Utils.getContext().getContentResolver();
+        ContentResolver contentResolver = Utils.getApp().getContentResolver();
         Uri resultUri = contentResolver.insert(contentUri, contentValues);
         try {
             if (resultUri != null) {
@@ -218,7 +218,7 @@ public class AndroidQFileUtils {
         contentValues.put(MediaStore.Audio.Media.MIME_TYPE, mimeType);
         contentValues.put(MediaStore.Audio.Media.RELATIVE_PATH, relativePath);
         Uri contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver contentResolver = Utils.getContext().getContentResolver();
+        ContentResolver contentResolver = Utils.getApp().getContentResolver();
         Uri resultUri = contentResolver.insert(contentUri, contentValues);
         try {
             if (resultUri != null) {
@@ -257,7 +257,7 @@ public class AndroidQFileUtils {
         contentValues.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
         contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
         Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        ContentResolver contentResolver = Utils.getContext().getContentResolver();
+        ContentResolver contentResolver = Utils.getApp().getContentResolver();
         Uri resultUri = contentResolver.insert(contentUri, contentValues);
         try {
             if (resultUri != null) {
@@ -289,7 +289,7 @@ public class AndroidQFileUtils {
         if ("content".equals(uri.getScheme())) {
             Cursor cursor = null;
             try {
-                ContentResolver contentResolver = Utils.getContext().getContentResolver();
+                ContentResolver contentResolver = Utils.getApp().getContentResolver();
                 cursor = contentResolver.query(uri, new String[]{"_data"},
                         null, null, null);
                 if (cursor == null || !cursor.moveToFirst()) {
@@ -358,7 +358,7 @@ public class AndroidQFileUtils {
         if (findInPath) {
             selectionArgs = new String[]{fileName, relativePath};
         }
-        Cursor cursor = Utils.getContext().getContentResolver().query(mediaUri,
+        Cursor cursor = Utils.getApp().getContentResolver().query(mediaUri,
                 null,
                 selection,
                 selectionArgs,

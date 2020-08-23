@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.R;
-import cn.yue.base.common.utils.code.SharePreferencesUtils;
 import cn.yue.base.common.utils.device.KeyboardUtils;
+import cn.yue.base.common.utils.display.SPUtils;
 import cn.yue.base.common.widget.emoji.EmojiConstant;
 import cn.yue.base.common.widget.keyboard.mode.EmotionUtils;
 import cn.yue.base.common.widget.keyboard.mode.IEmotionSort;
@@ -165,13 +165,13 @@ public class EmotionLayout extends LinearLayout implements IKeyboard{
     public void setMaxKeyboardHeight(int keyboardHeight) {
         if (keyboardHeight > maxKeyboardHeight) {
             this.maxKeyboardHeight = keyboardHeight;
-            SharePreferencesUtils.getInstance().put("keyboardHeight", keyboardHeight);
+            SPUtils.getInstance().put("keyboardHeight", keyboardHeight);
         }
     }
 
     public int getMaxKeyboardHeight() {
         if (maxKeyboardHeight < MIN_HEIGHT) {
-            return SharePreferencesUtils.getInstance().getInt("keyboardHeight");
+            return SPUtils.getInstance().getInt("keyboardHeight");
         }
         return maxKeyboardHeight;
     }

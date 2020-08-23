@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.activity.rx.ILifecycleProvider;
-import cn.yue.base.common.utils.file.BitmapFileUtil;
 import cn.yue.base.middle.init.BaseUrlAddress;
 import cn.yue.base.middle.init.InitConstant;
 import cn.yue.base.middle.net.RetrofitManager;
@@ -68,10 +67,10 @@ public class UploadUtils {
                     public SingleSource<? extends List<File>> apply(List<String> strings) throws Exception {
                         List<File> files = new ArrayList<>();
                         for (String url : strings) {
-                            File file = BitmapFileUtil.getCompressBitmapFile(url);
-                            if (file != null) {
-                                files.add(file);
-                            }
+//                            File file = BitmapFileUtil.getCompressBitmapFile(url);
+//                            if (file != null) {
+//                                files.add(file);
+//                            }
                         }
                         return Single.just(files);
                     }

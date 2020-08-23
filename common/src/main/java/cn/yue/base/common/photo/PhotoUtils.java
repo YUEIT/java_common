@@ -63,7 +63,12 @@ public class PhotoUtils {
      */
     public static ArrayList<MediaVO> getTheLastPhotos(Context context, int num) {
         ArrayList<MediaVO> list = new ArrayList<>();
-        list.addAll(getMediaByFolder(context, true, null, MediaType.PHOTO).subList(0, num));
+        ArrayList<MediaVO> photos = getMediaByFolder(context, true, null, MediaType.PHOTO);
+        if (photos.size() > num) {
+            list.addAll(photos.subList(0, num));
+        } else {
+            list.addAll(photos);
+        }
         return list;
     }
 

@@ -2,7 +2,7 @@ package cn.yue.base.middle.net.observer;
 
 import java.util.concurrent.CancellationException;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -48,7 +48,7 @@ public abstract class BaseNetSingleObserver<T> extends DisposableSingleObserver<
 
     private void onLoginInvalid() {
         if (invalidListener != null) {
-            ToastUtils.showShortToast("登录失效~");
+            ToastUtils.showShort("登录失效~");
             invalidListener.onInvalid();
         }
     }

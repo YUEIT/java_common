@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import cn.yue.base.common.R;
+import cn.yue.base.common.utils.app.BarUtils;
+import cn.yue.base.common.utils.display.SizeUtils;
 
 /**
  * Description :
@@ -20,6 +24,7 @@ import cn.yue.base.common.R;
  */
 public class TopBar extends RelativeLayout {
 
+    private RelativeLayout barContentRL;
     private LinearLayout leftLL;
     private LinearLayout rightLL;
     private TextView leftTV;
@@ -40,6 +45,12 @@ public class TopBar extends RelativeLayout {
 
     private void initView(Context context) {
         inflate(context, R.layout.layout_top_bar, this);
+        View statusBarSpace = findViewById(R.id.statusBarSpace);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)statusBarSpace.getLayoutParams();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            layoutParams.height = Math.max(BarUtils.getStatusBarHeight(), SizeUtils.dp2px(30f));
+        }
+        barContentRL = findViewById(R.id.barContentRL);
         leftLL = findViewById(R.id.leftLL);
         rightLL = findViewById(R.id.rightLL);
         leftTV = findViewById(R.id.leftTV);
@@ -73,6 +84,11 @@ public class TopBar extends RelativeLayout {
 
     public TopBar setBarVisibility(int visible) {
         setVisibility(visible);
+        return this;
+    }
+
+    public TopBar setContentVisibility(int visibility) {
+        barContentRL.setVisibility(visibility);
         return this;
     }
 

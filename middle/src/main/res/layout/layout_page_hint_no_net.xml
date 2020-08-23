@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/q70"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/app_icon_exception_no_net"/>
+            android:src="@drawable/ic_baseline_wifi_off"/>
 
         <TextView
             android:layout_width="wrap_content"

@@ -9,8 +9,8 @@ import android.view.ViewStub;
 import java.util.List;
 
 import cn.yue.base.common.activity.BaseFragment;
-import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.load.LoadStatus;
@@ -51,7 +51,7 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
                 if (NetworkUtils.isConnected()) {
                     refresh();
                 } else {
-                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
                 }
             }
         });

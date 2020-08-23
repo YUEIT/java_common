@@ -2,7 +2,6 @@ package cn.yue.base.common.widget.emoji;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseIntArray;
 
 import com.google.gson.Gson;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.R;
-import cn.yue.base.common.utils.code.TypeUtils;
+import cn.yue.base.common.utils.variable.TypeUtils;
 
 
 /**

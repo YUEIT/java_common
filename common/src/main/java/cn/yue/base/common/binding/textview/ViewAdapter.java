@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import androidx.databinding.BindingAdapter;
 
-import cn.yue.base.common.utils.app.DisplayUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.display.SizeUtils;
 
 /**
  * Description : textView binding
@@ -103,7 +103,7 @@ public class ViewAdapter {
             if (textSizeArray != null) {
                 try {
                     int textSize = Integer.parseInt(textSizeArray[i]);
-                    AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(DisplayUtils.sp2dp(textSize), true);
+                    AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(SizeUtils.sp2dp(textSize), true);
                     spannable.setSpan(sizeSpan, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                 } catch (Exception e) {
                     e.printStackTrace();

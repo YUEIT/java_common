@@ -38,7 +38,6 @@ ext {
             "rxandroid"                            : "io.reactivex.rxjava2:rxandroid:2.1.1",
             "rxlifecycle"                          : "com.trello.rxlifecycle3:rxlifecycle-components:3.1.0",
             "okhttp"                               : "com.squareup.okhttp3:okhttp:4.2.2",
-
             'okhttp-log'                           : 'com.squareup.okhttp3:logging-interceptor:3.11.0',
             "retrofit"                             : "com.squareup.retrofit2:retrofit:2.6.2",
             "retrofit-converter-gson"              : "com.squareup.retrofit2:converter-gson:2.6.2",
@@ -53,5 +52,7 @@ ext {
             'viewpager2'                           : "androidx.viewpager2:viewpager2:1.0.0",
             'systembartint'                        : 'com.readystatesoftware.systembartint:systembartint:1.0.3',
             'tkrefreshlayout'                      : 'com.lcodecorex:tkrefreshlayout:1.0.7',
+            'autosize'                             : 'me.jessyan:autosize:1.2.1',
+            'utils'                                : 'com.blankj:utilcodex:1.29.0'
     ]
 }

@@ -18,10 +18,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.middle.router.FRouter;
+import cn.yue.base.test.component.TestDialogFragment;
 
 /**
  * Description :
@@ -36,12 +38,18 @@ public class TestFragment extends BaseHintFragment{
     }
 
     @Override
+    protected void initTopBar(TopBar topBar) {
+        super.initTopBar(topBar);
+        topBar.setContentVisibility(View.GONE);
+    }
+
+    @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         RecyclerView recyclerView = findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         List<Object> list = new ArrayList<>();
-        for (int i=0; i < 7; i++) {
+        for (int i=0; i < 8; i++) {
             list.add(new Object());
         }
 
@@ -128,6 +136,15 @@ public class TestFragment extends BaseHintFragment{
 //                                    .build("/app/testMotion")
 //                                    .navigation(mActivity);
                             startLive();
+                        }
+                    });
+                }
+                if (position == 7) {
+                    holder.setText(R.id.testTV, "dialog test");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new TestDialogFragment().show(mFragmentManager, "");
                         }
                     });
                 }

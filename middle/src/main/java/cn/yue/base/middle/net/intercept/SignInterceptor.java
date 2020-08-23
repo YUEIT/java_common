@@ -76,7 +76,7 @@ public class SignInterceptor implements Interceptor {
             }
             String appVersion = InitConstant.getVersionName();
             String deviceId = InitConstant.getDeviceId();
-            String sign = EncryptUtils.md5((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
+            String sign = EncryptUtils.encryptMD5ToString((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
                     deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());
 
             url = original.url().newBuilder().query(null)
@@ -178,7 +178,7 @@ public class SignInterceptor implements Interceptor {
             }
             String appVersion = InitConstant.getVersionName();
             String deviceId = InitConstant.getDeviceId();
-            String sign = EncryptUtils.md5((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
+            String sign = EncryptUtils.encryptMD5ToString((appVersion + InitConstant.APP_CLIENT_TYPE + encodeData +
                     deviceId + time + InitConstant.APP_SIGN_KEY).getBytes());
             tmp.put("app_version", appVersion);
             tmp.put("client_type", InitConstant.APP_CLIENT_TYPE + "");

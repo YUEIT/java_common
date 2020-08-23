@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.common.activity.BaseFragment;
-import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
@@ -72,7 +72,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
                         refresh();
                     }
                 } else {
-                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
                 }
             }
 
@@ -343,10 +343,10 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
                 showStatusView(loader.setPageStatus(PageStatus.ERROR));
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
                 showStatusView(loader.setPageStatus(PageStatus.ERROR));
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else {
                 showStatusView(loader.setPageStatus(PageStatus.ERROR));
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             }
         } else {
             if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
@@ -357,10 +357,10 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
                 footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
                 footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             } else {
                 footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-                ToastUtils.showShortToast(e.getMessage());
+                ToastUtils.showShort(e.getMessage());
             }
         }
     }

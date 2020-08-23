@@ -59,6 +59,8 @@ dependencies {
     api rootProject.ext.dependencies["rxandroid"]
 //    api rootProject.ext.dependencies["rxlifecycle"]
 
+    api rootProject.ext.dependencies["autosize"]
+//    api rootProject.ext.dependencies["utils"]
 }
 
 //apply plugin: 'maven'

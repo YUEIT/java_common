@@ -7,8 +7,8 @@ import android.view.ViewStub;
 
 import androidx.lifecycle.Observer;
 
-import cn.yue.base.common.utils.debug.ToastUtils;
 import cn.yue.base.common.utils.device.NetworkUtils;
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.load.LoadStatus;
 import cn.yue.base.middle.components.load.PageStatus;
@@ -41,7 +41,7 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
                 if (NetworkUtils.isConnected()) {
                     viewModel.refresh();
                 } else {
-                    ToastUtils.showShortToast("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
                 }
             }
         });
