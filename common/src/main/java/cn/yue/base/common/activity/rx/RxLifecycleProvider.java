@@ -9,6 +9,8 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
@@ -39,29 +41,21 @@ public class RxLifecycleProvider implements ILifecycleProvider<Event>, Lifecycle
     }
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
-        return new SingleTransformer<T, T>() {
-
+    public <T> RxLifecycleTransformer<T> toBindLifecycle() {
+        return new RxLifecycleTransformer<T>() {
             @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(Event.ON_DESTROY))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
+            public LifecycleTransformer<T> toBindUntilEvent() {
+                return bindUntilEvent(Event.ON_DESTROY);
             }
         };
     }
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(Event event) {
-        return new SingleTransformer<T, T>() {
-
+    public <T> RxLifecycleTransformer<T> toBindLifecycle(Event event) {
+        return new RxLifecycleTransformer<T>() {
             @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(event))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
+            public LifecycleTransformer<T> toBindUntilEvent() {
+                return bindUntilEvent(event);
             }
         };
     }

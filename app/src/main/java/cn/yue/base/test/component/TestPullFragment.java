@@ -1,6 +1,7 @@
 package cn.yue.base.test.component;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,13 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import cn.yue.base.common.utils.event.RxBus;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BasePullFragment;
 import cn.yue.base.middle.net.observer.BasePullSingleObserver;
 import cn.yue.base.test.R;
+import cn.yue.base.test.data.TextEvent;
 import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 
 @Route(path = "/app/testPull")
 public class TestPullFragment extends BasePullFragment {

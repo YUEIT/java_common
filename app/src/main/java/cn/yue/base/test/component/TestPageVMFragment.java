@@ -6,6 +6,7 @@ import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.middle.mvvm.CommonVMAdapter;
 import cn.yue.base.middle.mvvm.ItemViewModel;
 import cn.yue.base.middle.mvvm.components.BasePageVMFragment;
+import cn.yue.base.test.data.TestItemBean;
 
 @Route(path = "/app/testPageVM")
 public class TestPageVMFragment extends BasePageVMFragment<TestPageViewModel, TestItemBean> {

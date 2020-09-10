@@ -1,4 +1,4 @@
-package cn.yue.base.test.component;
+package cn.yue.base.test.data;
 
 /**
  * Description :

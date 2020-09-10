@@ -4,6 +4,7 @@ package cn.yue.base.common.activity.rx;
 import androidx.lifecycle.LifecycleObserver;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.SingleTransformer;
 import io.reactivex.annotations.CheckReturnValue;
 
@@ -18,8 +19,9 @@ public interface ILifecycleProvider<E> extends LifecycleObserver {
     Observable<E> lifecycle();
 
     @CheckReturnValue
-    <T> SingleTransformer<T, T> toBindLifecycle();
+    <T> RxLifecycleTransformer<T> toBindLifecycle();
 
     @CheckReturnValue
-    <T> SingleTransformer<T, T> toBindLifecycle(E e);
+    <T> RxLifecycleTransformer<T> toBindLifecycle(E e);
+
 }

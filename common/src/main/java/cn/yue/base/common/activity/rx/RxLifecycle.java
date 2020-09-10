@@ -8,8 +8,6 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
-import static cn.yue.base.common.activity.rx.Preconditions.checkNotNull;
-
 public class RxLifecycle {
 
     private RxLifecycle() {
@@ -96,5 +94,13 @@ public class RxLifecycle {
                 .onErrorReturn(Functions.RESUME_FUNCTION)
                 .filter(Functions.SHOULD_COMPLETE);
     }
+
+    public static <T> T checkNotNull(T value, String message) {
+        if (value == null) {
+            throw new NullPointerException(message);
+        }
+        return value;
+    }
+
 }
 

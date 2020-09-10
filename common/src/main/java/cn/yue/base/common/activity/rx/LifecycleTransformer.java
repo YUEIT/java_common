@@ -18,14 +18,12 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 
-import static cn.yue.base.common.activity.rx.Preconditions.checkNotNull;
-
 public final class LifecycleTransformer<T> implements ObservableTransformer<T, T>,
         FlowableTransformer<T, T>,
         SingleTransformer<T, T>,
         MaybeTransformer<T, T>,
-        CompletableTransformer
-{
+        CompletableTransformer {
+
     final Observable<?> observable;
 
     LifecycleTransformer(Observable<?> observable) {
@@ -80,5 +78,11 @@ public final class LifecycleTransformer<T> implements ObservableTransformer<T, T
                 '}';
     }
 
+    public static <T> T checkNotNull(T value, String message) {
+        if (value == null) {
+            throw new NullPointerException(message);
+        }
+        return value;
+    }
 
 }

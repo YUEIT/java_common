@@ -20,12 +20,15 @@ import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.LifecycleTransformer;
 import cn.yue.base.common.activity.rx.RxLifecycle;
 import cn.yue.base.common.activity.rx.RxLifecycleAndroid;
+import cn.yue.base.common.activity.rx.RxLifecycleTransformer;
 import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.mvvm.data.FinishModel;
 import cn.yue.base.middle.mvvm.data.LoaderLiveData;
 import cn.yue.base.middle.mvvm.data.RouterModel;
 import cn.yue.base.middle.router.RouterCard;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
@@ -71,29 +74,21 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
     }
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
-        return new SingleTransformer<T, T>() {
-
+    public <T> RxLifecycleTransformer<T> toBindLifecycle() {
+        return new RxLifecycleTransformer<T>() {
             @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(Event.ON_DESTROY))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
+            public LifecycleTransformer<T> toBindUntilEvent() {
+                return bindUntilEvent(Event.ON_DESTROY);
             }
         };
     }
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(Event event) {
-        return new SingleTransformer<T, T>() {
-
+    public <T> RxLifecycleTransformer<T> toBindLifecycle(Event event) {
+        return new RxLifecycleTransformer<T>() {
             @Override
-            public SingleSource<T> apply(Single<T> upstream) {
-                return upstream.
-                        compose(bindUntilEvent(event))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
+            public LifecycleTransformer<T> toBindUntilEvent() {
+                return bindUntilEvent(event);
             }
         };
     }

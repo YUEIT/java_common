@@ -10,7 +10,7 @@ import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BasePageFragment;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.test.R;
-import cn.yue.base.test.component.TestItemBean;
+import cn.yue.base.test.data.TestItemBean;
 import io.reactivex.Single;
 
 public class ChildFragment2 extends BasePageFragment<TestItemBean> implements HeaderScrollHelper.ScrollableContainer {

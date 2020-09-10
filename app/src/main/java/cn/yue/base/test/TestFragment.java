@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,12 +19,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.yue.base.common.utils.event.RxBus;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.middle.router.FRouter;
 import cn.yue.base.test.component.TestDialogFragment;
+import cn.yue.base.test.data.TextEvent;
+import io.reactivex.functions.Consumer;
 
 /**
  * Description :
@@ -52,7 +56,6 @@ public class TestFragment extends BaseHintFragment{
         for (int i=0; i < 8; i++) {
             list.add(new Object());
         }
-
         recyclerView.setAdapter(new CommonAdapter(mActivity, list) {
             @Override
             public int getLayoutIdByType(int viewType) {

@@ -16,6 +16,7 @@ import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
 import cn.yue.base.middle.components.BaseListFragment;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.test.R;
+import cn.yue.base.test.data.TestItemBean;
 import io.reactivex.Single;
 
 /**

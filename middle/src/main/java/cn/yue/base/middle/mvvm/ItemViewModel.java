@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
+import cn.yue.base.common.activity.rx.RxLifecycleTransformer;
 import cn.yue.base.middle.router.RouterCard;
 import io.reactivex.SingleTransformer;
 
@@ -23,12 +24,12 @@ public abstract class ItemViewModel extends BaseViewModel {
 
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle() {
+    public <T> RxLifecycleTransformer<T> toBindLifecycle() {
         return parentViewModel.toBindLifecycle();
     }
 
     @Override
-    public <T> SingleTransformer<T, T> toBindLifecycle(Lifecycle.Event event) {
+    public <T> RxLifecycleTransformer<T> toBindLifecycle(Lifecycle.Event event) {
         return parentViewModel.toBindLifecycle(event);
     }
 

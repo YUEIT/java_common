@@ -9,6 +9,7 @@ import java.util.List;
 
 import cn.yue.base.middle.mvvm.PageViewModel;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.test.data.TestItemBean;
 import io.reactivex.Single;
 
 public class TestPageViewModel extends PageViewModel<TestItemBean> {
