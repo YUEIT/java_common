@@ -24,6 +24,7 @@ public class RxLifecycleProvider implements ILifecycleProvider<Event>, Lifecycle
 
     @NonNull
     @CheckResult
+    @Override
     public final Observable<Event> lifecycle() {
         return this.lifecycleSubject.hide();
     }

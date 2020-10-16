@@ -6,10 +6,10 @@
 
     <TextView
         android:id="@+id/testTV"
-        android:layout_width="360dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/rdp360"
+        android:layout_height="@dimen/rdp50"
         android:gravity="center"
         android:text="hello"
-        android:textSize="15sp" />
+        android:textSize="@dimen/rsp15" />
 
 </LinearLayout>

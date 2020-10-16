@@ -12,5 +12,6 @@ public class BaseModuleService implements IBaseModule {
     public void init(Context context) {
         FRouter.init((Application) context);
         BaseUrlAddress.setDebug(InitConstant.isDebug);
+        NotificationConfig.initChannel();
     }
 }

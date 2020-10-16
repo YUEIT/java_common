@@ -111,6 +111,14 @@ public class NotificationUtils {
         nmc.notify(tag, id, builder.build());
     }
 
+    public static void initChannelConfig(ChannelConfig channelConfig) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager nm = (NotificationManager) Utils.getApp().getSystemService(Context.NOTIFICATION_SERVICE);
+            //noinspection ConstantConditions
+            nm.createNotificationChannel(channelConfig.getNotificationChannel());
+        }
+    }
+
     /**
      * Cancel The notification.
      *
