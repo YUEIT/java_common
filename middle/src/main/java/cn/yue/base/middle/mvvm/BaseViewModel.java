@@ -55,6 +55,7 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
 
     private final BehaviorSubject<Event> lifecycleSubject = BehaviorSubject.create();
 
+    @Override
     @NonNull
     @CheckResult
     public final Observable<Event> lifecycle() {

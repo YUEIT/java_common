@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.haibin.calendarview.CalendarView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -53,7 +54,7 @@ public class TestFragment extends BaseHintFragment{
         RecyclerView recyclerView = findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         List<Object> list = new ArrayList<>();
-        for (int i=0; i < 8; i++) {
+        for (int i=0; i < 7; i++) {
             list.add(new Object());
         }
         recyclerView.setAdapter(new CommonAdapter(mActivity, list) {
@@ -135,19 +136,10 @@ public class TestFragment extends BaseHintFragment{
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-//                            FRouter.getInstance()
-//                                    .build("/app/testMotion")
-//                                    .navigation(mActivity);
-                            startLive();
-                        }
-                    });
-                }
-                if (position == 7) {
-                    holder.setText(R.id.testTV, "dialog test");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new TestDialogFragment().show(mFragmentManager, "");
+                            FRouter.getInstance()
+                                    .build("/app/testHint")
+                                    .navigation(mActivity);
+
                         }
                     });
                 }

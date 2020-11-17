@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.LayoutRes;
+import androidx.core.widget.NestedScrollView;
 
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
@@ -19,7 +20,7 @@ import cn.yue.base.middle.router.FRouter;
  * Created by yue on 2018/11/13
  */
 
-public class PageHintView extends RelativeLayout{
+public class PageHintView extends NestedScrollView {
 
     public PageHintView(Context context) {
         this(context, null);
@@ -35,6 +36,7 @@ public class PageHintView extends RelativeLayout{
     }
 
     private void initView(Context context) {
+        setFillViewport(true);
         setClickable(true);
         setDefault(context);
     }

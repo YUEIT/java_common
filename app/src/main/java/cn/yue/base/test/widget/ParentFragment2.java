@@ -3,6 +3,7 @@ package cn.yue.base.test.widget;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,12 +13,15 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
+import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.viewpager.HeaderScrollHelper;
 import cn.yue.base.common.widget.viewpager.HeaderScrollView;
 import cn.yue.base.common.widget.viewpager.SampleFragmentPagerAdapter;
 import cn.yue.base.common.widget.viewpager.SampleTabStrip;
 import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.view.refresh.IRefreshLayout;
 import cn.yue.base.middle.view.refresh.OverRefreshLayout;
+import cn.yue.base.middle.view.refresh.SwipeRefreshLayout;
 import cn.yue.base.test.R;
 
 @Route(path = "/app/parent2")
@@ -34,9 +38,15 @@ public class ParentFragment2 extends BaseHintFragment {
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
-        OverRefreshLayout refreshL = findViewById(R.id.refreshL);
-        refreshL.setEnableLoadmore(false);
-        refreshL.setEnableOverScroll(false);
+        SwipeRefreshLayout refreshL = findViewById(R.id.refreshL);
+        refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshL.finishRefreshing();
+            }
+        });
+//        refreshL.setEnableLoadmore(false);
+//        refreshL.setEnableOverScroll(false);
         headerScrollView = findViewById(R.id.headerViewPager);
 //        headerViewPager.setTopOffset(DisplayUtils.dip2px(50));
         pageAdapter = new MyPageAdapter(mFragmentManager);
@@ -46,6 +56,13 @@ public class ParentFragment2 extends BaseHintFragment {
         viewPager.setCurrentItem(0);
         SampleTabStrip tab = findViewById(R.id.tabs);
         tab.setViewPagerAutoRefresh(viewPager);
+        FrameLayout headerFL = findViewById(R.id.headerFL);
+        headerFL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtils.showShort("click header");
+            }
+        });
     }
 
     class MyPageAdapter extends SampleFragmentPagerAdapter implements SampleTabStrip.LayoutTabProvider {

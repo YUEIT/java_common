@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <cn.yue.base.middle.view.refresh.OverRefreshLayout
+    <cn.yue.base.middle.view.refresh.SwipeRefreshLayout
         android:id="@+id/refreshL"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,6 +14,7 @@
         android:layout_height="match_parent">
 
         <FrameLayout
+            android:id="@+id/headerFL"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:background="#00fff0"/>
@@ -30,5 +31,5 @@
             android:layout_height="match_parent" />
 
     </cn.yue.base.common.widget.viewpager.HeaderScrollView>
-    </cn.yue.base.middle.view.refresh.OverRefreshLayout>
+    </cn.yue.base.middle.view.refresh.SwipeRefreshLayout>
 </FrameLayout>
