@@ -4,6 +4,15 @@ import cn.yue.base.middle.router.RouterCard;
 
 public class RouterModel {
 
+    public RouterModel() {
+    }
+
+    public RouterModel(RouterCard routerCard, int requestCode, String toActivity) {
+        this.routerCard = routerCard;
+        this.requestCode = requestCode;
+        this.toActivity = toActivity;
+    }
+
     private RouterCard routerCard;
     private int requestCode;
     private String toActivity;

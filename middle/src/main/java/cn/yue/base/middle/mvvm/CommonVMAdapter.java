@@ -35,15 +35,19 @@ abstract public class CommonVMAdapter<T> extends CommonAdapter<T> {
 
     @Override
     public void setList(List<T> list) {
-        modelList.clear();
-        addAllModel(list);
-        super.setList(list);
+        if (list != null) {
+            modelList.clear();
+            addAllModel(list);
+            super.setList(list);
+        }
     }
 
     @Override
     public void addList(Collection<T> list) {
-        addAllModel(list);
-        super.addList(list);
+        if (list != null) {
+            addAllModel(list);
+            super.addList(list);
+        }
     }
 
     private void addAllModel(Collection<T> list) {
@@ -60,10 +64,12 @@ abstract public class CommonVMAdapter<T> extends CommonAdapter<T> {
 
     @Override
     public void addItem(T t) {
-        ItemViewModel itemViewModel = initItemViewModel(t);
-        modelList.put(t.hashCode(), itemViewModel);
-        typeToLayoutMap.put(itemViewModel.getItemType(), itemViewModel.getLayoutId());
-        super.addItem(t);
+        if (t != null) {
+            ItemViewModel itemViewModel = initItemViewModel(t);
+            modelList.put(t.hashCode(), itemViewModel);
+            typeToLayoutMap.put(itemViewModel.getItemType(), itemViewModel.getLayoutId());
+            super.addItem(t);
+        }
     }
 
     @Override
@@ -75,13 +81,17 @@ abstract public class CommonVMAdapter<T> extends CommonAdapter<T> {
 
     @Override
     public void remove(T t) {
-        modelList.remove(t.hashCode());
-        super.remove(t);
+        if (t != null) {
+            modelList.remove(t.hashCode());
+            super.remove(t);
+        }
     }
 
     @Override
     public void remove(int position) {
-        modelList.remove(list.get(position).hashCode());
+        if (getData().size() > position && getData().get(position) != null) {
+            modelList.remove(list.get(position).hashCode());
+        }
         super.remove(position);
     }
 
@@ -91,9 +101,11 @@ abstract public class CommonVMAdapter<T> extends CommonAdapter<T> {
 
     @Override
     protected int getViewType(int position) {
-        ItemViewModel itemViewModel = modelList.get(getData().get(position).hashCode());
-        if (itemViewModel != null) {
-            return itemViewModel.getItemType();
+        if (getData().size() > position && getData().get(position) != null) {
+            ItemViewModel itemViewModel = modelList.get(getData().get(position).hashCode());
+            if (itemViewModel != null) {
+                return itemViewModel.getItemType();
+            }
         }
         return super.getViewType(position);
     }

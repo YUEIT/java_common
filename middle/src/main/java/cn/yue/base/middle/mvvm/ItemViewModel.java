@@ -18,7 +18,9 @@ public abstract class ItemViewModel extends BaseViewModel {
         this.parentViewModel = parentViewModel;
     }
 
-    protected abstract int getItemType();
+    protected int getItemType() {
+        return this.hashCode() % 100;
+    }
 
     public abstract int getLayoutId();
 

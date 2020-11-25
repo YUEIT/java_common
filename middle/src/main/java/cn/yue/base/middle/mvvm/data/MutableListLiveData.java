@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class MutableListLiveData<T> extends MutableLiveData<ArrayList<T>> {
 
@@ -17,9 +18,25 @@ public class MutableListLiveData<T> extends MutableLiveData<ArrayList<T>> {
         super.postValue(value);
     }
 
+    public void postValue(List<T> value) {
+        if (value == null) {
+            super.postValue(new ArrayList<>());
+        } else {
+            super.postValue(new ArrayList<>(value));
+        }
+    }
+
     @Override
     public void setValue(ArrayList<T> value) {
         super.setValue(value);
+    }
+
+    public void setValue(List<T> value) {
+        if (value == null) {
+            super.setValue(new ArrayList<>());
+        } else {
+            super.setValue(new ArrayList<>(value));
+        }
     }
 
     public void add(T t) {

@@ -164,7 +164,7 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
         if (waitDialog == null) {
             waitDialog = new WaitDialog(mActivity);
         }
-        waitDialog.show(title, true, null);
+        waitDialog.show(title);
     }
 
     @Override

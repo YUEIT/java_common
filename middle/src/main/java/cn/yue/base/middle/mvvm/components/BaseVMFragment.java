@@ -73,7 +73,7 @@ public abstract class BaseVMFragment<VM extends BaseViewModel> extends BaseFragm
             public void onChanged(RouterModel routerModel) {
                 FRouter.getInstance()
                         .bindRouterCard(routerModel.getRouterCard())
-                        .navigation(mActivity,  routerModel.getToActivity(), routerModel.getRequestCode());
+                        .navigation(mActivity, routerModel.getRequestCode(), routerModel.getToActivity());
             }
         });
         viewModel.finishEvent.observe(this, new Observer<FinishModel>() {
@@ -96,7 +96,7 @@ public abstract class BaseVMFragment<VM extends BaseViewModel> extends BaseFragm
         if (waitDialog == null) {
             waitDialog = new WaitDialog(mActivity);
         }
-        waitDialog.show(title, true, null);
+        waitDialog.show(title);
     }
 
     @Override

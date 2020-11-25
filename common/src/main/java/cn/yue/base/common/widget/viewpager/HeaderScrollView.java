@@ -162,12 +162,18 @@ public class HeaderScrollView extends LinearLayout {
             case MotionEvent.ACTION_MOVE:
                 if(refreshLayout !=null) {
                     if (canPtr()) {
-                        refreshLayout.setEnabled(true);
+                        if (!refreshLayout.isEnabled()) {
+                            refreshLayout.setEnabled(true);
+                        }
                     } else {
-                        refreshLayout.setEnabled(false);
+                        if (refreshLayout.isEnabled()) {
+                            refreshLayout.setEnabled(false);
+                        }
                     }
                 }
-                if (mDisallowIntercept) break;
+                if (mDisallowIntercept) {
+                    break;
+                }
                 deltaY = mLastY - currentY;
                 deltaX = mLastX - currentX;
                 mLastX = currentX;

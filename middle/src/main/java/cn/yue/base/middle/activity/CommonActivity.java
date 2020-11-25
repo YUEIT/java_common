@@ -10,6 +10,7 @@ import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.activity.TransitionAnimation;
 import cn.yue.base.common.utils.debug.LogUtils;
 import cn.yue.base.middle.router.FRouter;
+import cn.yue.base.middle.router.RouterCard;
 
 /**
  * Description :
@@ -18,24 +19,23 @@ import cn.yue.base.middle.router.FRouter;
 
 public class CommonActivity extends BaseFragmentActivity {
 
-    private int transition; //入场动画
+    //入场动画
+    private int transition;
     @Override
     public Fragment getFragment() {
-        if (getIntent() == null
-                || getIntent().getExtras() == null
-                || getIntent().getExtras().getParcelable(FRouter.TAG) == null) {
+        if (getIntent() == null || getIntent().getExtras() == null) {
             return null;
         }
-        FRouter fRouter = getIntent().getExtras().getParcelable(FRouter.TAG);
+        RouterCard fRouter = getIntent().getExtras().getParcelable(RouterCard.TAG);
         if (fRouter == null) {
             return null;
         }
-        transition = fRouter.getRouterCard().getTransition();
+        transition = fRouter.getTransition();
         try {
             return (Fragment) ARouter.getInstance()
-                    .build(fRouter.getRouterCard().getPath())
+                    .build(fRouter.getPath())
                     .with(getIntent().getExtras())
-                    .setTimeout(fRouter.getRouterCard().getTimeout())
+                    .setTimeout(fRouter.getTimeout())
 //                        .withTransition(fRouter.getEnterAnim(), fRouter.getExitAnim())
                     .navigation(this, new NavigationCallback() {
                         @Override

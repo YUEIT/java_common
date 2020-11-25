@@ -25,9 +25,11 @@ import cn.yue.base.common.utils.debug.LogUtils;
  */
 public class RouterCard implements INavigation, Parcelable{
 
+    public static final String TAG = "RouterCard";
+
     private Uri uri;
     private Object tag;
-    private Bundle mBundle;
+    private Bundle mBundle = new Bundle();
 
     private String pactUrl;
     private String path;
@@ -35,16 +37,15 @@ public class RouterCard implements INavigation, Parcelable{
     private int timeout;
     private int enterAnim;
     private int exitAnim;
-    private int transition; //入场方式
-    private boolean isInterceptLogin; //是否登录拦截
+    //入场方式
+    private int transition;
+    //是否登录拦截
+    private boolean isInterceptLogin;
     private INavigation navigation;
 
-    public RouterCard() {
-        clear();
-    }
+    public RouterCard() { }
 
     public RouterCard(INavigation navigation) {
-        clear();
         this.navigation = navigation;
     }
 
@@ -382,7 +383,10 @@ public class RouterCard implements INavigation, Parcelable{
 
     protected RouterCard(Parcel in) {
         uri = in.readParcelable(Uri.class.getClassLoader());
-        mBundle = in.readBundle();
+        mBundle = in.readBundle(Bundle.class.getClassLoader());
+        if (mBundle == null) {
+            mBundle = new Bundle();
+        }
         path = in.readString();
         flags = in.readInt();
         timeout = in.readInt();
@@ -410,30 +414,24 @@ public class RouterCard implements INavigation, Parcelable{
     }
 
     @Override
-    public void navigation(Context context) {
+    public void navigation(@NonNull Context context) {
         if (navigation != null) {
             navigation.navigation(context);
         }
     }
 
     @Override
-    public void navigation(@NonNull Context context, String toActivity) {
-        if (navigation != null) {
-            navigation.navigation(context, toActivity);
-        }
-    }
-
-    @Override
-    public void navigation(Activity context, int requestCode) {
+    public void navigation(@NonNull Context context, int requestCode) {
         if (navigation != null) {
             navigation.navigation(context, requestCode);
         }
     }
 
     @Override
-    public void navigation(@NonNull Activity context, String toActivity, int requestCode) {
+    public void navigation(@NonNull Context context, int requestCode, String toActivity) {
         if (navigation != null) {
-            navigation.navigation(context, toActivity, requestCode);
+            navigation.navigation(context, requestCode, toActivity);
         }
     }
+
 }

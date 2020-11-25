@@ -51,8 +51,6 @@ public class PageHintView extends NestedScrollView {
         noNetView = inflate(context, R.layout.layout_page_hint_no_net, null);
         noDataView = inflate(context, R.layout.layout_page_hint_no_data, null);
         serverErrorView = inflate(context, R.layout.layout_page_hint_server_error, null);
-        ImageView loadingIV = loadingView.findViewById(R.id.loadingIV);
-        ImageLoader.getLoader().loadGif(loadingIV, R.drawable.app_icon_wait);
 
         noNetView.findViewById(R.id.reloadTV).setOnClickListener(new OnClickListener() {
             @Override

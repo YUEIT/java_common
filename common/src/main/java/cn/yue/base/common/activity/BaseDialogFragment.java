@@ -279,7 +279,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
         if (waitDialog == null) {
             waitDialog = new WaitDialog(mActivity);
         }
-        waitDialog.show(title, true, null);
+        waitDialog.show(title);
     }
 
     public void dismissWaitDialog() {

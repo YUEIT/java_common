@@ -27,11 +27,9 @@ import cn.yue.base.middle.activity.CommonActivity;
  */
 
 public class FRouter implements INavigation, Parcelable {
-
-    public static final String TAG = "FRouter";
-
+    
     protected FRouter(Parcel in) {
-        routerCard = in.readParcelable(RouterCard.class.getClassLoader());
+        mRouterCard = in.readParcelable(RouterCard.class.getClassLoader());
     }
 
     public static final Creator<FRouter> CREATOR = new Creator<FRouter>() {
@@ -51,7 +49,9 @@ public class FRouter implements INavigation, Parcelable {
         ARouter.init(application);
     }
 
-    //必须写在init之前，否则这些配置在init过程中将无效
+    /**
+     * 必须写在init之前，否则这些配置在init过程中将无效
+     */
     public static void debug() {
         ARouter.openLog();     // 打印日志
         ARouter.openDebug();   // 开启调试模式(如果在InstantRun模式下运行，必须开启调试模式！线上版本需要关闭,否则有安全风险)
@@ -64,7 +64,7 @@ public class FRouter implements INavigation, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(routerCard, flags);
+        dest.writeParcelable(mRouterCard, flags);
     }
 
     private static class FRouterHolder {
@@ -72,23 +72,22 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     public static FRouter getInstance() {
-        FRouter fRouter = FRouterHolder.instance;
-        fRouter.routerCard.clear();
-        return fRouter;
+        return FRouterHolder.instance;
     }
 
-    private RouterCard routerCard;
+    private RouterCard mRouterCard;
+    
     public FRouter() {
-        routerCard = new RouterCard(this);
+        mRouterCard = new RouterCard(this);
     }
 
     public RouterCard getRouterCard() {
-        return routerCard;
+        return mRouterCard;
     }
 
     public RouterCard build(String path) {
-        routerCard.setPath(path);
-        return routerCard;
+        mRouterCard.setPath(path);
+        return mRouterCard;
     }
 
     private Class targetActivity;
@@ -98,10 +97,10 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     public RouteType getRouteType() {
-        if (TextUtils.isEmpty(routerCard.getPath())) {
-            throw new NullPointerException("path is null");
+        if (TextUtils.isEmpty(mRouterCard.getPath())) {
+            return RouteType.UNKNOWN;
         }
-        Postcard postcard = ARouter.getInstance().build(routerCard.getPath());
+        Postcard postcard = ARouter.getInstance().build(mRouterCard.getPath());
         try {
             LogisticsCenter.completion(postcard);
         } catch (NoRouteFoundException e) {
@@ -111,39 +110,25 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     @Override
-    public INavigation bindRouterCard(RouterCard routerCard) {
-        this.routerCard = routerCard;
-        this.routerCard.setNavigationImpl(this);
+    public INavigation bindRouterCard(RouterCard mRouterCard) {
+        this.mRouterCard = mRouterCard;
+        this.mRouterCard.setNavigationImpl(this);
         return this;
     }
 
     @Override
-    public void navigation(Context context) {
-        this.navigation(context, null);
+    public void navigation(@NonNull Context context) {
+        this.navigation(context, 0);
     }
 
     @Override
-    public void navigation(@NonNull Context context, String toActivity) {
-        if (routerCard.isInterceptLogin() && interceptLogin(context)) {
-            return;
-        }
-        if (getRouteType() == RouteType.ACTIVITY) {
-            jumpToActivity(context);
-        } else if (getRouteType() == RouteType.FRAGMENT) {
-            jumpToFragment(context, toActivity);
-        } else {
-            ToastUtils.showShort("找不到页面~");
-        }
+    public void navigation(@NonNull Context context, int requestCode) {
+        navigation(context, requestCode, null);
     }
 
     @Override
-    public void navigation(Activity context, int requestCode) {
-        this.navigation(context, null, requestCode);
-    }
-
-    @Override
-    public void navigation(@NonNull Activity context, String toActivity, int requestCode) {
-        if (routerCard.isInterceptLogin() && interceptLogin(context)) {
+    public void navigation(@NonNull Context context, int requestCode, String toActivity) {
+        if (mRouterCard.isInterceptLogin() && interceptLogin(context)) {
             return;
         }
         if (getRouteType() == RouteType.ACTIVITY) {
@@ -154,19 +139,14 @@ public class FRouter implements INavigation, Parcelable {
             ToastUtils.showShort("找不到页面~");
         }
     }
-
-
-    private void jumpToActivity(Context context) {
-        jumpToActivity(context, -1);
-    }
-
+    
     private void jumpToActivity(Context context, int requestCode) {
         Postcard postcard = ARouter.getInstance()
-                .build(routerCard.getPath())
-                .withFlags(routerCard.getFlags())
-                .with(routerCard.getExtras())
-                .withTransition(routerCard.getRealEnterAnim(), routerCard.getRealExitAnim())
-                .setTimeout(routerCard.getTimeout());
+                .build(mRouterCard.getPath())
+                .withFlags(mRouterCard.getFlags())
+                .with(mRouterCard.getExtras())
+                .withTransition(mRouterCard.getRealEnterAnim(), mRouterCard.getRealExitAnim())
+                .setTimeout(mRouterCard.getTimeout());
         if (requestCode <= 0 || !(context instanceof Activity)) {
             postcard.navigation(context);
         } else {
@@ -174,19 +154,11 @@ public class FRouter implements INavigation, Parcelable {
         }
     }
 
-    private void jumpToFragment(Context context) {
-        jumpToFragment(context, null);
-    }
-
-    private void jumpToFragment(Context context, String toActivity) {
-        jumpToFragment(context, toActivity, -1);
-    }
-
     private void jumpToFragment(Context context, String toActivity, int requestCode) {
         Intent intent = new Intent();
-        intent.putExtra(TAG, this);
-        intent.putExtras(routerCard.getExtras());
-        intent.setFlags(routerCard.getFlags());
+        intent.putExtra(RouterCard.TAG, mRouterCard);
+        intent.putExtras(mRouterCard.getExtras());
+        intent.setFlags(mRouterCard.getFlags());
         if (toActivity == null) {
             if (targetActivity == null) {
                 intent.setClass(context, CommonActivity.class);
@@ -204,19 +176,18 @@ public class FRouter implements INavigation, Parcelable {
             }
         }
         if (context instanceof Activity) {
-            ((Activity) context).overridePendingTransition(routerCard.getRealEnterAnim(), routerCard.getRealExitAnim());
+            ((Activity) context).overridePendingTransition(mRouterCard.getRealEnterAnim(), mRouterCard.getRealExitAnim());
         }
     }
 
     public DialogFragment navigationDialogFragment(BaseFragmentActivity context) {
         DialogFragment dialogFragment = (DialogFragment) ARouter.getInstance()
-                .build(routerCard.getPath())
-                .with(routerCard.getExtras())
+                .build(mRouterCard.getPath())
+                .with(mRouterCard.getExtras())
                 .navigation(context);
         dialogFragment.show(context.getSupportFragmentManager(), null);
         return dialogFragment;
     }
-
 
     public interface OnInterceptLoginListener {
         boolean interceptLogin(Context context);

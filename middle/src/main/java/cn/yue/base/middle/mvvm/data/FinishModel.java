@@ -3,7 +3,7 @@ package cn.yue.base.middle.mvvm.data;
 import android.os.Bundle;
 
 public class FinishModel {
-    private int resultCode = -1;
+    private int resultCode;
     private Bundle bundle;
 
     public int getResultCode() {

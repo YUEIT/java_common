@@ -427,7 +427,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
         if (waitDialog == null) {
             waitDialog = new WaitDialog(mActivity);
         }
-        waitDialog.show(title, true, null);
+        waitDialog.show(title);
     }
 
     @Override

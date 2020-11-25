@@ -62,7 +62,7 @@ public class NotificationConfig {
         //文本内容
         builder.setContentText(content);
         //小图标
-        builder.setSmallIcon(R.drawable.icon_share_qq_friend);
+//        builder.setSmallIcon(R.drawable.icon_share_qq_friend);
         //设置点击信息后自动清除通知
         builder.setAutoCancel(true);
         return builder;

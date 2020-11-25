@@ -2,6 +2,7 @@ package cn.yue.base.test.widget;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ public class ParentFragment2 extends BaseHintFragment {
 //        refreshL.setEnableLoadmore(false);
 //        refreshL.setEnableOverScroll(false);
         headerScrollView = findViewById(R.id.headerViewPager);
+        headerScrollView.setSwipeRefreshLayout(refreshL);
 //        headerViewPager.setTopOffset(DisplayUtils.dip2px(50));
         pageAdapter = new MyPageAdapter(mFragmentManager);
         ViewPager viewPager = findViewById(R.id.viewPager);
@@ -63,6 +65,7 @@ public class ParentFragment2 extends BaseHintFragment {
                 ToastUtils.showShort("click header");
             }
         });
+
     }
 
     class MyPageAdapter extends SampleFragmentPagerAdapter implements SampleTabStrip.LayoutTabProvider {

@@ -192,10 +192,7 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
     }
 
     public void navigation(RouterCard routerCard, int requestCode, String toActivity) {
-        RouterModel routerModel = new RouterModel();
-        routerModel.setRouterCard(routerCard);
-        routerModel.setRequestCode(requestCode);
-        routerModel.setToActivity(toActivity);
+        RouterModel routerModel = new RouterModel(routerCard, requestCode, toActivity);
         routerEvent.postValue(routerModel);
     }
 
