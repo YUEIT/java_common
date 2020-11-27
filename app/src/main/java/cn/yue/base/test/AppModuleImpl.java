@@ -10,4 +10,9 @@ public class AppModuleImpl implements IAppModule {
     public void init(Context context) {
 
     }
+
+    @Override
+    public void loginInvalid() {
+
+    }
 }

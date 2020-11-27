@@ -18,7 +18,7 @@ import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvvm.data.MutableListLiveData;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
-import cn.yue.base.middle.net.observer.BaseNetSingleObserver;
+import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import io.reactivex.Single;
 
@@ -74,7 +74,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
         getRequestSingle(pageNt)
                 .delay(1000, TimeUnit.MILLISECONDS)
                 .compose(this.<P>toBindLifecycle())
-                .subscribe(new BaseNetSingleObserver<P>() {
+                .subscribe(new BaseNetObserver<P>() {
 
                     private boolean isLoadingRefresh = false;
                     @Override

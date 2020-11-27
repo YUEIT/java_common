@@ -1,23 +1,22 @@
 package cn.yue.base.common.binding.image;
 
-
 import android.widget.ImageView;
 
 import androidx.databinding.BindingAdapter;
 
-/**
- * Created by goldze on 2017/6/18.
- */
-public final class ViewAdapter {
-    @BindingAdapter(value = {"url", "placeholderRes", "viewCorner", "isCenterCrop", "startTopCorner", "endTopCorner", "startBottomCorner", "endBottomCorner"}, requireAll = false)
-    public static void setImageUri(ImageView imageView, String url, int placeholderRes, int viewCorner, boolean isCenterCrop,
-                                   boolean startTopCorner, boolean endTopCorner, boolean startBottomCorner, boolean endBottomCorner) {
+import cn.yue.base.common.image.ImageLoader;
 
+public class ViewAdapter {
+
+    @BindingAdapter(value = {"url", "imageRes"} , requireAll = false)
+    public static void setImageResource(ImageView imageView, String url, int imageRes) {
+        if (url != null && !url.isEmpty()) {
+            ImageLoader.getLoader().loadImage(imageView, url);
+            return;
+        }
+        if (imageRes != 0) {
+            ImageLoader.getLoader().loadImage(imageView, imageRes);
+        }
     }
 
-    @BindingAdapter(value = {"gif"}, requireAll = false)
-    public static void setImageUri(ImageView imageView, int gifRes) {
-
-    }
 }
-

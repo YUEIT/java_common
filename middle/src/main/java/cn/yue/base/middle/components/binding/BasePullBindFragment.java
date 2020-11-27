@@ -18,8 +18,8 @@ public abstract class BasePullBindFragment<T extends ViewDataBinding> extends Ba
     protected T binding;
 
     @Override
-    protected void stubInflate(ViewStub stub, View inflated) {
-        super.stubInflate(stub, inflated);
+    protected void bindLayout(View inflated) {
+        super.bindLayout(inflated);
         binding = DataBindingUtil.bind(inflated);
     }
 }

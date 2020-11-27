@@ -2,8 +2,7 @@ package cn.yue.base.test.component;
 
 import androidx.databinding.ObservableField;
 
-import cn.yue.base.common.binding.action.BindingAction;
-import cn.yue.base.common.binding.action.BindingCommand;
+import cn.yue.base.common.binding.action.Consumer;
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.ItemViewModel;
 import cn.yue.base.test.R;
@@ -19,22 +18,17 @@ public class TestItemViewModel2 extends ItemViewModel {
     }
 
     @Override
-    protected int getItemType() {
-        return 2;
-    }
-
-    @Override
     public int getLayoutId() {
         return R.layout.item_test_other2;
     }
 
     public ObservableField<String> nameField = new ObservableField<>();
 
-    public BindingCommand<Void> onclick = new BindingCommand<Void>(new BindingAction() {
+    public Consumer onclick = new Consumer() {
         @Override
-        public void call() {
+        public void accept() {
             itemBean.setName("change");
             nameField.set(itemBean.getName());
         }
-    });
+    };
 }

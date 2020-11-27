@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,7 +31,7 @@ import cn.yue.base.middle.mvp.photo.IPhotoView;
 import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
-import cn.yue.base.middle.net.observer.BaseNetSingleObserver;
+import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
@@ -47,7 +46,8 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
     private String pageNt = "1";
     private String lastNt = "1";
     protected List<S> dataList = new ArrayList<>();
-    protected int total;    //当接口返回总数时，为返回数量；接口未返回数量，为统计数量；
+    //当接口返回总数时，为返回数量；接口未返回数量，为统计数量；
+    protected int total;
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
     private Loader loader = new Loader();
@@ -79,8 +79,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
         });
 
         refreshL = findViewById(R.id.refreshL);
-        refreshL.init();
-        refreshL.setEnabled(canPullDown());
+        refreshL.setEnabledRefresh(canPullDown());
         refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -88,7 +87,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
             }
         });
         if (canPullDown()) {
-            hintView.setRefreshTarget((ViewGroup) refreshL);
+            hintView.setRefreshTarget(refreshL);
         }
         footer = getFooter();
         if (footer != null) {
@@ -250,7 +249,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
         getRequestSingle(pageNt)
                 .delay(1000, TimeUnit.MILLISECONDS)
                 .compose(this.getLifecycleProvider().<P>toBindLifecycle())
-                .subscribe(new BaseNetSingleObserver<P>() {
+                .subscribe(new BaseNetObserver<P>() {
 
                     private boolean isLoadingRefresh = false;
                     @Override

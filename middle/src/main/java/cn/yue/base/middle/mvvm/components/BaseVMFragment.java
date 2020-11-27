@@ -110,6 +110,10 @@ public abstract class BaseVMFragment<VM extends BaseViewModel> extends BaseFragm
     public void onDestroy() {
         super.onDestroy();
         getLifecycle().removeObserver(viewModel);
+        // 通过Transaction的移除再添加或者替换的操作，会出现复用已经被destroy的fragment情况
+        // 这种情况下如果使用缓存，会出现liveData无法监听，因为liveData的观察者已经在destroy时被移除了
+        // 这里就不使用缓存了，那么重复初始化的逻辑就需要检查了
+        clearCacheView();
     }
 
     @Override

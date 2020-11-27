@@ -132,77 +132,18 @@ public class TestFragment extends BaseHintFragment{
                     });
                 }
                 if (position == 6) {
-                    holder.setText(R.id.testTV, "Motion Layout");
+                    holder.setText(R.id.testTV, "select photos");
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             FRouter.getInstance()
-                                    .build("/app/testHint")
+                                    .build("/common/selectPhoto")
                                     .navigation(mActivity);
-
                         }
                     });
                 }
             }
         });
-    }
-
-
-    private void startLive() {
-        showActivity("com.iqoo.secure");
-    }
-
-    /**
-     * 跳转到指定应用的首页
-     */
-    private void showActivity(@NonNull String packageName) {
-        Intent intent = mActivity.getPackageManager().getLaunchIntentForPackage(packageName);
-        startActivity(intent);
-    }
-
-    /**
-     * 跳转到指定应用的指定页面
-     */
-    private void showActivity(@NonNull String packageName, @NonNull String activityDir) {
-        Intent intent = new Intent();
-        intent.setComponent(new ComponentName(packageName, activityDir));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void hookOnClickListener(View view) {
-        try {
-            // 得到 View 的 ListenerInfo 对象
-            Method getListenerInfo = View.class.getDeclaredMethod("getListenerInfo");
-            getListenerInfo.setAccessible(true);
-            Object listenerInfo = getListenerInfo.invoke(view);
-            // 得到 原始的 OnClickListener 对象
-            Class<?> listenerInfoClz = Class.forName("android.view.View$ListenerInfo");
-            Field mOnClickListener = listenerInfoClz.getDeclaredField("mOnClickListener");
-            mOnClickListener.setAccessible(true);
-            View.OnClickListener originOnClickListener = (View.OnClickListener) mOnClickListener.get(listenerInfo);
-            // 用自定义的 OnClickListener 替换原始的 OnClickListener
-            View.OnClickListener hookedOnClickListener = new HookedOnClickListener(originOnClickListener);
-            mOnClickListener.set(listenerInfo, hookedOnClickListener);
-        } catch (Exception e) {
-
-        }
-    }
-
-    class HookedOnClickListener implements View.OnClickListener {
-        private View.OnClickListener origin;
-
-        HookedOnClickListener(View.OnClickListener origin) {
-            this.origin = origin;
-        }
-
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(mActivity, "hook click", Toast.LENGTH_SHORT).show();
-            if (origin != null) {
-                origin.onClick(v);
-            }
-        }
     }
 
     @Override

@@ -2,16 +2,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'walle'
 
-//版本号和debug在version.properties文件中配置
-def versionPropsFile = file("../version.properties")
-Properties versionProps = new Properties()
-versionProps.load(new FileInputStream(versionPropsFile))
-
 android {
     buildToolsVersion rootProject.ext.android.buildToolsVersion
     defaultConfig {
-        versionCode appVersionCode(versionProps['version_name'].toString())
-        versionName versionProps['version_name'].toString()
+        versionCode appVersionCode(rootProject.ext.version.versionName.toString())
+        versionName rootProject.ext.version.versionName.toString()
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [moduleName: project.getName()]
@@ -51,7 +46,6 @@ android {
             signingConfig signingConfigs.debug
             manifestPlaceholders = [UMENG_APPKEY_VALUE: umeng_key_release]
             buildConfigField("boolean", "DEBUG_MODE", "false")
-            buildConfigField("boolean", "LOG_MODE", "false")
         }
 
         debug {
@@ -66,8 +60,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
             manifestPlaceholders = [UMENG_APPKEY_VALUE: umeng_key_debug]
-            buildConfigField("boolean", "DEBUG_MODE", versionProps['debug_mode'].toString())
-            buildConfigField("boolean", "LOG_MODE", versionProps['log_mode'].toString())
+            buildConfigField("boolean", "DEBUG_MODE", rootProject.ext.version.debug.toString())
         }
     }
 

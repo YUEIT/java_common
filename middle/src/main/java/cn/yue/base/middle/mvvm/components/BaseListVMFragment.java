@@ -57,8 +57,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
             }
         });
         refreshL = findViewById(R.id.refreshL);
-        refreshL.init();
-        refreshL.setEnabled(canPullDown());
+        refreshL.setEnabledRefresh(canPullDown());
         refreshL.setOnRefreshListener(new IRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -66,7 +65,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
             }
         });
         if (canPullDown()) {
-            hintView.setRefreshTarget((ViewGroup) refreshL);
+            hintView.setRefreshTarget(refreshL);
         }
         footer = getFooter();
         if (footer != null) {

@@ -9,11 +9,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,28 +32,23 @@ import cn.yue.base.common.widget.TopBar;
  * Created by yue on 2019/3/11
  */
 
-public abstract class BaseFragment extends Fragment implements View.OnTouchListener{
+public abstract class BaseFragment extends Fragment implements View.OnTouchListener {
 
     private ILifecycleProvider<Lifecycle.Event> lifecycleProvider;
     protected View cacheView;
     protected FragmentManager mFragmentManager;
     protected BaseFragmentActivity mActivity;
-    protected Bundle bundle;
-    protected LayoutInflater mInflater;
     protected Handler mHandler = new Handler();
     protected TopBar topBar;
-    protected String requestTag = UUID.randomUUID().toString();
-
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (null == context || !(context instanceof BaseFragmentActivity)) {
+        if (!(context instanceof BaseFragmentActivity)) {
             throw new RuntimeException("BaseFragment必须与BaseActivity配合使用");
         }
         mActivity = (BaseFragmentActivity) context;
         mFragmentManager = getChildFragmentManager();
-        mInflater = LayoutInflater.from(mActivity);
     }
 
     @Override
@@ -57,7 +56,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         lifecycleProvider = initLifecycleProvider();
         getLifecycle().addObserver(lifecycleProvider);
-        bundle = getArguments();
     }
 
     protected ILifecycleProvider<Lifecycle.Event> initLifecycleProvider() {
@@ -78,10 +76,11 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
         }
     }
 
-    protected void initOther() { }
+    protected void initOther() {
+    }
 
     @Override
-    public final View onCreateView(@Nullable LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (cacheView == null || !needCache()) {//如果view没有被初始化或者不需要缓存的情况下，重新初始化控件
             topBar = mActivity.getTopBar();
             initTopBar(topBar);
@@ -93,9 +92,9 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
             hasCache = false;
         } else {
             hasCache = true;
-            ViewGroup v = (ViewGroup) cacheView.getParent();
-            if (v != null) {
-                v.removeView(cacheView);
+            ViewParent v = cacheView.getParent();
+            if (v instanceof ViewGroup) {
+                ((ViewGroup) v).removeView(cacheView);
             }
         }
         return cacheView;
@@ -115,16 +114,12 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
 
     /**
      * 获取布局
-     *
-     * @return
      */
     protected abstract int getLayoutId();
 
 
     /**
      * 直接findViewById()初始化组件
-     *
-     * @param savedInstanceState
      */
     protected abstract void initView(Bundle savedInstanceState);
 
@@ -144,7 +139,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
 
     /**
      * 自定义topbar
-     * @param view
      */
     public void customTopBar(View view) {
         mActivity.customTopBar(view);
@@ -174,11 +168,9 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
         mHandler.removeCallbacksAndMessages(null);
     }
 
-    public BaseFragment newInstance(String fragmentName, Bundle bundle) {
-        BaseFragment fragment = (BaseFragment) Fragment.instantiate(getActivity(), fragmentName, bundle);
-        return fragment;
+    public void clearCacheView() {
+        cacheView = null;
     }
-
 
     public boolean onFragmentBackPressed() {
         return false;
@@ -213,7 +205,7 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mFragmentManager != null) {
             List<Fragment> fragments = mFragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
+            if (fragments.size() > 0) {
                 for (Fragment fragment : fragments) {
                     if (fragment != null && fragment.isAdded() && fragment.isVisible() && fragment.getUserVisibleHint()) {
                         fragment.onActivityResult(requestCode, resultCode, data);
@@ -222,20 +214,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
             }
         }
     }
-
-    public final void jumpFragment(BaseFragment fragment, String tag) {
-        mActivity.replace(fragment, tag, true);
-    }
-
-    public final void jumpFragment(BaseFragment fragment) {
-        mActivity.replace(fragment, getClass().getSimpleName(), true);
-    }
-
-    public final void jumpFragmentNoBack(BaseFragment fragment) {
-        mActivity.replace(fragment, null, false);
-    }
-
-    //--------------------------------------------------------------------------------------------------------------
 
     public final void finishFragment() {
         mActivity.onBackPressed();
@@ -271,8 +249,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
         finishAllWithResult(Activity.RESULT_OK, intent);
     }
 
-    //--------------------------------------------------------------------------------------------------------------
-
     public final <T extends View> T findViewById(int resId) {
         if (cacheView == null) {
             return null;
@@ -281,14 +257,12 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<Fragment> fragments = getChildFragmentManager().getFragments();
-        if (fragments != null) {
-            for (Fragment fragment : fragments) {
-                if (fragment != null) {
-                    fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                }
+        for (Fragment fragment : fragments) {
+            if (fragment != null) {
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
     }

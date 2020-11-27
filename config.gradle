@@ -1,5 +1,11 @@
 ext {
 
+    version = [
+            'applicationId' : 'cn.yue.koltin.test',
+            'versionName' : '1.0.0',
+            'debug' : true
+    ]
+
     android = [
             'buildToolsVersion' : '29.0.2',
             'targetSdkVersion' : 29,
@@ -54,5 +60,16 @@ ext {
             'tkrefreshlayout'                      : 'com.lcodecorex:tkrefreshlayout:1.0.7',
             'autosize'                             : 'me.jessyan:autosize:1.2.1',
 //            'utils'                                : 'com.blankj:utilcodex:1.29.0'
+    ]
+
+    refresh = [
+            'smart-refresh'                        : 'com.scwang.smart:refresh-layout-kernel:2.0.1',
+            'header-classics'                      : 'com.scwang.smart:refresh-header-classics:2.0.1',    //精典下拉
+            'header-radar'                         : 'com.scwang.smart:refresh-header-radar:2.0.1',       //雷达刷新头
+            'header-falsify'                       : 'com.scwang.smart:refresh-header-falsify:2.0.1',     //虚拟刷新头
+            'header-material'                      : 'com.scwang.smart:refresh-header-material:2.0.1',    //谷歌刷新头
+            'header-two-level'                     : 'com.scwang.smart:refresh-header-two-level:2.0.1',   //二级刷新头
+            'footer-ball'                          : 'com.scwang.smart:refresh-footer-ball:2.0.1',        //球脉冲加载
+            'footer-classics'                      : 'com.scwang.smart:refresh-footer-classics:2.0.1'     //经典加载
     ]
 }

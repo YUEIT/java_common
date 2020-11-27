@@ -58,16 +58,17 @@ public abstract class BaseActivity extends FragmentActivity {
 
     protected void initBundle(Bundle bundle) {}
 
-    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon) {
-        setSystemBar(isFillUpTop, isDarkIcon, Color.TRANSPARENT);
+    public void setSystemBar(boolean isFillScreen) {
+        setSystemBar(isFillScreen, true);
     }
 
-    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return;
-        }
+    public void setSystemBar(boolean isFillScreen, boolean isDarkIcon) {
+        setSystemBar(isFillScreen, isDarkIcon, Color.WHITE);
+    }
+
+    public void setSystemBar(boolean isFillScreen, boolean isDarkIcon, int bgColor) {
         try {
-            BarUtils.setStyle(this, isFillUpTop, isDarkIcon, bgColor);
+            BarUtils.setStyle(this, isFillScreen, isDarkIcon, bgColor);
         } catch (Exception e) {
             e.printStackTrace();
         }

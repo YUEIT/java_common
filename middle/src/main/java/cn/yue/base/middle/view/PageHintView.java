@@ -14,6 +14,7 @@ import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.router.FRouter;
+import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
  * Description :
@@ -190,14 +191,14 @@ public class PageHintView extends NestedScrollView {
         }
     }
 
-    private ViewGroup refreshLayout;
-    public void setRefreshTarget(ViewGroup refreshLayout) {
+    private IRefreshLayout refreshLayout;
+    public void setRefreshTarget(IRefreshLayout refreshLayout) {
         this.refreshLayout = refreshLayout;
     }
 
     private void setRefreshEnable(boolean enable) {
         if (refreshLayout != null) {
-            refreshLayout.setEnabled(enable);
+            refreshLayout.setEnabledRefresh(enable);
         }
     }
 

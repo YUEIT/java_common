@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 
+import androidx.annotation.ContentView;
+
 import java.util.List;
 
 import cn.yue.base.common.activity.BaseFragment;
@@ -32,9 +34,9 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
 public abstract class BasePullFragment extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView, IPullView {
 
     protected Loader loader = new Loader();
-    protected IRefreshLayout refreshL;
-    protected PageHintView hintView;
-    private ViewStub baseVS;
+    private IRefreshLayout refreshL;
+    private PageHintView hintView;
+    private View contentView;
     private PhotoHelper photoHelper;
 
     @Override
@@ -62,22 +64,23 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
                 refresh();
             }
         });
-        refreshL.setEnabled(canPullDown());
+        refreshL.setEnabledRefresh(canPullDown());
         if (canPullDown()) {
-            hintView.setRefreshTarget((ViewGroup) refreshL);
+            hintView.setRefreshTarget(refreshL);
         }
-        baseVS = findViewById(R.id.baseVS);
+        ViewStub baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());
         baseVS.setOnInflateListener(new ViewStub.OnInflateListener() {
             @Override
             public void onInflate(ViewStub stub, View inflated) {
-                stubInflate(stub, inflated);
+                contentView = inflated;
+                bindLayout(inflated);
             }
         });
         baseVS.inflate();
     }
 
-    protected void stubInflate(ViewStub stub, View inflated) { }
+    protected void bindLayout(View inflated) { }
 
     @Override
     protected void initOther() {
@@ -113,7 +116,7 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
             return;
         }
         if (isPageRefreshAnim) {
-            baseVS.setVisibility(View.GONE);
+            contentView.setVisibility(View.GONE);
             showStatusView(loader.setPageStatus(PageStatus.LOADING));
         } else {
             startRefresh();
@@ -143,13 +146,13 @@ public abstract class BasePullFragment extends BaseFragment implements IStatusVi
             if (loader.isFirstLoad()) {
                 hintView.show(status);
                 if (loader.getPageStatus() == PageStatus.NORMAL) {
-                    baseVS.setVisibility(View.VISIBLE);
+                    contentView.setVisibility(View.VISIBLE);
                 } else {
-                    baseVS.setVisibility(View.GONE);
+                    contentView.setVisibility(View.GONE);
                 }
             } else {
                 hintView.show(PageStatus.NORMAL);
-                baseVS.setVisibility(View.VISIBLE);
+                contentView.setVisibility(View.VISIBLE);
             }
         }
         if (status == PageStatus.NORMAL) {

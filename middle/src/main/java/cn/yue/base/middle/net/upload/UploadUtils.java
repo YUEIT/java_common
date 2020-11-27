@@ -24,7 +24,7 @@ import okhttp3.RequestBody;
  */
 public class UploadUtils {
 
-    private static final UploadServer uploadServer = RetrofitManager.getInstance().getRetrofit(BaseUrlAddress.getUpLoadUrl()).create(UploadServer.class);
+    private static final UploadServer uploadServer = RetrofitManager.getInstance().getRetrofit("http://upload").create(UploadServer.class);
 
     public static UploadServer getUploadServer() {
         return uploadServer;
@@ -36,7 +36,7 @@ public class UploadUtils {
                     @Override
                     public SingleSource<ImageResultListData> apply(List<File> files) throws Exception {
                         String url;
-                        if (InitConstant.isDebug) {
+                        if (InitConstant.isDebug()) {
                             url = "4tpBNVAu7iPQgmQetUXvXA";
                         } else {
                             url = getUploadKey();

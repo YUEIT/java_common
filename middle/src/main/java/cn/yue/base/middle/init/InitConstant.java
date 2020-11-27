@@ -14,9 +14,15 @@ public class InitConstant {
     /**------------------------------------------------------------------------------------------**/
     //version.properties文件中修改对应值（正式编译版本无需修改，自动设置false）
 
-    public static boolean isDebug;
+    private static boolean mDebug;
 
-    public static boolean logMode;
+    public static boolean isDebug() {
+        return mDebug;
+    }
+
+    public static void setDebug(boolean isDebug) {
+        mDebug = isDebug;
+    }
 
     /**------------------------------------------------------------------------------------------**/
 
@@ -41,7 +47,7 @@ public class InitConstant {
 
     public final static String APP_CLIENT_TYPE = "2";
 
-    public final static String APP_SIGN_KEY = "nK!op4w9lB.alev0";
+    public final static String APP_SIGN_KEY = "";
 
     /**------------------------------------------------------------------------------------------**/
 

@@ -52,9 +52,9 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
                 viewModel.refresh();
             }
         });
-        refreshL.setEnabled(canPullDown());
+        refreshL.setEnabledRefresh(canPullDown());
         if (canPullDown()) {
-            hintView.setRefreshTarget((ViewGroup) refreshL);
+            hintView.setRefreshTarget(refreshL);
         }
         ViewStub baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());

@@ -21,7 +21,6 @@ import cn.yue.base.common.widget.viewpager.SampleFragmentPagerAdapter;
 import cn.yue.base.common.widget.viewpager.SampleTabStrip;
 import cn.yue.base.middle.components.BaseHintFragment;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
-import cn.yue.base.middle.view.refresh.OverRefreshLayout;
 import cn.yue.base.middle.view.refresh.SwipeRefreshLayout;
 import cn.yue.base.test.R;
 

@@ -50,7 +50,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
     protected Bundle bundle;
     protected LayoutInflater mInflater;
     protected Handler mHandler = new Handler();
-    protected String requestTag = UUID.randomUUID().toString();
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -92,7 +91,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     protected void initOther() { }
 
     @Override
-    public final View onCreateView(@Nullable LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (cacheView == null || !needCache()) {//如果view没有被初始化或者不需要缓存的情况下，重新初始化控件
             if (getLayoutId() == 0) {
                 cacheView = null;

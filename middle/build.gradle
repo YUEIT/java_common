@@ -57,6 +57,7 @@ dependencies {
     api rootProject.ext.dependencies["arouter-api"]
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
 
-    api rootProject.ext.dependencies["tkrefreshlayout"]
+    implementation rootProject.ext.refresh["smart-refresh"]
+    implementation rootProject.ext.refresh["header-classics"]
 }
 

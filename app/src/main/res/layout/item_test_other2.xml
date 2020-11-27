@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            onClickCommand="@{viewModel.onclick}"
+            onClickListener="@{viewModel.onclick}"
             android:text="@{viewModel.nameField}"
             android:textColor="#ff0000"
             android:textSize="15sp" />

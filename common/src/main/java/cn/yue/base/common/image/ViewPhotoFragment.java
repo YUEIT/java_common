@@ -37,10 +37,13 @@ public class ViewPhotoFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (bundle.getStringArrayList("list") != null) {
-            photoList = bundle.getStringArrayList("list");
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            if (bundle.getStringArrayList("list") != null) {
+                photoList = bundle.getStringArrayList("list");
+            }
+            currentIndex = bundle.getInt("position");
         }
-        currentIndex = bundle.getInt("position");
     }
 
     private TopBar topBar;
