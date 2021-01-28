@@ -18,7 +18,10 @@ import android.widget.ScrollView;
 
 public class HeaderScrollHelper {
 
-    private int sysVersion;         //当前sdk版本，用于判断api版本
+    /**
+     * 当前sdk版本，用于判断api版本
+     */
+    private int sysVersion;
     private ScrollableContainer mCurrentScrollableContainer;
 
     public HeaderScrollHelper() {
@@ -130,6 +133,20 @@ public class HeaderScrollHelper {
             ((RecyclerView) scrollableView).fling(0, velocityY);
         } else if (scrollableView instanceof WebView) {
             ((WebView) scrollableView).flingScroll(0, velocityY);
+        }
+    }
+
+    public void scrollToTop() {
+        View scrollableView = getScrollableView();
+        if (scrollableView instanceof AbsListView) {
+            AbsListView absListView = (AbsListView) scrollableView;
+            absListView.smoothScrollToPosition(0);
+        } else if (scrollableView instanceof ScrollView) {
+            ((ScrollView) scrollableView).scrollTo(0, 0);
+        } else if (scrollableView instanceof RecyclerView) {
+            ((RecyclerView) scrollableView).scrollToPosition(0);
+        } else if (scrollableView instanceof WebView) {
+            ((WebView) scrollableView).scrollTo(0, 0);
         }
     }
 }

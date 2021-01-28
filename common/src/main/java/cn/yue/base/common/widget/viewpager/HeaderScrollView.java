@@ -5,10 +5,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 
@@ -28,24 +32,63 @@ public class HeaderScrollView extends LinearLayout {
     private static final int DIRECTION_UP = 1;
     private static final int DIRECTION_DOWN = 2;
 
-    private int topOffset = 0;      //滚动的最大偏移量
+    /**
+     * 滚动的最大偏移量
+     */
+    private int topOffset = 0;
 
     private Scroller mScroller;
-    private int mTouchSlop;         //表示滑动的时候，手的移动要大于这个距离才开始移动控件。
-    private int mMinimumVelocity;   //允许执行一个fling手势动作的最小速度值
-    private int mMaximumVelocity;   //允许执行一个fling手势动作的最大速度值
-    private int sysVersion;         //当前sdk版本，用于判断api版本
-    private View mHeadView;         //需要被滑出的头部
-    private int mHeadHeight;        //滑出头部的高度
-    private int maxY = 0;           //最大滑出的距离，等于 mHeadHeight
-    private int minY = 0;           //最小的距离， 头部在最顶部
-    private int mCurY;              //当前已经滚动的距离
+    /**
+     * 表示滑动的时候，手的移动要大于这个距离才开始移动控件。
+     */
+    private int mTouchSlop;
+    /**
+     * 允许执行一个fling手势动作的最小速度值
+     */
+    private int mMinimumVelocity;
+    /**
+     * 允许执行一个fling手势动作的最大速度值
+     */
+    private int mMaximumVelocity;
+    /**
+     * 当前sdk版本，用于判断api版本
+     */
+    private int sysVersion;
+    /**
+     * 需要被滑出的头部
+     */
+    private View mHeadView;
+    /**
+     * 滑出头部的高度
+     */
+    private int mHeadHeight;
+    /**
+     * 最大滑出的距离，等于 mHeadHeight
+     */
+    private int maxY = 0;
+    /**
+     * 最小的距离， 头部在最顶部
+     */
+    private int minY = 0;
+    /**
+     * 当前已经滚动的距离
+     */
+    private int mCurY;
     private VelocityTracker mVelocityTracker;
     private int mDirection;
     private int mLastScrollerY;
-    private boolean mDisallowIntercept;  //是否允许拦截事件
-    private boolean isClickHead;         //当前点击区域是否在头部
-    private OnScrollListener onScrollListener;   //滚动的监听
+    /**
+     * 是否允许拦截事件
+     */
+    private boolean mDisallowIntercept;
+    /**
+     * 当前点击区域是否在头部
+     */
+    private boolean isClickHead;
+    /**
+     * 滚动的监听
+     */
+    private OnScrollListener onScrollListener;
     private HeaderScrollHelper mScrollable;
 
     public interface OnScrollListener {
@@ -74,9 +117,12 @@ public class HeaderScrollView extends LinearLayout {
         mScroller = new Scroller(context);
         mScrollable = new HeaderScrollHelper();
         ViewConfiguration configuration = ViewConfiguration.get(context);
-        mTouchSlop = configuration.getScaledTouchSlop();   //表示滑动的时候，手的移动要大于这个距离才开始移动控件。
-        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity(); //允许执行一个fling手势动作的最小速度值
-        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity(); //允许执行一个fling手势动作的最大速度值
+        //表示滑动的时候，手的移动要大于这个距离才开始移动控件。
+        mTouchSlop = configuration.getScaledTouchSlop();
+        //允许执行一个fling手势动作的最小速度值
+        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
+        //允许执行一个fling手势动作的最大速度值
+        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
         sysVersion = Build.VERSION.SDK_INT;
     }
 
@@ -104,12 +150,17 @@ public class HeaderScrollView extends LinearLayout {
         mDisallowIntercept = disallowIntercept;
     }
 
-    //解决SwipeRefreshLayout与其滑动冲突
+    /**
+     * 解决SwipeRefreshLayout与其滑动冲突
+     */
     private SwipeRefreshLayout refreshLayout;
     public void setSwipeRefreshLayout(SwipeRefreshLayout refreshLayout){
         this.refreshLayout = refreshLayout;
     }
-    //解决溢出顶部的刷新控件的滑动冲突
+
+    /**
+     * 解决溢出顶部的刷新控件的滑动冲突
+     */
     private boolean isRefreshLayoutOverTop = false;
     public void setRefreshLayoutOverTop(boolean isRefreshLayoutOverTop) {
         this.isRefreshLayoutOverTop = isRefreshLayoutOverTop;
@@ -126,11 +177,26 @@ public class HeaderScrollView extends LinearLayout {
      * return true;
      */
 
-    private float mDownX;  //第一次按下的x坐标
-    private float mDownY;  //第一次按下的y坐标
-    private float mLastX;  //最后一次移动的X坐标
-    private float mLastY;  //最后一次移动的Y坐标
-    private int scrollFlag = SCROLL_NULL;   //是否允许垂直滚动
+    /**
+     * 第一次按下的x坐标
+     */
+    private float mDownX;
+    /**
+     * 第一次按下的y坐标
+     */
+    private float mDownY;
+    /**
+     * 最后一次移动的X坐标
+     */
+    private float mLastX;
+    /**
+     * 最后一次移动的Y坐标
+     */
+    private float mLastY;
+    /**
+     * 是否允许垂直滚动
+     */
+    private int scrollFlag = SCROLL_NULL;
     private static final int SCROLL_NULL = 0;
     private static final int SCROLL_HORIZONTAL = 1;
     private static final int SCROLL_VERTICAL = 2;
@@ -140,13 +206,19 @@ public class HeaderScrollView extends LinearLayout {
         if(mScrollable.getScrollableView() == null){
             return false;
         }
-        float currentX = ev.getX();                   //当前手指相对于当前view的X坐标
-        float currentY = ev.getY();                   //当前手指相对于当前view的Y坐标
-        float shiftX = Math.abs(currentX - mDownX);   //当前触摸位置与第一次按下位置的X偏移量
-        float shiftY = Math.abs(currentY - mDownY);   //当前触摸位置与第一次按下位置的Y偏移量
+        //当前手指相对于当前view的X坐标
+        float currentX = ev.getX();
+        //当前手指相对于当前view的Y坐标
+        float currentY = ev.getY();
+        //当前触摸位置与第一次按下位置的X偏移量
+        float shiftX = Math.abs(currentX - mDownX);
+        //当前触摸位置与第一次按下位置的Y偏移量
+        float shiftY = Math.abs(currentY - mDownY);
         float deltaX;
-        float deltaY;                                 //滑动的偏移量，即连续两次进入Move的偏移量
-        obtainVelocityTracker(ev);                    //初始化速度追踪器
+        //滑动的偏移量，即连续两次进入Move的偏移量
+        float deltaY;
+        //初始化速度追踪器
+        obtainVelocityTracker(ev);
         switch (ev.getAction()) {
             //Down事件主要初始化变量
             case MotionEvent.ACTION_DOWN:
@@ -202,20 +274,24 @@ public class HeaderScrollView extends LinearLayout {
                         if (!(deltaY < 0 && isInEnd()) || !(deltaY > 0 && isInTop())) {
                             scrollBy(0, (int) (deltaY + 0.5));
                         }
+                        invalidate();
                     }
-                    invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if (scrollFlag == SCROLL_VERTICAL) {
-                    mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity); //1000表示单位，每1000毫秒允许滑过的最大距离是mMaximumVelocity
-                    float yVelocity = mVelocityTracker.getYVelocity();  //获取当前的滑动速度
-                    mDirection = yVelocity > 0 ? DIRECTION_DOWN : DIRECTION_UP;  //下滑速度大于0，上滑速度小于0
+                    //1000表示单位，每1000毫秒允许滑过的最大距离是mMaximumVelocity
+                    mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+                    //获取当前的滑动速度
+                    float yVelocity = mVelocityTracker.getYVelocity();
+                    //下滑速度大于0，上滑速度小于0
+                    mDirection = yVelocity > 0 ? DIRECTION_DOWN : DIRECTION_UP;
                     //根据当前的速度和初始化参数，将滑动的惯性初始化到当前View，至于是否滑动当前View，取决于computeScroll中计算的值
                     //这里不判断最小速度，确保computeScroll一定至少执行一次
                     mScroller.fling(0, getScrollY(), 0, -(int) yVelocity, 0, 0, -Integer.MAX_VALUE, Integer.MAX_VALUE);
                     mLastScrollerY = getScrollY();
-                    invalidate();  //更新界面，该行代码会导致computeScroll中的代码执行
+                    //更新界面，该行代码会导致computeScroll中的代码执行
+                    invalidate();
                     //阻止快读滑动的时候点击事件的发生，滑动的时候，将Up事件改为Cancel就不会发生点击了
                     if ((shiftX > mTouchSlop || shiftY > mTouchSlop)) {
                         if (isClickHead || (!isInTop() && !isRefreshLayoutOverTop)) {
@@ -240,9 +316,17 @@ public class HeaderScrollView extends LinearLayout {
             //防止垂直滑动时，触发侧滑
             MotionEvent interceptEvent = MotionEvent.obtain(ev.getDownTime(), ev.getEventTime(),
                     ev.getAction(), mDownX, ev.getY(), ev.getMetaState());
-            super.dispatchTouchEvent(interceptEvent);
+            try {
+                super.dispatchTouchEvent(interceptEvent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
-            super.dispatchTouchEvent(ev);
+            try {
+                super.dispatchTouchEvent(ev);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         //消费事件，返回True表示当前View需要消费事件，就是事件的TargetView
         return true;
@@ -274,15 +358,19 @@ public class HeaderScrollView extends LinearLayout {
                 // 手势向上划
                 if (isInTop()) {
                     //这里主要是将快速滚动时的速度对接起来，让布局看起来滚动连贯
-                    int distance = mScroller.getFinalY() - currY;    //除去布局滚动消耗的时间后，剩余的时间
-                    int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed()); //除去布局滚动的距离后，剩余的距离
+                    //除去布局滚动消耗的时间后，剩余的时间
+                    int distance = mScroller.getFinalY() - currY;
+                    //除去布局滚动的距离后，剩余的距离
+                    int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed());
                     mScrollable.smoothScrollBy(getScrollerVelocity(distance, duration), distance, duration);
                     //外层布局已经滚动到指定位置，不需要继续滚动了
                     mScroller.abortAnimation();
                     return;
                 } else {
-                    scrollTo(0, currY);  //将外层布局滚动到指定位置
-                    invalidate();        //移动完后刷新界面
+                    //将外层布局滚动到指定位置
+                    scrollTo(0, currY);
+                    //移动完后刷新界面
+                    invalidate();
                 }
             } else {
                 // 手势向下划，内部View已经滚动到顶了，需要滚动外层的View
@@ -297,14 +385,20 @@ public class HeaderScrollView extends LinearLayout {
                     invalidate();
                 } else {
                     //这里主要是将快速滚动时的速度对接起来，让布局看起来滚动连贯
-                    int distance = mScroller.getFinalY() - currY;    //除去布局滚动消耗的时间后，剩余的时间
-                    int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed()); //除去布局滚动的距离后，剩余的距离
+                    //除去布局滚动消耗的时间后，剩余的时间
+                    int distance = mScroller.getFinalY() - currY;
+                    //除去布局滚动的距离后，剩余的距离
+                    int duration = calcDuration(mScroller.getDuration(), mScroller.timePassed());
                     int velocity = -getScrollerVelocity(distance, duration);
-                    mScrollable.smoothScrollBy(velocity, distance, duration);
+                    if (isInTop()) {
+                        //向下滑动时，初始状态可能不在顶部，所以要一直重绘，让computeScroll一直调用
+                        //确保代码能进入上面的if判断
+                        invalidate();
+                    } else {
+                        //向下滑动，且布局未置顶时，需要将加速度传给target
+                        mScrollable.smoothScrollBy(velocity, distance, duration);
+                    }
                 }
-                //向下滑动时，初始状态可能不在顶部，所以要一直重绘，让computeScroll一直调用
-                //确保代码能进入上面的if判断
-                invalidate();
             }
             mLastScrollerY = currY;
         }
@@ -383,5 +477,39 @@ public class HeaderScrollView extends LinearLayout {
 
     public void setCurrentScrollableContainer(HeaderScrollHelper.ScrollableContainer scrollableContainer) {
         mScrollable.setCurrentScrollableContainer(scrollableContainer);
+    }
+
+    public void contentScrollToTop() {
+        if (!isInTop()) {
+            mScrollable.scrollToTop();
+        }
+    }
+
+    public void scrollToTop() {
+        mScrollable.scrollToTop();
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ScrollAnimation scrollAnimation = new ScrollAnimation(mCurY);
+                scrollAnimation.setInterpolator(new AccelerateInterpolator());
+                scrollAnimation.setDuration(mCurY/10);
+                startAnimation(scrollAnimation);
+            }
+        }, 50);
+    }
+
+    class ScrollAnimation extends Animation {
+
+        private int currentY;
+        ScrollAnimation(int currentY) {
+            this.currentY = currentY;
+        }
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+            super.applyTransformation(interpolatedTime, t);
+            int toY = (int)(((float)currentY) * (1 - interpolatedTime));
+            scrollTo(0, toY);
+        }
     }
 }
