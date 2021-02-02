@@ -20,13 +20,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import cn.yue.base.common.R;
 
-
-/**
- * 介绍：带有头部的ViewPager
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/10/26.
- */
-
 public class HeaderScrollView extends LinearLayout {
 
     private static final int DIRECTION_UP = 1;
@@ -62,6 +55,10 @@ public class HeaderScrollView extends LinearLayout {
      * 滑出头部的高度
      */
     private int mHeadHeight;
+    /**
+     * 实际显示区域大小
+     */
+    private int screenHeight;
     /**
      * 最大滑出的距离，等于 mHeadHeight
      */
@@ -140,8 +137,9 @@ public class HeaderScrollView extends LinearLayout {
         measureChildWithMargins(mHeadView, widthMeasureSpec, 0, MeasureSpec.UNSPECIFIED, 0);
         mHeadHeight = mHeadView.getMeasuredHeight();
         maxY = mHeadHeight - topOffset;
+        screenHeight = MeasureSpec.getSize(heightMeasureSpec);
         //让测量高度加上头部的高度
-        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec) + maxY, MeasureSpec.EXACTLY));
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(screenHeight + maxY, MeasureSpec.EXACTLY));
     }
 
     /** @param disallowIntercept 作用同 requestDisallowInterceptTouchEvent */
@@ -203,9 +201,6 @@ public class HeaderScrollView extends LinearLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(mScrollable.getScrollableView() == null){
-            return false;
-        }
         //当前手指相对于当前view的X坐标
         float currentX = ev.getX();
         //当前手指相对于当前view的Y坐标
@@ -250,15 +245,17 @@ public class HeaderScrollView extends LinearLayout {
                 deltaX = mLastX - currentX;
                 mLastX = currentX;
                 mLastY = currentY;
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    //水平滑动
-                    if (scrollFlag == SCROLL_NULL) {
-                        scrollFlag = SCROLL_HORIZONTAL;
-                    }
-                } else if (Math.abs(deltaY) >= Math.abs(deltaX)) {
-                    //垂直滑动
-                    if (scrollFlag == SCROLL_NULL) {
-                        scrollFlag = SCROLL_VERTICAL;
+                if (Math.abs(deltaX) != 0 || Math.abs(deltaY) != 0) {
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        //水平滑动
+                        if (scrollFlag == SCROLL_NULL) {
+                            scrollFlag = SCROLL_HORIZONTAL;
+                        }
+                    } else if (Math.abs(deltaY) >= Math.abs(deltaX)) {
+                        //垂直滑动
+                        if (scrollFlag == SCROLL_NULL) {
+                            scrollFlag = SCROLL_VERTICAL;
+                        }
                     }
                 }
                 /*
@@ -267,15 +264,15 @@ public class HeaderScrollView extends LinearLayout {
                     下滑时（child优先） 如果child没有置顶，先滑动child，然后滑动当前
                  */
                 if (scrollFlag == SCROLL_VERTICAL) {
-                    if (mScrollable.isTop() || deltaY > 0 || isClickHead) {
+                    if (containerInTop() || deltaY > 0 || isClickHead) {
                         //如果是向下滑，则deltaY小于0，对于scrollBy来说
                         //正值为向上和向左滑，负值为向下和向右滑，这里要注意
                         // 将置顶向上滑，置底向下滑排除
-                        if (!(deltaY < 0 && isInEnd()) || !(deltaY > 0 && isInTop())) {
+                        if (canScrollToY(deltaY)) {
                             scrollBy(0, (int) (deltaY + 0.5));
                         }
-                        invalidate();
                     }
+                    invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -332,6 +329,22 @@ public class HeaderScrollView extends LinearLayout {
         return true;
     }
 
+    private boolean canScrollToY(float deltaY) {
+        if (deltaY == 0) {
+            return false;
+        }
+        if (isInTop() && deltaY > 0) {
+            return false;
+        }
+        if (isInEnd() && deltaY < 0) {
+            return false;
+        }
+        if (isInTop() && isInEnd()) {
+            return false;
+        }
+        return true;
+    }
+
     private void checkIsClickHead(int downY, int headHeight, int scrollY) {
         isClickHead = ((downY + scrollY) <= headHeight);
     }
@@ -374,7 +387,7 @@ public class HeaderScrollView extends LinearLayout {
                 }
             } else {
                 // 手势向下划，内部View已经滚动到顶了，需要滚动外层的View
-                if (mScrollable.isTop() || isClickHead) {
+                if (containerInTop() || isClickHead) {
                     int deltaY = (currY - mLastScrollerY);
                     int toY = getScrollY() + deltaY;
                     scrollTo(0, toY);
@@ -446,6 +459,9 @@ public class HeaderScrollView extends LinearLayout {
 
     /** 头部置顶 最大层度隐藏 */
     public boolean isInTop() {
+        if(mScrollable.getScrollableView() == null) {
+            return mCurY >= maxY - screenHeight;
+        }
         return mCurY >= maxY;
     }
 
@@ -468,7 +484,14 @@ public class HeaderScrollView extends LinearLayout {
 
     /** 是否允许下拉，与PTR结合使用 */
     public boolean canPtr() {
-        return scrollFlag == SCROLL_VERTICAL && mCurY == minY && mScrollable.isTop();
+        return scrollFlag == SCROLL_VERTICAL && mCurY == minY && containerInTop();
+    }
+
+    private boolean containerInTop() {
+        if (mScrollable.getScrollableView() == null) {
+            return mCurY >= getMeasuredHeight() - screenHeight - screenHeight;
+        }
+        return mScrollable.isTop();
     }
 
     public void setTopOffset(int topOffset) {
@@ -513,3 +536,4 @@ public class HeaderScrollView extends LinearLayout {
         }
     }
 }
+

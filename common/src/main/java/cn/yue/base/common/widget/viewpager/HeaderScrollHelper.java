@@ -10,12 +10,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ScrollView;
 
-/**
- * 介绍：带有头部的ViewPager的滑动类
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/10/26.
- */
-
 public class HeaderScrollHelper {
 
     /**
@@ -40,7 +34,9 @@ public class HeaderScrollHelper {
     }
 
     public View getScrollableView() {
-        if (mCurrentScrollableContainer == null) return null;
+        if (mCurrentScrollableContainer == null) {
+            return null;
+        }
         return mCurrentScrollableContainer.getScrollableView();
     }
 
@@ -75,7 +71,10 @@ public class HeaderScrollHelper {
             if (layoutManager instanceof LinearLayoutManager) {
                 int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
                 View childAt = recyclerView.getChildAt(0);
-                if (childAt == null || (firstVisibleItemPosition == 0 && childAt.getTop() >= layoutManager.getTopDecorationHeight(childAt))) {
+                if (childAt == null) {
+                    return true;
+                }
+                if (firstVisibleItemPosition == 0 && childAt.getTop() >= layoutManager.getTopDecorationHeight(childAt)) {
                     return true;
                 }
             }

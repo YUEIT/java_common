@@ -16,13 +16,6 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import cn.yue.base.common.R;
 
-
-/**
- * 介绍：viewPager 带文字的指示器
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/10/26.
- */
-
 public class SampleTabStrip2 extends RecyclerView {
 
     public interface LayoutTabProvider {

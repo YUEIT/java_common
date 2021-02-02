@@ -30,13 +30,6 @@ import java.util.Locale;
 
 import cn.yue.base.common.R;
 
-
-/**
- * 介绍：viewPager 带文字的指示器
- * 邮箱：luobiao@imcoming.cn
- * 时间：2016/10/26.
- */
-
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
     public interface IconTabProvider {
