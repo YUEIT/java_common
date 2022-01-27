@@ -1,5 +1,5 @@
 //这里将一些打包编译，以及一些task独立出来
-apply plugin: 'com.android.application'
+
 apply plugin: 'walle'
 
 android {

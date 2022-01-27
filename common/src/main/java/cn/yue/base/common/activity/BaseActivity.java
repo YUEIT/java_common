@@ -36,6 +36,7 @@ public abstract class BaseActivity extends FragmentActivity {
         getLifecycle().addObserver(lifecycleProvider);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         if (hasContentView()) {
+            setStatusBar();
             setContentView(getLayoutId());
         }
         if (getIntent() != null && getIntent().getExtras() != null) {
@@ -43,6 +44,10 @@ public abstract class BaseActivity extends FragmentActivity {
         }
         initView();
     }
+
+    protected abstract int getLayoutId();
+
+    protected abstract void initView();
 
     protected ILifecycleProvider<Lifecycle.Event> initLifecycleProvider() {
         return new RxLifecycleProvider();
@@ -52,26 +57,22 @@ public abstract class BaseActivity extends FragmentActivity {
         return true;
     }
 
-    protected abstract int getLayoutId();
-
-    protected abstract void initView();
-
     protected void initBundle(Bundle bundle) {}
 
-    public void setSystemBar(boolean isFillScreen) {
-        setSystemBar(isFillScreen, true);
+    public void setStatusBar() {
+        setStatusBar(false);
     }
 
-    public void setSystemBar(boolean isFillScreen, boolean isDarkIcon) {
-        setSystemBar(isFillScreen, isDarkIcon, Color.WHITE);
+    public void setStatusBar(boolean isFullScreen) {
+        setSystemBar(isFullScreen, true);
     }
 
-    public void setSystemBar(boolean isFillScreen, boolean isDarkIcon, int bgColor) {
-        try {
-            BarUtils.setStyle(this, isFillScreen, isDarkIcon, bgColor);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setSystemBar(boolean isFullScreen, boolean isDarkIcon) {
+        setSystemBar(isFullScreen, isDarkIcon, Color.WHITE);
+    }
+
+    public void setSystemBar(boolean isFullScreen, boolean isDarkIcon, int bgColor) {
+        BarUtils.setStyle(this, isFullScreen, isDarkIcon, bgColor);
     }
 
     public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
@@ -151,9 +152,14 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     private void startSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + getPackageName()));
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Settings.ACTION_SETTINGS);
+            startActivity(intent);
+        }
     }
 
 }

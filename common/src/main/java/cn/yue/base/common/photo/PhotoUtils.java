@@ -1,5 +1,6 @@
 package cn.yue.base.common.photo;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -61,9 +62,9 @@ public class PhotoUtils {
      * @param num
      * @return
      */
-    public static ArrayList<MediaVO> getTheLastPhotos(Context context, int num) {
+    public static ArrayList<MediaVO> getTheLastMedias(Context context, int num, MediaType mediaType) {
         ArrayList<MediaVO> list = new ArrayList<>();
-        ArrayList<MediaVO> photos = getMediaByFolder(context, true, null, MediaType.PHOTO);
+        ArrayList<MediaVO> photos = getMediaByFolder(context, true, null, mediaType);
         if (photos.size() > num) {
             list.addAll(photos.subList(0, num));
         } else {
@@ -91,6 +92,7 @@ public class PhotoUtils {
      * @param mediaType
      * @return
      */
+    @SuppressLint("Range")
     public static ArrayList<MediaVO> getMediaByFolder(Context context, boolean isAll, String folderId, MediaType mediaType) {
         ArrayList<MediaVO> list = new ArrayList<>();
         Cursor cursor = MediaLoader.load(context, isAll, folderId, mediaType);
@@ -102,6 +104,14 @@ public class PhotoUtils {
             mediaVO.setMimeType(mimeType);
             mediaVO.setSize(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE));
             mediaVO.setDuration(cursor.getLong(cursor.getColumnIndex("duration")));
+            int orientation = cursor.getInt(cursor.getColumnIndex("orientation"));
+            if (orientation == 90 || orientation == 270) {
+                mediaVO.setHeight(cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns.WIDTH)));
+                mediaVO.setWidth(cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns.HEIGHT)));
+            } else {
+                mediaVO.setHeight(cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns.HEIGHT)));
+                mediaVO.setWidth(cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns.WIDTH)));
+            }
             Uri contentUri;
             if (MimeType.isImage(mimeType)) {
                 contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -124,8 +134,8 @@ public class PhotoUtils {
      * @param context
      * @return
      */
-    public static List<MediaFolderVO> getAllPhotosFolder(Context context) {
-        return getAllMediaFolder(context, MediaType.PHOTO);
+    public static List<MediaFolderVO> getAllMediasFolder(Context context) {
+        return getAllMediaFolder(context, MediaType.ALL);
     }
 
     /**
@@ -133,6 +143,7 @@ public class PhotoUtils {
      * @param context
      * @return
      */
+    @SuppressLint("Range")
     public static List<MediaFolderVO> getAllMediaFolder(Context context, MediaType mediaType) {
         List<MediaFolderVO> list = new ArrayList<MediaFolderVO>();
         Cursor cursor = MediaFolderLoader.load(context, mediaType);

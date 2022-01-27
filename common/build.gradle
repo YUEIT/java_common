@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.android.targetSdkVersion
@@ -37,19 +36,35 @@ dependencies {
     androidTestImplementation rootProject.ext.androidx["junit-test"]
     androidTestImplementation rootProject.ext.androidx["espresso-test"]
 
+    api rootProject.ext.androidx["core"]
+    api rootProject.ext.androidx["core-ktx"]
+    api rootProject.ext.androidx["multidex"]
+    api rootProject.ext.androidx["lifecycle-viewmodel"]
+    api rootProject.ext.androidx["lifecycle-runtime-ktx"]
+    api rootProject.ext.androidx["lifecycle-viewmodel-ktx"]
+    api rootProject.ext.androidx["lifecycle-livedata"]
+    api rootProject.ext.androidx["lifecycle-viewmodel-savestate"]
+    annotationProcessor rootProject.ext.androidx["lifecycle-compiler"]
+
     api rootProject.ext.androidx["appcompat"]
     api rootProject.ext.androidx["gridlayout"]
     api rootProject.ext.androidx["recyclerview"]
     api rootProject.ext.androidx["cardview"]
     api rootProject.ext.androidx["viewpager2"]
     api rootProject.ext.androidx["design"]
-    api rootProject.ext.androidx["legacy"]
+    api rootProject.ext.androidx["constraintlayout"]
+    api rootProject.ext.androidx["coordinatorlayout"]
+    api rootProject.ext.androidx["lifecycle-common"]
+    api rootProject.ext.androidx["collection"]
+    api rootProject.ext.androidx["collection-ktx"]
 
     api rootProject.ext.kotlin["stdlib"]
     api rootProject.ext.kotlin["coroutine"]
     api rootProject.ext.kotlin["coroutine-android"]
+    api rootProject.ext.kotlin["reflect"]
     implementation rootProject.ext.dependencies["systembartint"]
     implementation rootProject.ext.dependencies["glide"]
+
     api rootProject.ext.dependencies["gson"]
     //aRouter
     api rootProject.ext.dependencies["arouter-api"]
@@ -60,18 +75,7 @@ dependencies {
 //    api rootProject.ext.dependencies["rxlifecycle"]
 
     api rootProject.ext.dependencies["autosize"]
-//    api rootProject.ext.dependencies["utils"]
-}
+    api rootProject.ext.dependencies["mmkv"]
 
-//apply plugin: 'maven'
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            pom.groupId = 'cn.yue.base'
-//            pom.artifactId = "common"
-//            pom.version = "1.0"
-//            pom.packaging = 'aar'
-//            repository(url: uri("${rootProject.projectDir}/repo"))
-//        }
-//    }
-//}
+    api rootProject.ext.dependencies["exoplayer"]
+}

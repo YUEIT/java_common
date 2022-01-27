@@ -1,5 +1,6 @@
 package cn.yue.base.common.utils.app;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -1836,6 +1838,19 @@ public final class FragmentUtils {
                     + "->"
                     + ((next == null || next.isEmpty()) ? "no child" : next.toString());
         }
+    }
+
+    public static Fragment instantiate(Context context, String fname, Bundle args) {
+        if (context instanceof FragmentActivity) {
+            Fragment f = ((FragmentActivity) context).getSupportFragmentManager()
+                    .getFragmentFactory().instantiate(context.getClassLoader(), fname);
+            if (args != null) {
+                args.setClassLoader(f.getClass().getClassLoader());
+                f.setArguments(args);
+            }
+            return f;
+        }
+        throw new RuntimeException("context not instanceof FragmentActivity");
     }
 
     ///////////////////////////////////////////////////////////////////////////

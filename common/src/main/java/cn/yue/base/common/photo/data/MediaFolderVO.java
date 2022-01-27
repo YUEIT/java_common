@@ -15,7 +15,6 @@ public class MediaFolderVO implements Parcelable{
     private String name;
     private int count;
     private Uri coverUri;
-
     private String path;
 
     public MediaFolderVO() {

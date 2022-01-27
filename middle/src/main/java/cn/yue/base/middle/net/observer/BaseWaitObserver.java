@@ -23,7 +23,7 @@ public abstract class BaseWaitObserver<T> extends BaseNetObserver<T> {
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         if (iBaseView != null) {
             iBaseView.showWaitDialog(title);

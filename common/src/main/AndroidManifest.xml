@@ -16,7 +16,7 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 
-        <activity android:name=".image.ViewPhotoActivity"
+        <activity android:name=".photo.perview.ViewMediaActivity"
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 

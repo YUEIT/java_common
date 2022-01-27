@@ -16,6 +16,7 @@ import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.common.photo.data.MediaFolderVO;
+import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MediaVO;
 import cn.yue.base.common.utils.code.ThreadUtils;
 import cn.yue.base.common.widget.TopBar;
@@ -32,8 +33,7 @@ public class SelectPhotoFolderFragment extends BaseFragment {
     private CommonAdapter commonAdapter;
 
     @Override
-    protected void initTopBar(TopBar topBar) {
-    }
+    protected void initTopBar(TopBar topBar) { }
 
     @Override
     protected int getLayoutId() {
@@ -72,9 +72,9 @@ public class SelectPhotoFolderFragment extends BaseFragment {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                List<MediaFolderVO> allFolder = PhotoUtils.getAllPhotosFolder(mActivity);
-                List<MediaVO> lastPhotos = PhotoUtils.getTheLastPhotos(mActivity, 100);
-                if (lastPhotos != null && !lastPhotos.isEmpty()){
+                List<MediaFolderVO> allFolder = PhotoUtils.getAllMediasFolder(mActivity);
+                List<MediaVO> lastPhotos = PhotoUtils.getTheLastMedias(mActivity, 100, getMediaType());
+                if (!lastPhotos.isEmpty()){
                     MediaFolderVO lastMediaFolderVO = new MediaFolderVO();
                     lastMediaFolderVO.setId("");
                     lastMediaFolderVO.setCoverUri(lastPhotos.get(0).getUri());
@@ -104,4 +104,7 @@ public class SelectPhotoFolderFragment extends BaseFragment {
         }
     });
 
+    private MediaType getMediaType() {
+        return ((SelectPhotoActivity)mActivity).getMediaType();
+    }
 }

@@ -1,7 +1,9 @@
 package cn.yue.base.common.photo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,6 +11,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,15 +20,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.PermissionCallBack;
 import cn.yue.base.common.image.ImageLoader;
+import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MediaVO;
+import cn.yue.base.common.photo.data.MimeType;
+import cn.yue.base.common.photo.perview.ViewMediaActivity;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.code.ThreadUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.variable.TimeUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
@@ -44,8 +52,7 @@ public class SelectPhotoFragment extends BaseFragment {
     private boolean isCanLoadMore = true;
 
     @Override
-    protected void initTopBar(TopBar topBar) {
-    }
+    protected void initTopBar(TopBar topBar) { }
 
     @Override
     protected int getLayoutId() {
@@ -55,7 +62,7 @@ public class SelectPhotoFragment extends BaseFragment {
     @Override
     protected void initView(Bundle savedInstanceState) {
         RecyclerView photoRV = findViewById(R.id.photoRV);
-        photoRV.setLayoutManager(new GridLayoutManager(mActivity, 4));
+        photoRV.setLayoutManager(new GridLayoutManager(mActivity, 3));
         photoRV.setAdapter(adapter = new CommonAdapter<MediaVO>(mActivity, photoList) {
 
             @Override
@@ -66,25 +73,40 @@ public class SelectPhotoFragment extends BaseFragment {
             @Override
             public void bindData(CommonViewHolder<MediaVO> holder, int position, final MediaVO mediaVO) {
                 ImageView photoIV = holder.getView(R.id.photoIV);
-                final CheckBox checkIV = holder.getView(R.id.checkIV);
-
+                final ImageView checkIV = holder.getView(R.id.checkIV);
+                TextView timeTV = holder.getView(R.id.timeTV);
                 photoIV.setBackgroundColor(Color.parseColor("#ffffff"));
                 ImageLoader.getLoader().loadImage(photoIV, mediaVO.getUri());
+                if (MimeType.isVideo(mediaVO.getMimeType())) {
+                    timeTV.setVisibility(View.VISIBLE);
+                    timeTV.setText(TimeUtils.formatDuration(mediaVO.getDuration()));
+                } else {
+                    timeTV.setVisibility(View.GONE);
+                }
                 photoIV.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (getSelectList().size() >= getMaxNum() && !checkIV.isChecked()){
-                            return;
+                        if (getIsPreview()) {
+                            Intent intent = new Intent(mActivity, ViewMediaActivity.class);
+                            intent.putExtra("mediaType", mediaVO.getMediaType().name());
+                            ArrayList<Uri> uris = new ArrayList<>();
+                            uris.add(mediaVO.getUri());
+                            intent.putParcelableArrayListExtra("uris", uris);
+                            startActivity(intent);
+                        } else {
+                            if (getSelectList().size() >= getMaxNum() && !checkIV.isSelected()){
+                                return;
+                            }
+                            checkIV.setSelected(!checkIV.isSelected());
+                            addSelectList(mediaVO, checkIV.isSelected());
+                            topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "/" + getMaxNum() +  "）");
                         }
-                        checkIV.setChecked(!checkIV.isChecked());
-                        addSelectList(mediaVO, checkIV.isChecked());
-                        topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "/" + getMaxNum() +  "）");
                     }
                 });
                 if (contains(mediaVO)) {
-                    checkIV.setChecked(true);
+                    checkIV.setSelected(true);
                 } else {
-                    checkIV.setChecked(false);
+                    checkIV.setSelected(false);
                 }
             }
         });
@@ -93,7 +115,6 @@ public class SelectPhotoFragment extends BaseFragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                LogUtils.e("" + layoutManager.findLastVisibleItemPosition());
                 if ((photoList.size() - 5 <= layoutManager.findLastVisibleItemPosition()) && isCanLoadMore) {
                     isCanLoadMore = false;
                     getPhotoList();
@@ -129,7 +150,7 @@ public class SelectPhotoFragment extends BaseFragment {
                     public void run() {
                         if (allMedia == null) {
                             if (TextUtils.isEmpty(folderId)) {
-                                allMedia = PhotoUtils.getTheLastPhotos(mActivity, 100);
+                                allMedia = PhotoUtils.getTheLastMedias(mActivity, 100, getMediaType());
                             } else if (Integer.parseInt(folderId) == -1){
                                 allMedia = PhotoUtils.getPhotosByFolder(mActivity, true, folderId);
                             } else {
@@ -194,6 +215,14 @@ public class SelectPhotoFragment extends BaseFragment {
             return 1;
         }
         return ((SelectPhotoActivity)mActivity).getMaxNum();
+    }
+
+    private MediaType getMediaType() {
+        return ((SelectPhotoActivity)mActivity).getMediaType();
+    }
+
+    private boolean getIsPreview() {
+        return ((SelectPhotoActivity)mActivity).getIsPreview();
     }
 
     private void addSelectList(MediaVO mediaVO, boolean checked) {

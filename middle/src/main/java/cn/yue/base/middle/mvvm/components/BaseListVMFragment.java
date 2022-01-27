@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
@@ -28,9 +29,9 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseVMFragment<VM> implements IStatusView {
+public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends BaseVMFragment<VM> implements IStatusView {
 
-    private CommonAdapter adapter;
+    private CommonAdapter<S> adapter;
     private BaseFooter footer;
     private IRefreshLayout refreshL;
     private RecyclerView baseRV;
@@ -97,12 +98,12 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
         } else {
             viewModel.loader.setPageStatus(PageStatus.NO_NET);
         }
-        viewModel.dataLiveData.observe(this, new Observer<ArrayList>() {
+        viewModel.dataLiveData.observe(this, new Observer<ArrayList<S>>() {
             @Override
-            public void onChanged(ArrayList list) {
-                Log.d("luobiao", "onChanged: " + list.size());
-                adapter.setList(list);
-                adapter.notifyDataSetChanged();
+            public void onChanged(ArrayList<S> list) {
+                if (adapter != null) {
+                    setData(list);
+                }
             }
         });
         viewModel.loader.observePage(this, new Observer<PageStatus>() {
@@ -134,15 +135,21 @@ public abstract class BaseListVMFragment<VM extends ListViewModel> extends BaseV
 
     protected void initRecyclerView(RecyclerView baseRV) {
         baseRV.setLayoutManager(getLayoutManager());
-        baseRV.setAdapter(adapter = getAdapter());
+        baseRV.setAdapter(adapter = initAdapter());
         adapter.addFooterView(footer);
     }
 
-    public abstract CommonAdapter getAdapter();
+    public abstract CommonAdapter<S> initAdapter();
+
+    public CommonAdapter<S> getAdapter() {
+        return adapter;
+    }
 
     protected RecyclerView.LayoutManager getLayoutManager() {
         return new LinearLayoutManager(mActivity);
     }
+
+    abstract void setData(List<S> list);
 
     protected BaseFooter getFooter() {
         if (footer == null) {

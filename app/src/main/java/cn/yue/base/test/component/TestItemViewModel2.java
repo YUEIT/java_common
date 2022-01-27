@@ -31,4 +31,4 @@ public class TestItemViewModel2 extends ItemViewModel {
             nameField.set(itemBean.getName());
         }
     };
-}
+} 

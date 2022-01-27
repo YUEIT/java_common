@@ -38,8 +38,8 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     protected View cacheView;
     protected FragmentManager mFragmentManager;
     protected BaseFragmentActivity mActivity;
-    protected Handler mHandler = new Handler();
     protected TopBar topBar;
+    protected Handler mHandler = new Handler();
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -101,7 +101,7 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     }
 
     /**
-     * true 避免当前Fragment被repalce后回退回来重走oncreateview，导致重复初始化View和数据
+     * true 避免当前Fragment被replace后回退回来重走onCreateView，导致重复初始化View和数据
      */
     protected boolean needCache() {
         return true;
@@ -137,9 +137,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
         }
     }
 
-    /**
-     * 自定义topbar
-     */
     public void customTopBar(View view) {
         mActivity.customTopBar(view);
     }

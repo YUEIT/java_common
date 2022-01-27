@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Parcel;
@@ -48,34 +49,26 @@ public class SampleTabStrip extends HorizontalScrollView {
 
     private LinearLayout.LayoutParams defaultTabLayoutParams;
     private LinearLayout.LayoutParams expandedTabLayoutParams;
-
     private final PageListener pageListener = new PageListener();
     public ViewPager.OnPageChangeListener delegatePageListener;
-
     private AdapterChangeListener mAdapterChangeListener;
-
     private LinearLayout tabsContainer;
     private ViewPager pager;
-
     private PagerAdapter mPagerAdapter;
     private DataSetObserver mPagerAdapterObserver;
-
     private int tabCount;
-
     private int currentPosition = 0;
-    private float currentPositionOffset = 0f;
-
-    private Paint rectPaint;
-
+    private int movePosition = 0;
+    private float movePositionOffset = 0f;
+    private Paint indicatorPaint;
+    private int indicatorWidth = 0;
+    private int indicatorHeight = 0;
     private boolean shouldExpand = false;
-    private boolean textAllCaps = true;
-
+    private boolean isTextAllCaps = true;
     private int scrollOffset = 52;
     private int tabPadding = 10;
-
     private int lastScrollX = 0;
-
-    private int tabBackgroundResId = 0;
+    private int tabBackground = 0;
 
     private Locale locale;
 
@@ -97,28 +90,22 @@ public class SampleTabStrip extends HorizontalScrollView {
         tabsContainer.setOrientation(LinearLayout.HORIZONTAL);
         tabsContainer.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         addView(tabsContainer);
-
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-
-        scrollOffset = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, scrollOffset, dm);
-        tabPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, tabPadding, dm);
-
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SampleTabStrip);
 
         tabPadding = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsTabPaddingLeftRight, tabPadding);
-        tabBackgroundResId = a.getResourceId(R.styleable.SampleTabStrip_stsTabBackground, tabBackgroundResId);
+        tabBackground= a.getResourceId(R.styleable.SampleTabStrip_stsTabBackground, tabBackground);
         shouldExpand = a.getBoolean(R.styleable.SampleTabStrip_stsShouldExpand, shouldExpand);
         scrollOffset = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsScrollOffset, scrollOffset);
-        textAllCaps = a.getBoolean(R.styleable.SampleTabStrip_stsTextAllCaps, textAllCaps);
+        isTextAllCaps = a.getBoolean(R.styleable.SampleTabStrip_stsTextAllCaps, isTextAllCaps);
+        indicatorWidth = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsIndicatorWidth, indicatorWidth);
+        indicatorHeight = a.getDimensionPixelSize(R.styleable.SampleTabStrip_stsIndicatorHeight, indicatorHeight);
+        indicatorPaint = new Paint();
+        indicatorPaint.setAntiAlias(true);
+        indicatorPaint.setStyle(Paint.Style.FILL);
+        indicatorPaint.setColor(a.getColor(R.styleable.SampleTabStrip_stsIndicatorColor, Color.TRANSPARENT));
         a.recycle();
-
-        rectPaint = new Paint();
-        rectPaint.setAntiAlias(true);
-        rectPaint.setStyle(Paint.Style.FILL);
-
         defaultTabLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
         expandedTabLayoutParams = new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f);
-
         if (locale == null) {
             locale = getResources().getConfiguration().locale;
         }
@@ -130,7 +117,6 @@ public class SampleTabStrip extends HorizontalScrollView {
             throw new IllegalStateException("ViewPager does not have adapter instance.");
         }
         pager.addOnPageChangeListener(pageListener);
-
         notifyDataSetChanged();
     }
 
@@ -269,7 +255,7 @@ public class SampleTabStrip extends HorizontalScrollView {
     private void updateTabStyles() {
         for (int i = 0; i < tabCount; i++) {
             View v = tabsContainer.getChildAt(i);
-            v.setBackgroundResource(tabBackgroundResId);
+            v.setBackgroundResource(tabBackground);
             if (pager.getAdapter() instanceof LayoutTabProvider) {
                 ((LayoutTabProvider) pager.getAdapter()).changeTabStyle(v, i == currentPosition);
             }
@@ -298,28 +284,36 @@ public class SampleTabStrip extends HorizontalScrollView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (isInEditMode() || tabCount == 0) {
+        if (isInEditMode() || tabCount == 0 || indicatorHeight == 0 || indicatorWidth == 0) {
             return;
         }
         final int height = getHeight();
 
         // default: line below current tab
-        View currentTab = tabsContainer.getChildAt(currentPosition);
-        float lineLeft = currentTab.getLeft();
-        float lineRight = currentTab.getRight();
-
-        // if there is an offset, start interpolating left and right coordinates between current and next tab
-        if (currentPositionOffset > 0f && currentPosition < tabCount - 1) {
-            View nextTab = tabsContainer.getChildAt(currentPosition + 1);
-            final float nextTabLeft = nextTab.getLeft();
-            final float nextTabRight = nextTab.getRight();
-
-            lineLeft = (currentPositionOffset * nextTabLeft + (1f - currentPositionOffset) * lineLeft);
-            lineRight = (currentPositionOffset * nextTabRight + (1f - currentPositionOffset) * lineRight);
+        View moveTab = tabsContainer.getChildAt(movePosition);
+        float moveLeft = moveTab.getLeft();
+        float moveRight = moveTab.getRight();
+        float moveCenter = (moveLeft + moveRight) / 2;
+        int nextPosition = movePosition + 1;
+        int defaultMarginBottom = 5;
+        if (nextPosition < tabCount) {
+            View nextTab = tabsContainer.getChildAt(nextPosition);
+            float nextLeft = nextTab.getLeft();
+            float nextRight = nextTab.getRight();
+            float nextCenter = (nextLeft + nextRight) / 2;
+            float currentCenter = moveCenter + (nextCenter - moveCenter) * movePositionOffset;
+            canvas.drawRect(currentCenter - indicatorWidth / 2,
+                    getMeasuredHeight() - indicatorHeight - defaultMarginBottom,
+                    currentCenter + indicatorWidth / 2,
+                    getMeasuredHeight() - defaultMarginBottom,
+                    indicatorPaint);
+        } else {
+            canvas.drawRect(moveCenter - indicatorWidth / 2,
+                    getMeasuredHeight() - indicatorHeight - defaultMarginBottom,
+                    moveCenter + indicatorWidth / 2,
+                    getMeasuredHeight() - defaultMarginBottom,
+                    indicatorPaint);
         }
-        lineLeft += (float) currentTab.getMeasuredWidth() / 2;
-        lineRight -= (float) currentTab.getMeasuredWidth() / 2;
-        canvas.drawRect(lineLeft, height, lineRight, height, rectPaint);
     }
 
     private class PagerAdapterObserver extends DataSetObserver {
@@ -360,8 +354,8 @@ public class SampleTabStrip extends HorizontalScrollView {
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            currentPosition = position;
-            currentPositionOffset = positionOffset;
+            movePosition = position;
+            movePositionOffset = positionOffset;
             if (position < tabsContainer.getChildCount()) {
                 scrollToChild(position, (int) (positionOffset * tabsContainer.getChildAt(position).getWidth()));
                 updateTabStyles();
@@ -384,10 +378,14 @@ public class SampleTabStrip extends HorizontalScrollView {
 
         @Override
         public void onPageSelected(int position) {
+            currentPosition = position;
+            if (position < tabsContainer.getChildCount()) {
+                updateTabStyles();
+                invalidate();
+            }
             if (delegatePageListener != null) {
                 delegatePageListener.onPageSelected(position);
             }
-
         }
 
     }
@@ -411,19 +409,19 @@ public class SampleTabStrip extends HorizontalScrollView {
     }
 
     public boolean isTextAllCaps() {
-        return textAllCaps;
+        return isTextAllCaps;
     }
 
     public void setAllCaps(boolean textAllCaps) {
-        this.textAllCaps = textAllCaps;
+        this.isTextAllCaps = textAllCaps;
     }
 
     public void setTabBackground(int resId) {
-        this.tabBackgroundResId = resId;
+        this.tabBackground = resId;
     }
 
     public int getTabBackground() {
-        return tabBackgroundResId;
+        return tabBackground;
     }
 
     public void setTabPaddingLeftRight(int paddingPx) {

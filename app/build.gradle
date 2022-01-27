@@ -1,6 +1,6 @@
-apply from: rootProject.getRootDir().getAbsolutePath() + "/release.gradle"
+apply plugin: 'com.android.application'
+//apply from: rootProject.getRootDir().getAbsolutePath() + "/release.gradle"
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.android.targetSdkVersion
@@ -8,6 +8,8 @@ android {
         applicationId rootProject.ext.version.applicationId
         minSdkVersion rootProject.ext.android.minSdkVersion
         targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode appVersionCode(rootProject.ext.version.versionName.toString())
+        versionName rootProject.ext.version.versionName.toString()
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -29,6 +31,25 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+//1.0.0 = 10000; 1.1.0 = 10100 分割"."，每项固定显示长度为2
+def appVersionCode(String appVersionName) {
+    String[] arrayString = appVersionName.split("\\.")
+    if (arrayString.length != 3) {
+        throw new GradleException("version length error")
+    }
+    StringBuilder stringBuilder = new StringBuilder()
+    for (String s : arrayString) {
+        if (s.length() == 1) {
+            stringBuilder.append("0" + s)
+        } else if (s.length() == 2) {
+            stringBuilder.append(s)
+        } else {
+            throw new GradleException("version name error")
+        }
+    }
+    return stringBuilder.toInteger()
 }
 
 dependencies {

@@ -17,6 +17,11 @@ import io.reactivex.observers.DisposableSingleObserver;
 public abstract class BaseNetObserver<T> extends DisposableSingleObserver<T> {
 
     @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public void onError(Throwable e) {
         ResultException resultException;
         if (e instanceof ResultException) {

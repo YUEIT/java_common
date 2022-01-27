@@ -2,6 +2,7 @@ package cn.yue.base.common.activity.rx;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Lifecycle.Event;
 import androidx.lifecycle.LifecycleObserver;
@@ -18,7 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class RxLifecycleProvider implements ILifecycleProvider<Event>, LifecycleObserver {
+public class RxLifecycleProvider implements ILifecycleProvider<Event>, DefaultLifecycleObserver {
 
     private final BehaviorSubject<Event> lifecycleSubject = BehaviorSubject.create();
 
@@ -27,18 +28,6 @@ public class RxLifecycleProvider implements ILifecycleProvider<Event>, Lifecycle
     @Override
     public final Observable<Event> lifecycle() {
         return this.lifecycleSubject.hide();
-    }
-
-    @NonNull
-    @CheckResult
-    private <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
-        return RxLifecycle.bindUntilEvent(this.lifecycleSubject, event);
-    }
-
-    @NonNull
-    @CheckResult
-    private <T> LifecycleTransformer<T> bindToLifecycle() {
-        return RxLifecycleAndroid.bind(this.lifecycleSubject);
     }
 
     @Override
@@ -61,38 +50,39 @@ public class RxLifecycleProvider implements ILifecycleProvider<Event>, Lifecycle
         };
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-    void onAny(LifecycleOwner owner, Lifecycle.Event event) {
-        this.lifecycleSubject.onNext(Lifecycle.Event.ON_ANY);
+    @NonNull
+    @CheckResult
+    private <T> LifecycleTransformer<T> bindUntilEvent(@NonNull Event event) {
+        return RxLifecycle.bindUntilEvent(this.lifecycleSubject, event);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    void onCreate() {
+    @Override
+    public void onCreate(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_CREATE);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    void onDestroy() {
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_DESTROY);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    void onStart() {
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_START);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    void onStop() {
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_STOP);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void onResume() {
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_RESUME);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    void onPause() {
+    @Override
+    public void onPause(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_PAUSE);
     }
 

@@ -3,6 +3,7 @@ package cn.yue.base.test.component;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,8 @@ import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.test.R;
 import cn.yue.base.test.data.TestItemBean;
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 
 /**
  * Description :
@@ -97,18 +100,22 @@ public class TestPageFragment extends BaseListFragment<BaseListBean<TestItemBean
     }
 
     @Override
-    protected Single<BaseListBean<TestItemBean>> getRequestSingle(String nt) {
-        BaseListBean listBean = new BaseListBean();
-        listBean.setPageSize(20);
-        listBean.setTotal(22);
-        List<TestItemBean> list = new ArrayList<>();
-        for (int i=0; i < 20; i++) {
-            TestItemBean testItemBean = new TestItemBean();
-            testItemBean.setName("this is " + i);
-            list.add(testItemBean);
-        }
-        listBean.setList(list);
-        return Single.just(listBean);
+    protected void doLoadData(String nt) {
+        Single.create(new SingleOnSubscribe<BaseListBean<TestItemBean>>() {
+            @Override
+            public void subscribe(@NonNull SingleEmitter<BaseListBean<TestItemBean>> emitter) throws Exception {
+                BaseListBean listBean = new BaseListBean();
+                List<TestItemBean> list = new ArrayList<>();
+                for (int i=0; i < 20; i++) {
+                    TestItemBean testItemBean = new TestItemBean();
+                    testItemBean.setName("this is " + i);
+                    list.add(testItemBean);
+                }
+                listBean.setList(list);
+                emitter.onSuccess(listBean);
+            }
+        }).compose(new PageTransformer())
+                .subscribe();
     }
 
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Lifecycle.Event;
 import androidx.lifecycle.LifecycleOwner;
@@ -36,7 +37,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class BaseViewModel extends AndroidViewModel implements ILifecycleProvider<Event>, IWaitView {
+public class BaseViewModel extends AndroidViewModel
+        implements ILifecycleProvider<Event>, DefaultLifecycleObserver, IWaitView {
 
     public LoaderLiveData loader = new LoaderLiveData();
     public MutableLiveData<String> waitEvent = new MutableLiveData<>();
@@ -94,73 +96,63 @@ public class BaseViewModel extends AndroidViewModel implements ILifecycleProvide
         };
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-    protected void onAny(LifecycleOwner owner, Lifecycle.Event event) {
-        this.lifecycleSubject.onNext(Lifecycle.Event.ON_ANY);
-        if (!childViewModels.isEmpty()) {
-            for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onAny(owner, event);
-            }
-        }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    protected void onCreate() {
+    @Override
+    public void onCreate(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_CREATE);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onCreate();
+                childViewModel.onCreate(owner);
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    protected void onDestroy() {
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_DESTROY);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onDestroy();
+                childViewModel.onDestroy(owner);
             }
         }
         childViewModels.clear();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    protected void onStart() {
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_START);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onStart();
+                childViewModel.onStart(owner);
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    protected void onStop() {
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_STOP);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onStop();
+                childViewModel.onStop(owner);
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    protected void onResume() {
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_RESUME);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onResume();
+                childViewModel.onResume(owner);
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    protected void onPause() {
+    @Override
+    public void onPause(@NonNull LifecycleOwner owner) {
         this.lifecycleSubject.onNext(Lifecycle.Event.ON_PAUSE);
         if (!childViewModels.isEmpty()) {
             for (BaseViewModel childViewModel : childViewModels) {
-                childViewModel.onPause();
+                childViewModel.onPause(owner);
             }
         }
     }

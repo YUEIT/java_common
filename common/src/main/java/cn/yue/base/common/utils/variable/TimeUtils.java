@@ -1617,4 +1617,81 @@ public final class TimeUtils {
         return sb.toString();
     }
 
+    private static final int SECONDS_PER_MINUTE = 60;
+    private static final int SECONDS_PER_HOUR = 60 * 60;
+    private static final int SECONDS_PER_DAY = 24 * 60 * 60;
+    private static final TimeFormat DEFAULT_FORMAT = new TimeFormat("  ", ":", ":", "", "");
+
+    public static String formatDuration(long duration) {
+        return formatDuration(duration, DEFAULT_FORMAT, false);
+    }
+
+    public static String formatDuration(long duration, TimeFormat format, boolean showMillis) {
+        if (duration == 0L) {
+            return "";
+        }
+        int millis = (int)(duration % 1000);
+        int seconds = (int)Math.floor((float)(duration / 1000));
+        int days = 0;
+        int hours = 0;
+        int minutes = 0;
+        if (seconds > SECONDS_PER_DAY) {
+            days = seconds / SECONDS_PER_DAY;
+            seconds -= days * SECONDS_PER_DAY;
+        }
+        if (seconds > SECONDS_PER_HOUR) {
+            hours = seconds / SECONDS_PER_HOUR;
+            seconds -= hours * SECONDS_PER_HOUR;
+        }
+        if (seconds > SECONDS_PER_MINUTE) {
+            minutes = seconds / SECONDS_PER_MINUTE;
+            seconds -= minutes * SECONDS_PER_MINUTE;
+        }
+        String dayString = "";
+        if (days != 0) {
+            dayString = days + "" + format.day;
+        }
+        String hoursString = "";
+        if (days != 0 && hours != 0) {
+            hoursString = printField(hours, 2) + format.hours;
+        }
+        String millisString = "";
+        if (showMillis) {
+            millisString = printField(millis, 3) + format.millis;
+        }
+        return new StringBuilder()
+                .append(dayString)
+                .append(hoursString)
+                .append(printField(minutes, 2) + format.minute)
+                .append(printField(seconds, 2) + format.second)
+                .append(millisString)
+                .toString();
+    }
+
+    private static String printField(int time, int length) {
+        int cur = length - String.valueOf(time).length();
+        if (cur == 1) {
+            return "0" + time;
+        } else if (cur == 2) {
+            return "00" + time;
+        }
+        return "" + time;
+    }
+
+    static class TimeFormat {
+
+        TimeFormat(String day, String hours, String minute, String second, String millis) {
+            this.day = day;
+            this.hours = hours;
+            this.minute = minute;
+            this.second = second;
+            this.millis = millis;
+        }
+
+        String day;
+        String hours;
+        String minute;
+        String second;
+        String millis;
+    }
 }

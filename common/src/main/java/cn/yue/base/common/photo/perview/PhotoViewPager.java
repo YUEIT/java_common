@@ -1,4 +1,4 @@
-package cn.yue.base.common.image;
+package cn.yue.base.common.photo.perview;
 
 import android.content.Context;
 import androidx.annotation.NonNull;

@@ -19,7 +19,7 @@ public abstract class BasePageBindFragment<DB extends ViewDataBinding, S> extend
     protected DB binding;
     @Override
     protected CommonAdapter<S> getAdapter() {
-        CommonAdapter adapter = new CommonAdapter<S>(mActivity, new ArrayList<S>()) {
+        return new CommonAdapter<S>(mActivity, new ArrayList<S>()) {
 
             @Override
             protected int getViewType(int position) {
@@ -34,17 +34,16 @@ public abstract class BasePageBindFragment<DB extends ViewDataBinding, S> extend
             @Override
             public void bindData(CommonViewHolder<S> holder, int position, S s) {
                 binding = DataBindingUtil.bind(holder.itemView);
-                bindItemData(holder, position, s);
+                bindItemData(binding, position, s);
             }
         };
-        return adapter;
     }
 
     @Override
     protected void bindItemData(CommonViewHolder<S> holder, int position, S s) {
-        bindItemData(position, s);
+        throw new IllegalStateException("this function is deprecated");
     }
 
-    protected abstract void bindItemData(int position, S s);
+    protected abstract void bindItemData(DB binding, int position, S s);
 
 }

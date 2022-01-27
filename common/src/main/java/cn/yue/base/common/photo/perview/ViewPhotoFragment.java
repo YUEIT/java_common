@@ -1,8 +1,10 @@
-package cn.yue.base.common.image;
+package cn.yue.base.common.photo.perview;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,7 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.yue.base.common.R;
-import cn.yue.base.common.activity.BaseActivity;
+import cn.yue.base.common.activity.BaseFragment;
+import cn.yue.base.common.widget.TopBar;
 
 /**
  * Description :
@@ -21,9 +24,10 @@ import cn.yue.base.common.activity.BaseActivity;
  */
 
 @Route(path = "/common/viewPhoto")
-public class ViewPhotoActivity extends BaseActivity{
+public class ViewPhotoFragment extends BaseFragment {
 
     private List<String> photoList = new ArrayList<>();
+    private int currentIndex;
 
     @Override
     protected int getLayoutId() {
@@ -31,16 +35,47 @@ public class ViewPhotoActivity extends BaseActivity{
     }
 
     @Override
-    protected void initBundle(Bundle bundle) {
-        if (bundle.getStringArrayList("list") != null) {
-            photoList = bundle.getStringArrayList("list");
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            if (bundle.getStringArrayList("list") != null) {
+                photoList = bundle.getStringArrayList("list");
+            }
+            currentIndex = bundle.getInt("position");
         }
     }
 
+    private TopBar topBar;
+
     @Override
-    protected void initView() {
+    protected void initTopBar(TopBar topBar) {
+        super.initTopBar(topBar);
+        this.topBar = topBar;
+        topBar.setCenterTextStr((currentIndex + 1) + "/" + photoList.size());
+    }
+
+    @Override
+    protected void initView(Bundle savedInstanceState) {
         PhotoViewPager viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(photoAdapter);
+        viewPager.setCurrentItem(currentIndex);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                topBar.setCenterTextStr((position + 1) + "/" + photoList.size());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private PagerAdapter photoAdapter = new PagerAdapter() {
@@ -56,7 +91,7 @@ public class ViewPhotoActivity extends BaseActivity{
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
             PhotoView photoView = mViewCache.get(position);
-            ((PhotoViewPager)container).setCurrentPhotoView(photoView, position, photoList.get(position));
+            ((PhotoViewPager) container).setCurrentPhotoView(photoView, position, photoList.get(position));
         }
 
         @NonNull
@@ -64,7 +99,7 @@ public class ViewPhotoActivity extends BaseActivity{
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             PhotoView photoView = mViewCache.get(position);
             if (photoView == null) {
-                photoView = new PhotoView(ViewPhotoActivity.this);
+                photoView = new PhotoView(mActivity);
                 photoView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 photoView.loadImage(photoList.get(position));
                 mViewCache.put(position, photoView);

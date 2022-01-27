@@ -56,7 +56,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         lifecycleProvider = new RxLifecycleProvider();
         getLifecycle().addObserver(lifecycleProvider);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setSystemBar(false, true, Color.WHITE);
+        setStatusBar();
         setContentView(getContentViewLayoutId());
         initView();
         replace(getFragment(), null, false);
@@ -89,27 +89,31 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         });
     }
 
-    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon) {
-        setSystemBar(isFillUpTop, isDarkIcon, Color.TRANSPARENT);
+    public void setStatusBar() {
+        setStatusBar(false);
     }
 
-    public void setSystemBar(boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
-        try {
-            BarUtils.setStyle(this, true, isDarkIcon, bgColor);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        setFillUpTopLayout(isFillUpTop);
+    public void setStatusBar(boolean isFullUpTop) {
+        setStatusBar(isFullUpTop, true);
     }
 
-    private void setFillUpTopLayout(boolean isFillUpTop) {
-        if (getTopBar() == null) {
+    public void setStatusBar(boolean isFullUpTop, boolean isDarkIcon) {
+        setStatusBar(isFullUpTop, isDarkIcon, Color.WHITE);
+    }
+
+    public void setStatusBar(boolean isFullUpTop, boolean isDarkIcon, int bgColor) {
+        BarUtils.setStyle(this, true, isDarkIcon, bgColor);
+        setFullUpTopLayout(isFullUpTop);
+    }
+
+    private void setFullUpTopLayout(boolean isFullUpTop) {
+        if (topBar == null) {
             return;
         }
         int subject = R.id.topBar;
-        if (isFillUpTop) {
+        if (isFullUpTop) {
             subject = 0;
-            getTopBar().setBgColor(Color.TRANSPARENT);
+            topBar.setBgColor(Color.TRANSPARENT);
         }
         RelativeLayout.LayoutParams topBarLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         topFL.setLayoutParams(topBarLayoutParams);
@@ -119,6 +123,9 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     }
 
     public TopBar getTopBar() {
+        if (topBar == null) {
+            return new TopBar(this);
+        }
         return topBar;
     }
 
@@ -171,6 +178,10 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
             return (BaseFragment) fragment;
         }
         return null;
+    }
+
+    public void setCurrentFragment(BaseFragment fragment) {
+        this.currentFragment = fragment;
     }
 
     @Override
@@ -316,9 +327,14 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     }
 
     private void startSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + getPackageName()));
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Settings.ACTION_SETTINGS);
+            startActivity(intent);
+        }
     }
 
 }

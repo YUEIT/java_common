@@ -47,18 +47,15 @@ public abstract class BaseDialogFragment extends DialogFragment {
     protected View cacheView;
     protected FragmentManager mFragmentManager;
     protected BaseFragmentActivity mActivity;
-    protected Bundle bundle;
-    protected LayoutInflater mInflater;
-    protected Handler mHandler = new Handler();
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (null == context || !(context instanceof BaseFragmentActivity)) {
-            throw new RuntimeException("BaseFragment必须与BaseActivity配合使用");
+        if (!(context instanceof BaseFragmentActivity)) {
+            throw new RuntimeException("BaseFragment必须与BaseFragmentActivity配合使用");
         }
         mActivity = (BaseFragmentActivity) context;
         mFragmentManager = getChildFragmentManager();
-        mInflater = LayoutInflater.from(mActivity);
     }
 
     @Override
@@ -66,7 +63,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         lifecycleProvider = initLifecycleProvider();
         getLifecycle().addObserver(lifecycleProvider);
-        bundle = getArguments();
         setStyle(STYLE_NO_TITLE, 0);
     }
 
@@ -110,7 +106,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     /**
-     * true 避免当前Fragment被repalce后回退回来重走oncreateview，导致重复初始化View和数据
+     * true 避免当前Fragment被replace后回退回来重走onCreateView，导致重复初始化View和数据
      */
     protected boolean needCache() {
         return true;
@@ -124,15 +120,12 @@ public abstract class BaseDialogFragment extends DialogFragment {
     /**
      * 获取布局
      *
-     * @return
      */
     protected abstract int getLayoutId();
 
 
     /**
      * 直接findViewById()初始化组件
-     *
-     * @param savedInstanceState
      */
     protected abstract void initView(Bundle savedInstanceState);
 

@@ -16,7 +16,7 @@ public class AppApplication extends MiddleApplication {
 
     @Override
     protected void init() {
-        InitConstant.setDebug(BuildConfig.DEBUG_MODE);
+        InitConstant.setDebug(BuildConfig.DEBUG);
         InitConstant.setVersionName(BuildConfig.VERSION_NAME);
         super.init();
     }

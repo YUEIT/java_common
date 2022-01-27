@@ -1,5 +1,7 @@
 package cn.yue.base.test.widget;
 
+import android.graphics.pdf.PdfDocument;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,13 @@ public class ChildFragment extends BasePageFragment<TestItemBean> {
     }
 
     @Override
+    protected void doLoadData(String nt) {
+        getRequestSingle(nt)
+                .compose(new PageTransformer())
+                .subscribe();
+    }
+
+
     protected Single<BaseListBean<TestItemBean>> getRequestSingle(String nt) {
         BaseListBean listBean = new BaseListBean();
         listBean.setPageSize(20);

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.yue.base.middle.components.BaseListFragment;
 import cn.yue.base.middle.mvvm.PageViewModel;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.test.data.TestItemBean;
@@ -19,6 +20,12 @@ public class TestPageViewModel extends PageViewModel<TestItemBean> {
     }
 
     @Override
+    protected void doLoadData(String nt) {
+        getRequestSingle(nt)
+                .compose(new PageTransformer())
+                .subscribe();
+    }
+
     protected Single<BaseListBean<TestItemBean>> getRequestSingle(String nt) {
         BaseListBean listBean = new BaseListBean();
         listBean.setPageSize(20);

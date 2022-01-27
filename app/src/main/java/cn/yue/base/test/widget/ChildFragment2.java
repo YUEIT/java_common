@@ -32,6 +32,12 @@ public class ChildFragment2 extends BasePageFragment<TestItemBean> implements He
     }
 
     @Override
+    protected void doLoadData(String nt) {
+        getRequestSingle(nt)
+                .compose(new PageTransformer())
+                .subscribe();
+    }
+
     protected Single<BaseListBean<TestItemBean>> getRequestSingle(String nt) {
         BaseListBean listBean = new BaseListBean();
         listBean.setPageSize(20);

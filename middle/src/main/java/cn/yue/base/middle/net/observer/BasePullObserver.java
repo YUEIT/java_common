@@ -21,7 +21,7 @@ public abstract class BasePullObserver<T> extends BaseNetObserver<T> {
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
     }
 

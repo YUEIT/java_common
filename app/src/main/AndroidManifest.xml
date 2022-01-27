@@ -18,7 +18,8 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/LaunchTheme"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

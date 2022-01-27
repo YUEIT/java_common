@@ -16,18 +16,22 @@ public class MediaVO implements Parcelable {
     private Uri uri;
     private long size;
     private long duration;
+    private int width;
+    private int height;
     private String url;
 
     public MediaVO() {
     }
 
     protected MediaVO(Parcel in) {
-        url = in.readString();
         id = in.readString();
         mimeType = in.readString();
         uri = in.readParcelable(Uri.class.getClassLoader());
         size = in.readLong();
         duration = in.readLong();
+        width = in.readInt();
+        height = in.readInt();
+        url = in.readString();
     }
 
     public static final Creator<MediaVO> CREATOR = new Creator<MediaVO>() {
@@ -90,6 +94,22 @@ public class MediaVO implements Parcelable {
         this.duration = duration;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -97,12 +117,14 @@ public class MediaVO implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(url);
         dest.writeString(id);
         dest.writeString(mimeType);
         dest.writeParcelable(uri, flags);
         dest.writeLong(size);
         dest.writeLong(duration);
+        dest.writeInt(width);
+        dest.writeInt(height);
+        dest.writeString(url);
     }
 
     public static boolean equals(MediaVO mediaVO, MediaVO mediaVO1) {
@@ -110,5 +132,15 @@ public class MediaVO implements Parcelable {
             return false;
         }
         return mediaVO.getUri().equals(mediaVO1.getUri());
+    }
+
+    public MediaType getMediaType() {
+        if (MimeType.isImage(mimeType)) {
+            return MediaType.PHOTO;
+        } else if (MimeType.isVideo(mimeType)) {
+            return MediaType.VIDEO;
+        } else {
+            return MediaType.ALL;
+        }
     }
 }

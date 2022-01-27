@@ -513,7 +513,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
         @Override
         public int getItemCount() {
-            return list != null ? list.size() : 0;
+            return getListSize();
         }
 
         @Override
@@ -522,6 +522,9 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
+    public int getListSize() {
+        return list != null ? list.size() : 0;
+    }
 
     public final int getInnerViewType(int position) {
         return getViewType(position);

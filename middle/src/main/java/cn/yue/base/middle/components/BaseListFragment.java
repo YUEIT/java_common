@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import com.google.android.exoplayer2.C;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +36,21 @@ import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.middle.net.wrapper.IListModel;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends BaseFragment implements IStatusView, IWaitView, IBaseView, IPhotoView {
+public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseFragment
+        implements IBaseView, IPhotoView {
 
     private String pageNt = "1";
     private String lastNt = "1";
@@ -154,7 +163,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
 
     protected void initRecyclerView(RecyclerView baseRV) {
         baseRV.setLayoutManager(getLayoutManager());
-        baseRV.setAdapter(adapter = getAdapter());
+        baseRV.setAdapter(adapter = initAdapter());
         adapter.addFooterView(footer);
         footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
     }
@@ -163,7 +172,7 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
         return new LinearLayoutManager(mActivity);
     }
 
-    protected CommonAdapter<S> getAdapter() {
+    protected  CommonAdapter<S> initAdapter() {
         if (adapter != null) {
             return adapter;
         }
@@ -184,6 +193,10 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
                 bindItemData(holder, position, s);
             }
         };
+    }
+
+    protected CommonAdapter<S> getAdapter() {
+        return adapter;
     }
 
     /**
@@ -240,152 +253,224 @@ public abstract class BaseListFragment<P extends BaseListBean<S>, S> extends Bas
         return "1";
     }
 
-    protected abstract Single<P> getRequestSingle(String nt);
+    protected int initPageSize() {
+        return 20;
+    }
 
     private void loadData() {
-        if (getRequestSingle(pageNt) == null) {
-            return;
-        }
-        getRequestSingle(pageNt)
-                .delay(1000, TimeUnit.MILLISECONDS)
-                .compose(this.getLifecycleProvider().<P>toBindLifecycle())
-                .subscribe(new BaseNetObserver<P>() {
-
-                    private boolean isLoadingRefresh = false;
-                    @Override
-                    protected void onStart() {
-                        super.onStart();
-                        if (loader.getPageStatus() == PageStatus.LOADING
-                                || loader.getLoadStatus() == LoadStatus.REFRESH) {
-                            isLoadingRefresh = true;
-                        } else {
-                            isLoadingRefresh = false;
-                        }
-                    }
-
-                    @Override
-                    public void onSuccess(P p) {
-                        refreshL.finishRefreshing();
-                        if (isLoadingRefresh) {
-                            dataList.clear();
-                        }
-                        if (isLoadingRefresh && p.getCurrentPageTotal() == 0) {
-                            loadEmpty();
-                        } else {
-                            loadSuccess(p);
-                            if (p.getCurrentPageTotal() < p.getPageSize()) {
-                                loadNoMore();
-                            } else if (p.getTotal() > 0 && p.getTotal() <= dataList.size()) {
-                                loadNoMore();
-                            } else if (p.getCurrentPageTotal() == 0) {
-                                loadNoMore();
-                            } else if (TextUtils.isEmpty(p.getPageNt()) && !initPageNt().matches("\\d+")) {
-                                loadNoMore();
-                            }
-                        }
-                        if (isLoadingRefresh) {
-                            onRefreshComplete(p, null);
-                        }
-                    }
-
-                    @Override
-                    public void onException(ResultException e) {
-                        refreshL.finishRefreshing();
-                        loadFailed(e);
-                        if (isLoadingRefresh) {
-                            onRefreshComplete(null, e);
-                        }
-                    }
-
-                    @Override
-                    protected void onCancel(ResultException e) {
-                        super.onCancel(e);
-                        loadFailed(e);
-                    }
-                });
+        doLoadData(pageNt);
     }
 
-    protected void loadSuccess(P p) {
-        showStatusView(loader.setPageStatus(PageStatus.NORMAL));
-        footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-        if (TextUtils.isEmpty(p.getPageNt())) {
-            try {
-                if (p.getPageNo() == 0) {
-                    pageNt = String.valueOf(Integer.valueOf(pageNt) + 1);
-                } else {
-                    pageNt = String.valueOf(p.getPageNo() + 1);
+    protected abstract void doLoadData(String nt);
+
+    public class PageTransformer implements SingleTransformer<P, P> {
+
+        @NonNull
+        @Override
+        public SingleSource<P> apply(@NonNull Single<P> upstream) {
+            BaseNetObserver<P> pageObserver = getPageObserver();
+            return upstream
+                    .compose(getLifecycleProvider().toBindLifecycle())
+                    .doOnSubscribe(new Consumer<Disposable>() {
+                        @Override
+                        public void accept(Disposable disposable) throws Exception {
+                            pageObserver.onStart();
+                        }
+                    })
+                    .doOnSuccess(new Consumer<P>() {
+                        @Override
+                        public void accept(P p) throws Exception {
+                            pageObserver.onSuccess(p);
+                        }
+                    })
+                    .doOnError(new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            pageObserver.onError(throwable);
+                        }
+                    });
+        }
+    }
+
+    public class PageDelegateObserver extends BaseNetObserver<P> {
+
+        private BaseNetObserver<P> observer;
+        private BaseNetObserver<P> pageObserver = getPageObserver();
+
+        PageDelegateObserver(BaseNetObserver<P> observer) {
+            this.observer = observer;
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            pageObserver.onStart();
+            if (observer != null) {
+                observer.onStart();
+            }
+        }
+
+        @Override
+        public void onSuccess(@NonNull P p) {
+            pageObserver.onSuccess(p);
+            if (observer != null) {
+                observer.onSuccess(p);
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            super.onError(e);
+            pageObserver.onError(e);
+            if (observer != null) {
+                observer.onError(e);
+            }
+        }
+
+        @Override
+        protected void onCancel(ResultException e) {
+            super.onCancel(e);
+        }
+
+        @Override
+        public void onException(ResultException e) { }
+    }
+
+    public BaseNetObserver<P> getPageObserver() {
+        return new PageObserver();
+    }
+
+    public class PageObserver extends BaseNetObserver<P> {
+        private boolean isLoadingRefresh = false;
+        @Override
+        public void onStart() {
+            super.onStart();
+            if (loader.getPageStatus() == PageStatus.LOADING
+                    || loader.getLoadStatus() == LoadStatus.REFRESH) {
+                isLoadingRefresh = true;
+            } else {
+                isLoadingRefresh = false;
+            }
+        }
+
+        @Override
+        public void onSuccess(P p) {
+            refreshL.finishRefreshing();
+            if (isLoadingRefresh) {
+                dataList.clear();
+            }
+            if (isLoadingRefresh && p.getCurrentPageTotal() == 0) {
+                loadEmpty();
+            } else {
+                loadSuccess(p);
+                if (p.getCurrentPageTotal() < p.getPageSize()
+                        || (p.getTotal() > 0 && p.getTotal() <= dataList.size())
+                        || p.getCurrentPageTotal() == 0
+                        || (TextUtils.isEmpty(p.getPageNt()) && !initPageNt().matches("\\d+"))
+                        || p.getCurrentPageTotal() < initPageSize()) {
+                    loadNoMore();
                 }
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
             }
-        } else {
-            pageNt = p.getPageNt();
-        }
-        if (p.getTotal() > 0) {
-            total = p.getTotal();
-        } else {
-            total += p.getCurrentPageTotal();
-        }
-        lastNt = pageNt;
-        dataList.addAll(p.getList() == null? new ArrayList<S>() : p.getList());
-        notifyDataSetChanged();
-    }
-
-    protected void loadFailed(ResultException e) {
-        pageNt = lastNt;
-        if (loader.isFirstLoad()) {
-            if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-                showStatusView(loader.setPageStatus(PageStatus.NO_NET));
-            } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
-                showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
-            } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
-                showStatusView(loader.setPageStatus(PageStatus.ERROR));
-            } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-                showStatusView(loader.setPageStatus(PageStatus.ERROR));
-                ToastUtils.showShort(e.getMessage());
-            } else {
-                showStatusView(loader.setPageStatus(PageStatus.ERROR));
-                ToastUtils.showShort(e.getMessage());
-            }
-        } else {
-            if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-                footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_NET));
-            } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
-                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-            } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
-                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-            } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-                ToastUtils.showShort(e.getMessage());
-            } else {
-                footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
-                ToastUtils.showShort(e.getMessage());
+            if (isLoadingRefresh) {
+                onRefreshComplete(p, null);
             }
         }
-    }
 
-    protected void loadNoMore() {
-        footer.showStatusView(loader.setLoadStatus(LoadStatus.END));
-    }
+        @Override
+        public void onException(ResultException e) {
+            refreshL.finishRefreshing();
+            loadFailed(e);
+            if (isLoadingRefresh) {
+                onRefreshComplete(null, e);
+            }
+        }
 
-    protected void loadEmpty() {
-        total = 0;
-        dataList.clear();
-        notifyDataSetChanged();
-        if (showSuccessWithNoData()) {
+        @Override
+        protected void onCancel(ResultException e) {
+            super.onCancel(e);
+            loadFailed(e);
+        }
+
+        protected void loadSuccess(P p) {
             showStatusView(loader.setPageStatus(PageStatus.NORMAL));
-            footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_DATA));
-        } else {
-            showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
+            footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+            if (TextUtils.isEmpty(p.getPageNt())) {
+                try {
+                    if (p.getPageNo() == 0) {
+                        pageNt = String.valueOf(Integer.valueOf(pageNt) + 1);
+                    } else {
+                        pageNt = String.valueOf(p.getPageNo() + 1);
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                pageNt = p.getPageNt();
+            }
+            if (p.getTotal() > 0) {
+                total = p.getTotal();
+            } else {
+                total += p.getCurrentPageTotal();
+            }
+            lastNt = pageNt;
+            dataList.addAll(p.getList() == null? new ArrayList<S>() : p.getList());
+            notifyDataSetChanged();
         }
+
+        protected void loadFailed(ResultException e) {
+            pageNt = lastNt;
+            if (loader.isFirstLoad()) {
+                if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
+                    showStatusView(loader.setPageStatus(PageStatus.NO_NET));
+                } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
+                    showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
+                } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
+                    showStatusView(loader.setPageStatus(PageStatus.ERROR));
+                } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
+                    showStatusView(loader.setPageStatus(PageStatus.ERROR));
+                    ToastUtils.showShort(e.getMessage());
+                } else {
+                    showStatusView(loader.setPageStatus(PageStatus.ERROR));
+                    ToastUtils.showShort(e.getMessage());
+                }
+            } else {
+                if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_NET));
+                } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                } else if (NetworkConfig.ERROR_CANCEL.equals(e.getCode())) {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                    ToastUtils.showShort(e.getMessage());
+                } else {
+                    footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+                    ToastUtils.showShort(e.getMessage());
+                }
+            }
+        }
+
+        protected void loadNoMore() {
+            footer.showStatusView(loader.setLoadStatus(LoadStatus.END));
+        }
+
+        protected void loadEmpty() {
+            total = 0;
+            dataList.clear();
+            notifyDataSetChanged();
+            if (showSuccessWithNoData()) {
+                showStatusView(loader.setPageStatus(PageStatus.NORMAL));
+                footer.showStatusView(loader.setLoadStatus(LoadStatus.NO_DATA));
+            } else {
+                showStatusView(loader.setPageStatus(PageStatus.NO_DATA));
+            }
+        }
+
+        protected void onRefreshComplete(P p, ResultException e) { }
     }
 
     protected boolean showSuccessWithNoData() {
         return false;
-    }
-
-    protected void onRefreshComplete(P p, ResultException e) {
-
     }
 
     protected void notifyDataSetChanged() {

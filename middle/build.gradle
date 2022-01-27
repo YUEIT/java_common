@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.android.targetSdkVersion
@@ -37,11 +36,9 @@ dependencies {
     androidTestImplementation rootProject.ext.androidx["espresso-test"]
 
     api project(":common")
-    api rootProject.ext.androidx["multidex"]
-    api rootProject.ext.androidx["lifecycle-viewmodel"]
-    api rootProject.ext.androidx["lifecycle-livedata"]
-    api rootProject.ext.androidx["lifecycle-viewmodel-savestate"]
-    annotationProcessor rootProject.ext.androidx["lifecycle-compiler"]
+
+    api rootProject.ext.androidx["work"]
+    api rootProject.ext.androidx["work-rxjava2"]
     //Rx
     api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxandroid"]
@@ -54,10 +51,12 @@ dependencies {
     api rootProject.ext.dependencies["retrofit-converter-gson"]
     api rootProject.ext.dependencies["retrofit-adapter-rxjava"]
     //aRouter
-    api rootProject.ext.dependencies["arouter-api"]
+    implementation rootProject.ext.dependencies["arouter-api"]
     annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
 
     implementation rootProject.ext.refresh["smart-refresh"]
     implementation rootProject.ext.refresh["header-classics"]
+
+    api rootProject.ext.dependencies["wechat"]
 }
 
