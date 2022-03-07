@@ -13,7 +13,7 @@ public class BasePageVMFragment<VM extends PageViewModel<S>, S> extends BaseList
     }
 
     @Override
-    void setData(List<S> list) {
+    protected void setData(List<S> list) {
         if (getAdapter() != null) {
             getAdapter().setList(list);
         }

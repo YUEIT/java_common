@@ -8,7 +8,6 @@ import androidx.databinding.ViewDataBinding;
 
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.components.BaseHintVMFragment;
-import cn.yue.base.middle.mvvm.data.BR;
 
 public abstract class BaseHintVMBindFragment<VM extends BaseViewModel, T extends ViewDataBinding> extends BaseHintVMFragment<VM> {
 
@@ -20,9 +19,7 @@ public abstract class BaseHintVMBindFragment<VM extends BaseViewModel, T extends
         binding.setVariable(getVariableId(), viewModel);
     }
 
-    public int getVariableId() {
-        return BR.viewModel;
-    }
+    public abstract int getVariableId();
 
     @Override
     protected void bindLayout(View inflated) {

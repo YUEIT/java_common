@@ -36,7 +36,7 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private ArrayList<View> mFooterViews = new ArrayList<>();
 
     protected Context context;
-    protected List<T> list ;
+    protected List<T> list = new ArrayList<>() ;
     protected LayoutInflater inflater;
 
     private RecyclerView.AdapterDataObserver mDataObserver = new RecyclerView.AdapterDataObserver() {
@@ -110,40 +110,38 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
     }
 
     /**
-     * 单条刷新
+     * 刷新
      * @param position
      */
-    public void notifyItemChangedReally(int position){
+    public void notifyItemChangedReally(int position, int count){
         if (null != mInnerAdapter && position > -1 && position < mInnerAdapter.getItemCount()){
-            mInnerAdapter.notifyItemChanged(position);
+            mInnerAdapter.notifyItemRangeChanged(position, count);
         }
     }
 
     /**
-     * 单条插入
+     * 插入
      * @param position
      */
-    public void notifyItemInsertedReally(int position){
+    public void notifyItemInsertedReally(int position, int count){
         if (null != mInnerAdapter && position > -1 && position < mInnerAdapter.getItemCount()){
-            mInnerAdapter.notifyItemInserted(position);
-            mInnerAdapter.notifyItemRangeChanged(position, list.size() - position);
+            mInnerAdapter.notifyItemRangeInserted(position, count);
         }
     }
 
     /**
-     * 单条删除
+     * 删除
      * @param position
      */
-    public void notifyItemRemovedReally(int position){
+    public void notifyItemRemovedReally(int position, int count){
         if (null != mInnerAdapter && position > -1 && position < mInnerAdapter.getItemCount()){
-            mInnerAdapter.notifyItemRemoved(position);
-            mInnerAdapter.notifyItemRangeChanged(position, list.size() - position);
+            mInnerAdapter.notifyItemRangeRemoved(position, count);
         }
     }
 
 
     /**
-     * 单条移动
+     * 移动
      * @param fromPosition
      * @param toPosition
      */
@@ -151,7 +149,6 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<RecyclerView
         if (null != mInnerAdapter && fromPosition > -1 && fromPosition < mInnerAdapter.getItemCount()
                 && toPosition > -1 && toPosition < mInnerAdapter.getItemCount()){
             mInnerAdapter.notifyItemMoved(fromPosition, toPosition);
-            mInnerAdapter.notifyItemRangeChanged(Math.min(fromPosition, toPosition), Math.abs(fromPosition - toPosition)+1);
         }
     }
 

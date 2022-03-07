@@ -14,7 +14,7 @@ import java.util.List;
  * Created by yue on 2022/1/26
  */
 
-abstract class DiffRefreshAdapter<T> extends CommonAdapter<T> {
+public abstract class DiffRefreshAdapter<T> extends CommonAdapter<T> {
 
     public DiffRefreshAdapter(Context context) {
         super(context);
@@ -24,31 +24,36 @@ abstract class DiffRefreshAdapter<T> extends CommonAdapter<T> {
         super(context, list);
     }
 
-    private DiffCallBack mDiffCallBack;
+    private DiffCallBack mDiffCallBack = new DiffCallBack();
 
     public void setDataCollection(List<T> mData) {
         List<T> newList = mData;
         if (newList == null) {
             newList = new ArrayList<>();
         }
-        if ((getList().isEmpty() && !newList.isEmpty()) || (!getList().isEmpty() && newList.isEmpty())) {
+        if (getList().isEmpty() || newList.isEmpty()) {
             getList().clear();
             getList().addAll(newList);
-            notifyDataSetChanged();
+            notifyDataSetChangedReally();
         } else {
             mDiffCallBack.setNewList(newList);
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(mDiffCallBack, false);
+            int oldListSize = mDiffCallBack.getOldListSize();
             getList().clear();
             getList().addAll(newList);
             diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
                 @Override
                 public void onInserted(int position, int count) {
-                    notifyItemInsertedReally(position);
+                    notifyItemInsertedReally(position, count);
                 }
 
                 @Override
                 public void onRemoved(int position, int count) {
-                    notifyItemRemovedReally(position);
+                    if (oldListSize == count) {
+                        notifyDataSetChangedReally();
+                    } else {
+                        notifyItemRemovedReally(position, count);
+                    }
                 }
 
                 @Override
@@ -58,7 +63,7 @@ abstract class DiffRefreshAdapter<T> extends CommonAdapter<T> {
 
                 @Override
                 public void onChanged(int position, int count, @Nullable Object payload) {
-                    notifyItemChangedReally(position);
+                    notifyItemChangedReally(position, count);
                 }
             });
         }
@@ -102,7 +107,12 @@ abstract class DiffRefreshAdapter<T> extends CommonAdapter<T> {
         }
     }
 
-    abstract boolean areItemsTheSame(T item1, T item2);
+    protected abstract boolean areItemsTheSame(T item1, T item2);
 
-    abstract boolean areContentsTheSame(T oldItem, T newItem);
+    protected abstract boolean areContentsTheSame(T oldItem, T newItem);
+
+    @Override
+    public void setList(List<T> list) {
+        setDataCollection(list);
+    }
 }

@@ -15,6 +15,7 @@ import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvvm.PullViewModel;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.PageStateView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
@@ -24,8 +25,7 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
 public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseVMFragment<VM> implements IStatusView {
 
     protected IRefreshLayout refreshL;
-    protected PageHintView hintView;
-    private View contentView;
+    protected PageStateView stateView;
 
     @Override
     protected int getLayoutId() {
@@ -34,8 +34,8 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        hintView = findViewById(R.id.hintView);
-        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+        stateView = findViewById(R.id.stateView);
+        stateView.setOnReloadListener(new PageHintView.OnReloadListener() {
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
@@ -54,14 +54,13 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
         });
         refreshL.setEnabledRefresh(canPullDown());
         if (canPullDown()) {
-            hintView.setRefreshTarget(refreshL);
+            stateView.setRefreshTarget(refreshL);
         }
         ViewStub baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());
         baseVS.setOnInflateListener(new ViewStub.OnInflateListener() {
             @Override
             public void onInflate(ViewStub stub, View inflated) {
-                contentView = inflated;
                 bindLayout(inflated);
             }
         });
@@ -104,17 +103,11 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null) {
+        if (stateView != null) {
             if (viewModel.loader.isFirstLoad()) {
-                hintView.show(status);
-                if (status == PageStatus.NORMAL) {
-                    contentView.setVisibility(View.VISIBLE);
-                } else {
-                    contentView.setVisibility(View.GONE);
-                }
+                stateView.show(status);
             } else {
-                hintView.show(PageStatus.NORMAL);
-                contentView.setVisibility(View.VISIBLE);
+                stateView.show(PageStatus.NORMAL);
             }
         }
         if (status == PageStatus.NORMAL) {

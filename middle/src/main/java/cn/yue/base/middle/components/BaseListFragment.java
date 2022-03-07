@@ -38,6 +38,7 @@ import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.middle.net.wrapper.IListModel;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.PageStateView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -59,10 +60,9 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
     protected int total;
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
-    private Loader loader = new Loader();
+    private final Loader loader = new Loader();
     private IRefreshLayout refreshL;
-    private RecyclerView baseRV;
-    protected PageHintView hintView;
+    protected PageStateView stateView;
     private PhotoHelper photoHelper;
 
     @Override
@@ -72,8 +72,8 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        hintView = findViewById(R.id.hintView);
-        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+        stateView = findViewById(R.id.stateView);
+        stateView.setOnReloadListener(new PageHintView.OnReloadListener() {
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
@@ -96,7 +96,7 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
             }
         });
         if (canPullDown()) {
-            hintView.setRefreshTarget(refreshL);
+            stateView.setRefreshTarget(refreshL);
         }
         footer = getFooter();
         if (footer != null) {
@@ -107,9 +107,40 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
                 }
             });
         }
-        baseRV = findViewById(R.id.baseRV);
+        RecyclerView baseRV = findViewById(R.id.baseRV);
         refreshL.setTargetView(baseRV);
         initRecyclerView(baseRV);
+        addOnScrollListener(baseRV);
+    }
+
+    @Override
+    protected void initOther() {
+        super.initOther();
+        if (NetworkUtils.isConnected()) {
+            if (autoRefresh()) {
+                refresh();
+            }
+        } else {
+            showStatusView(loader.setPageStatus(PageStatus.NO_NET));
+        }
+    }
+
+    protected boolean autoRefresh() {
+        return true;
+    }
+
+    protected boolean canPullDown() {
+        return true;
+    }
+
+    protected void initRecyclerView(RecyclerView baseRV) {
+        baseRV.setLayoutManager(getLayoutManager());
+        baseRV.setAdapter(adapter = initAdapter());
+        adapter.addFooterView(footer);
+        footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
+    }
+
+    private void addOnScrollListener(RecyclerView baseRV) {
         baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -139,33 +170,6 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
                 }
             }
         });
-    }
-
-    @Override
-    protected void initOther() {
-        super.initOther();
-        if (NetworkUtils.isConnected()) {
-            if (autoRefresh()) {
-                refresh();
-            }
-        } else {
-            showStatusView(loader.setPageStatus(PageStatus.NO_NET));
-        }
-    }
-
-    protected boolean autoRefresh() {
-        return true;
-    }
-
-    protected boolean canPullDown() {
-        return true;
-    }
-
-    protected void initRecyclerView(RecyclerView baseRV) {
-        baseRV.setLayoutManager(getLayoutManager());
-        baseRV.setAdapter(adapter = initAdapter());
-        adapter.addFooterView(footer);
-        footer.showStatusView(loader.setLoadStatus(LoadStatus.NORMAL));
     }
 
     protected RecyclerView.LayoutManager getLayoutManager() {
@@ -249,7 +253,7 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
         loadData();
     }
 
-    protected String initPageNt() {
+    protected String  initPageNt() {
         return "1";
     }
 
@@ -294,8 +298,8 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
 
     public class PageDelegateObserver extends BaseNetObserver<P> {
 
-        private BaseNetObserver<P> observer;
-        private BaseNetObserver<P> pageObserver = getPageObserver();
+        private final BaseNetObserver<P> observer;
+        private final BaseNetObserver<P> pageObserver = getPageObserver();
 
         PageDelegateObserver(BaseNetObserver<P> observer) {
             this.observer = observer;
@@ -487,17 +491,11 @@ public abstract class BaseListFragment<P extends IListModel<S>, S> extends BaseF
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null) {
+        if (stateView != null) {
             if (loader.isFirstLoad()) {
-                hintView.show(status);
-                if (loader.getPageStatus() == PageStatus.NORMAL) {
-                    baseRV.setVisibility(View.VISIBLE);
-                } else {
-                    baseRV.setVisibility(View.GONE);
-                }
+                stateView.show(status);
             } else {
-                hintView.show(PageStatus.NORMAL);
-                baseRV.setVisibility(View.VISIBLE);
+                stateView.show(PageStatus.NORMAL);
             }
         }
         if (status == PageStatus.NORMAL) {

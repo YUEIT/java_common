@@ -31,72 +31,18 @@ import io.reactivex.SingleOnSubscribe;
 public class TestPageFragment extends BaseListFragment<BaseListBean<TestItemBean>, TestItemBean> {
 
     @Override
-    protected void initView(Bundle savedInstanceState) {
-        super.initView(savedInstanceState);
-        initTest();
-    }
-
-    @Override
     protected int getLayoutId() {
         return R.layout.test_fragment_base_pull_page;
     }
 
     @Override
-    protected int getItemType(int position) {
-        if (position == 1) {
-            return 1;
-        }
-        return super.getItemType(position);
-    }
-
-    @Override
     protected int getItemLayoutId(int viewType) {
-        if (viewType == 1) {
-            return R.layout.item_test_recyclerview;
-        }
         return R.layout.item_test;
     }
 
-    CommonAdapter<String> adapter;
-
     @Override
     protected void bindItemData(CommonViewHolder<TestItemBean> holder, int position, TestItemBean testItemBean) {
-        if (getItemType(position) == 1) {
-            RecyclerView recyclerView = holder.getView(R.id.rv);
-            if (recyclerView.getLayoutManager() == null) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.HORIZONTAL, false));
-                recyclerView.setAdapter(adapter = new CommonAdapter<String>(mActivity, testList){
-
-                    @Override
-                    public int getLayoutIdByType(int viewType) {
-                        return R.layout.item_test;
-                    }
-
-                    @Override
-                    public void bindData(CommonViewHolder<String> holder, int position, String s) {
-                        holder.setText(R.id.testTV, s);
-                    }
-                });
-            }
-            adapter.notifyDataSetChanged();
-        } else {
-            holder.setText(R.id.testTV, testItemBean.getName());
-            holder.setOnClickListener(R.id.testTV, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            });
-        }
-    }
-
-    private List<String> testList = new ArrayList<>();
-    private void initTest() {
-        for (int i=0; i<10; i++) {
-            testList.add("ssssa" + i);
-        }
+        holder.setText(R.id.testTV, testItemBean.getName());
     }
 
     @Override

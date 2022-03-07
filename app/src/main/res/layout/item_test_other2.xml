@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="cn.yue.base.test.component.TestItemViewModel2" />
+            type="cn.yue.base.test.component.ui_vm.TestItemViewModel2" />
     </data>
 
     <LinearLayout
@@ -18,10 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            onClickListener="@{viewModel.onclick}"
             android:text="@{viewModel.nameField}"
-            android:textColor="#ff0000"
-            android:textSize="15sp" />
+            android:textColor="#ff00ff"
+            android:textSize="15sp"
+            onClick="@{viewModel.onClick}"/>
 
     </LinearLayout>
 </layout>

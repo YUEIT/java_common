@@ -163,7 +163,7 @@ public class PhotoHelper {
             appDir.mkdirs();
         }
         String uuid = UUID.randomUUID().toString();
-        File tempFile = new File(storePath, "$uuid.jpg");
+        File tempFile = new File(storePath, uuid + ".jpg");
         return tempFile;
     }
 

@@ -14,13 +14,13 @@ import cn.yue.base.common.utils.display.SizeUtils;
 
 public class ViewAdapter {
 
-    @BindingAdapter(value = {"onClickListener"})
-    public static void setOnClickListener(View view, Consumer onClickListener) {
-        if (onClickListener != null) {
+    @BindingAdapter(value = {"onClick"})
+    public static void setOnClickListener(View view, Consumer onClick) {
+        if (onClick != null) {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onClickListener.accept();
+                    onClick.accept();
                 }
             });
         } else {
@@ -28,13 +28,13 @@ public class ViewAdapter {
         }
     }
 
-    @BindingAdapter(value = {"onLongClickListener"})
-    public static void setOnLongClickListener(View view, Function<Boolean> onLongClickListener) {
-        if (onLongClickListener != null) {
+    @BindingAdapter(value = {"onLongClick"})
+    public static void setOnLongClickListener(View view, Function<Boolean> onLongClick) {
+        if (onLongClick != null) {
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    return onLongClickListener.apply();
+                    return onLongClick.apply();
                 }
             });
         } else {

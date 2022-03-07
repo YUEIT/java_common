@@ -23,6 +23,7 @@ import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvvm.ListViewModel;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.PageStateView;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
@@ -34,8 +35,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
     private IRefreshLayout refreshL;
-    private RecyclerView baseRV;
-    protected PageHintView hintView;
+    protected PageStateView stateView;
 
     @Override
     protected int getLayoutId() {
@@ -44,8 +44,8 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        hintView = findViewById(R.id.hintView);
-        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+        stateView = findViewById(R.id.stateView);
+        stateView.setOnReloadListener(new PageHintView.OnReloadListener() {
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
@@ -66,7 +66,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
             }
         });
         if (canPullDown()) {
-            hintView.setRefreshTarget(refreshL);
+            stateView.setRefreshTarget(refreshL);
         }
         footer = getFooter();
         if (footer != null) {
@@ -77,15 +77,10 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
                 }
             });
         }
-        baseRV = findViewById(R.id.baseRV);
+        RecyclerView baseRV = findViewById(R.id.baseRV);
         refreshL.setTargetView(baseRV);
         initRecyclerView(baseRV);
-        baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                viewModel.hasLoad(recyclerView.getLayoutManager());
-            }
-        });
+        addOnScrollListener(baseRV);
     }
 
     @Override
@@ -139,6 +134,15 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
         adapter.addFooterView(footer);
     }
 
+    private void addOnScrollListener(RecyclerView baseRV) {
+        baseRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                viewModel.scrollToLoad(recyclerView.getLayoutManager());
+            }
+        });
+    }
+
     public abstract CommonAdapter<S> initAdapter();
 
     public CommonAdapter<S> getAdapter() {
@@ -149,7 +153,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
         return new LinearLayoutManager(mActivity);
     }
 
-    abstract void setData(List<S> list);
+    protected abstract void setData(List<S> list);
 
     protected BaseFooter getFooter() {
         if (footer == null) {
@@ -160,17 +164,11 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null) {
+        if (stateView != null) {
             if (viewModel.loader.isFirstLoad()) {
-                hintView.show(status);
-                if (status == PageStatus.NORMAL) {
-                    baseRV.setVisibility(View.VISIBLE);
-                } else {
-                    baseRV.setVisibility(View.GONE);
-                }
+                stateView.show(status);
             } else {
-                hintView.show(PageStatus.NORMAL);
-                baseRV.setVisibility(View.VISIBLE);
+                stateView.show(PageStatus.NORMAL);
             }
         }
         if (status == PageStatus.NORMAL) {

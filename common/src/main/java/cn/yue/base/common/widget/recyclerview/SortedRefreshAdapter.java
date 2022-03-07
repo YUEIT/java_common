@@ -56,17 +56,17 @@ abstract class SortedRefreshAdapter<T> extends CommonAdapter<T> {
 
         @Override
         public void onChanged(int position, int count) {
-            notifyItemChangedReally(position);
+            notifyItemChangedReally(position, count);
         }
 
         @Override
         public void onInserted(int position, int count) {
-            notifyItemInsertedReally(position);
+            notifyItemInsertedReally(position, count);
         }
 
         @Override
         public void onRemoved(int position, int count) {
-            notifyItemRemovedReally(position);
+            notifyItemRemovedReally(position, count);
         }
 
         @Override

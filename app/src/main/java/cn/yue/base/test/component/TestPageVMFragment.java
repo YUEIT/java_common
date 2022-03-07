@@ -4,8 +4,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.mvvm.CommonVMAdapter;
-import cn.yue.base.middle.mvvm.ItemViewModel;
+import cn.yue.base.common.widget.recyclerview.DiffRefreshAdapter;
 import cn.yue.base.middle.mvvm.components.BasePageVMFragment;
 import cn.yue.base.test.R;
 import cn.yue.base.test.data.TestItemBean;
@@ -15,7 +14,17 @@ public class TestPageVMFragment extends BasePageVMFragment<TestPageViewModel, Te
 
     @Override
     public CommonAdapter<TestItemBean> initAdapter() {
-        return new CommonAdapter<TestItemBean>(mActivity) {
+        return new DiffRefreshAdapter<TestItemBean>(mActivity) {
+            @Override
+            protected boolean areItemsTheSame(TestItemBean item1, TestItemBean item2) {
+                return item1 == item2;
+            }
+
+            @Override
+            protected boolean areContentsTheSame(TestItemBean oldItem, TestItemBean newItem) {
+                return oldItem == newItem;
+            }
+
             @Override
             public int getLayoutIdByType(int viewType) {
                 return R.layout.item_test;
@@ -26,15 +35,5 @@ public class TestPageVMFragment extends BasePageVMFragment<TestPageViewModel, Te
                 holder.setText(R.id.testTV, testItemBean.getName());
             }
         };
-//        return new CommonVMAdapter<TestItemBean>(mActivity) {
-//            @Override
-//            public ItemViewModel initItemViewModel(TestItemBean itemBean) {
-//                if (itemBean.getIndex() % 2 == 0) {
-//                    return new TestItemViewModel(itemBean, viewModel);
-//                } else {
-//                    return new TestItemViewModel2(itemBean, viewModel);
-//                }
-//            }
-//        };
     }
 }

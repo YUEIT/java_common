@@ -188,11 +188,9 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     public void onNewIntent(Bundle bundle) {
         if (mFragmentManager != null) {
             List<Fragment> fragments = mFragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
-                        ((BaseFragment) fragment).onNewIntent(bundle);
-                    }
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
+                    ((BaseFragment) fragment).onNewIntent(bundle);
                 }
             }
         }

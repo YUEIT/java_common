@@ -20,6 +20,7 @@ import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.photo.IPhotoView;
 import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.PageStateView;
 
 /**
  * Description :
@@ -28,8 +29,7 @@ import cn.yue.base.middle.view.PageHintView;
 public abstract class BaseHintFragment extends BaseFragment implements IStatusView, IWaitView, IBaseView , IPhotoView{
 
     protected Loader loader = new Loader();
-    protected PageHintView hintView;
-    private ViewStub baseVS;
+    protected PageStateView stateView;
     private PhotoHelper photoHelper;
 
     @Override
@@ -40,8 +40,8 @@ public abstract class BaseHintFragment extends BaseFragment implements IStatusVi
     @Override
     protected void initView(Bundle savedInstanceState) {
         loader.setPageStatus(PageStatus.NORMAL);
-        hintView = findViewById(R.id.hintView);
-        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+        stateView = findViewById(R.id.stateView);
+        stateView.setOnReloadListener(new PageHintView.OnReloadListener() {
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
@@ -51,7 +51,7 @@ public abstract class BaseHintFragment extends BaseFragment implements IStatusVi
                 }
             }
         });
-        baseVS = findViewById(R.id.baseVS);
+        ViewStub baseVS = findViewById(R.id.baseVS);
         baseVS.setLayoutResource(getContentLayoutId());
         baseVS.setOnInflateListener(new ViewStub.OnInflateListener() {
             @Override
@@ -78,11 +78,11 @@ public abstract class BaseHintFragment extends BaseFragment implements IStatusVi
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null) {
+        if (stateView != null) {
             if (loader.isFirstLoad()) {
-                hintView.show(status);
+                stateView.show(status);
             } else {
-                hintView.show(PageStatus.NORMAL);
+                stateView.show(PageStatus.NORMAL);
             }
         }
        if (status == PageStatus.NORMAL) {

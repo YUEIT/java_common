@@ -13,10 +13,11 @@ import cn.yue.base.middle.components.load.PageStatus;
 import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.view.PageHintView;
+import cn.yue.base.middle.view.PageStateView;
 
 public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseVMFragment<VM> implements IStatusView {
 
-    protected PageHintView hintView;
+    protected PageStateView stateView;
 
     @Override
     protected int getLayoutId() {
@@ -27,8 +28,8 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseV
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        hintView = findViewById(R.id.hintView);
-        hintView.setOnReloadListener(new PageHintView.OnReloadListener() {
+        stateView = findViewById(R.id.stateView);
+        stateView.setOnReloadListener(new PageHintView.OnReloadListener() {
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
@@ -69,8 +70,8 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseV
 
     @Override
     public void showStatusView(PageStatus status) {
-        if (hintView != null && viewModel.loader.isFirstLoad()) {
-            hintView.show(status);
+        if (stateView != null && viewModel.loader.isFirstLoad()) {
+            stateView.show(status);
         }
         if (status == PageStatus.NORMAL) {
             viewModel.loader.setFirstLoad(false);

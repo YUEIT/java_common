@@ -21,13 +21,14 @@ import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.middle.net.wrapper.IListModel;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseViewModel{
+public abstract class ListViewModel<P extends IListModel<S>, S> extends BaseViewModel{
 
     public ListViewModel(@NonNull Application application) {
         super(application);
@@ -292,7 +293,7 @@ public abstract class ListViewModel<P extends BaseListBean<S>, S> extends BaseVi
         return false;
     }
 
-    public void hasLoad(RecyclerView.LayoutManager layoutManager) {
+    public void scrollToLoad(RecyclerView.LayoutManager layoutManager) {
         if (dataList.size() <= 0) {
             return;
         }

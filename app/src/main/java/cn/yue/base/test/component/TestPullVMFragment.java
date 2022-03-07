@@ -7,6 +7,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import cn.yue.base.middle.mvvm.components.binding.BasePullVMBindFragment;
 import cn.yue.base.middle.router.RouterCard;
+import cn.yue.base.test.BR;
 import cn.yue.base.test.R;
 import cn.yue.base.test.databinding.FragmentTestPullVmBinding;
 
@@ -33,5 +34,10 @@ public class TestPullVMFragment extends BasePullVMBindFragment<TestPullViewModel
                 viewModel.finish();
             }
         });
+    }
+
+    @Override
+    public int getVariableId() {
+        return BR.viewModel;
     }
 }

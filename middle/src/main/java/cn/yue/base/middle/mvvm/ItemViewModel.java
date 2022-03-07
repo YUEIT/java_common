@@ -11,19 +11,12 @@ import io.reactivex.SingleTransformer;
 
 public abstract class ItemViewModel extends BaseViewModel {
 
-    private BaseViewModel parentViewModel;
+    private final BaseViewModel parentViewModel;
 
     public ItemViewModel(@NonNull BaseViewModel parentViewModel) {
         super(parentViewModel.getApplication());
         this.parentViewModel = parentViewModel;
     }
-
-    protected int getItemType() {
-        return this.hashCode() % 100;
-    }
-
-    public abstract int getLayoutId();
-
 
     @Override
     public <T> RxLifecycleTransformer<T> toBindLifecycle() {

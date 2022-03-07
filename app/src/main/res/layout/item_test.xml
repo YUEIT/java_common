@@ -6,9 +6,10 @@
 
     <TextView
         android:id="@+id/testTV"
-        android:layout_width="@dimen/rdp360"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/rdp50"
         android:gravity="center"
+        android:textColor="#333333"
         android:text="hello"
         android:textSize="@dimen/rsp15" />
 

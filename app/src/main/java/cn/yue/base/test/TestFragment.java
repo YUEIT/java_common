@@ -53,97 +53,87 @@ public class TestFragment extends BaseHintFragment{
         super.initView(savedInstanceState);
         RecyclerView recyclerView = findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
-        List<Object> list = new ArrayList<>();
-        for (int i=0; i < 7; i++) {
-            list.add(new Object());
-        }
-        recyclerView.setAdapter(new CommonAdapter(mActivity, list) {
+        recyclerView.setAdapter(new CommonAdapter<Item>(mActivity, initList()) {
             @Override
             public int getLayoutIdByType(int viewType) {
                 return R.layout.item_test;
             }
 
             @Override
-            public void bindData(CommonViewHolder holder, int position, Object o) {
-                if (position == 0) {
-                    holder.setText(R.id.testTV, "pull");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/testPull")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 1) {
-                    holder.setText(R.id.testTV, "pull-VM");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/testPullVM")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 2) {
-                    holder.setText(R.id.testTV, "page");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/testPullList")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 3) {
-                    holder.setText(R.id.testTV, "page-VM");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/testPageVM")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 4) {
-                    holder.setText(R.id.testTV, "Header-viewPager");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/parent")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 5) {
-                    holder.setText(R.id.testTV, "Header-viewPager2");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/app/parent2")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
-                if (position == 6) {
-                    holder.setText(R.id.testTV, "select photos");
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FRouter.getInstance()
-                                    .build("/common/selectPhoto")
-                                    .navigation(mActivity);
-                        }
-                    });
-                }
+            public void bindData(CommonViewHolder<Item> holder, int position, Item item) {
+                holder.setText(R.id.testTV, item.name);
+                holder.itemView.setOnClickListener(item.onClickListener);
             }
         });
+    }
+
+    private List<Item> initList() {
+        List<Item> list = new ArrayList<>();
+        list.add(new Item("pull", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/testPull")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("pull-VM", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/testPullVM")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("page", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/testPullList")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("page-VM", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/testPageVM")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("page-VM2", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/testPageVM2")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("Header-viewPager", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/parent")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("Header-viewPager2", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/app/parent2")
+                        .navigation(mActivity);
+            }
+        }));
+        list.add(new Item("select photos", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FRouter.getInstance()
+                        .build("/common/selectPhoto")
+                        .navigation(mActivity);
+            }
+        }));
+        return list;
     }
 
     @Override
@@ -154,4 +144,13 @@ public class TestFragment extends BaseHintFragment{
         }
     }
 
+    static class Item {
+        final String name;
+        final View.OnClickListener onClickListener;
+
+        Item(String name, View.OnClickListener onClickListener) {
+            this.name = name;
+            this.onClickListener = onClickListener;
+        }
+    }
 }

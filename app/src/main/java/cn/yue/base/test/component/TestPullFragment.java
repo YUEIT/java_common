@@ -23,11 +23,6 @@ import io.reactivex.Single;
 public class TestPullFragment extends BasePullFragment {
 
     @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_base_pull_test;
-    }
-
-    @Override
     protected int getContentLayoutId() {
         return R.layout.fragment_test_pull;
     }
@@ -64,6 +59,7 @@ public class TestPullFragment extends BasePullFragment {
                 .subscribe(new BasePullObserver<String>(this) {
                     @Override
                     public void onNext(String s) {
+
                         ToastUtils.showShort(s);
                     }
                 });
