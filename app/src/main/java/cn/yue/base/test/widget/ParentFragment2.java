@@ -2,7 +2,6 @@ package cn.yue.base.test.widget;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -19,7 +18,7 @@ import cn.yue.base.common.widget.viewpager.HeaderScrollHelper;
 import cn.yue.base.common.widget.viewpager.HeaderScrollView;
 import cn.yue.base.common.widget.viewpager.SampleFragmentPagerAdapter;
 import cn.yue.base.common.widget.viewpager.SampleTabStrip;
-import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.mvp.components.BaseHintFragment;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 import cn.yue.base.middle.view.refresh.SwipeRefreshLayout;
 import cn.yue.base.test.R;

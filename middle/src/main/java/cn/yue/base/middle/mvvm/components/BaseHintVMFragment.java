@@ -9,13 +9,12 @@ import androidx.lifecycle.Observer;
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.components.load.PageStatus;
-import cn.yue.base.middle.mvp.IStatusView;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.PageStateView;
 
-public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseVMFragment<VM> implements IStatusView {
+public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseVMFragment<VM> {
 
     protected PageStateView stateView;
 
@@ -68,8 +67,7 @@ public abstract class BaseHintVMFragment<VM extends BaseViewModel> extends BaseV
         });
     }
 
-    @Override
-    public void showStatusView(PageStatus status) {
+    private void showStatusView(PageStatus status) {
         if (stateView != null && viewModel.loader.isFirstLoad()) {
             stateView.show(status);
         }

@@ -2,8 +2,9 @@ package cn.yue.base.middle.net.observer;
 
 
 import cn.yue.base.common.utils.view.ToastUtils;
-import cn.yue.base.middle.components.load.PageStatus;
-import cn.yue.base.middle.mvp.IPullView;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
+import cn.yue.base.middle.mvp.IStatusView;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 
@@ -14,10 +15,10 @@ import cn.yue.base.middle.net.ResultException;
 
 public abstract class BasePullObserver<T> extends BaseNetObserver<T> {
 
-    private IPullView iPullView;
+    private IStatusView iStatusView;
 
-    public BasePullObserver(IPullView iPullView) {
-        this.iPullView = iPullView;
+    public BasePullObserver(IStatusView iStatusView) {
+        this.iStatusView = iStatusView;
     }
 
     @Override
@@ -27,36 +28,35 @@ public abstract class BasePullObserver<T> extends BaseNetObserver<T> {
 
     @Override
     public void onSuccess(T t) {
-        if (iPullView != null) {
-            iPullView.finishRefresh();
-            iPullView.loadComplete(PageStatus.NORMAL);
+        if (iStatusView != null) {
+            iStatusView.changeLoadStatus(LoadStatus.NORMAL);
+            iStatusView.changePageStatus(PageStatus.NORMAL);
         }
         onNext(t);
     }
 
     @Override
     public void onException(ResultException e) {
-        if (iPullView != null) {
+        if (iStatusView != null) {
             if (NetworkConfig.ERROR_NO_NET.equals(e.getCode())) {
-                iPullView.loadComplete(PageStatus.NO_NET);
+                iStatusView.changePageStatus(PageStatus.NO_NET);
             } else if (NetworkConfig.ERROR_NO_DATA.equals(e.getCode())) {
-                iPullView.loadComplete(PageStatus.NO_DATA);
+                iStatusView.changePageStatus(PageStatus.NO_DATA);
             } else if (NetworkConfig.ERROR_OPERATION.equals(e.getCode())) {
-                iPullView.loadComplete(PageStatus.ERROR);
+                iStatusView.changePageStatus(PageStatus.ERROR);
                 ToastUtils.showShort(e.getMessage());
             } else {
-                iPullView.loadComplete(PageStatus.ERROR);
+                iStatusView.changePageStatus(PageStatus.ERROR);
                 ToastUtils.showShort(e.getMessage());
             }
-            iPullView.finishRefresh();
         }
     }
 
     @Override
     protected void onCancel(ResultException e) {
         super.onCancel(e);
-        if (iPullView != null) {
-            iPullView.finishRefresh();
+        if (iStatusView != null) {
+            iStatusView.changeLoadStatus(LoadStatus.NORMAL);
         }
     }
 

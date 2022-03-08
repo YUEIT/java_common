@@ -1,4 +1,4 @@
-package cn.yue.base.middle.components.binding;
+package cn.yue.base.middle.mvp.components.binding;
 
 import android.view.View;
 import android.view.ViewStub;
@@ -6,7 +6,7 @@ import android.view.ViewStub;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 
-import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.mvp.components.BaseHintFragment;
 
 /**
  * Description :

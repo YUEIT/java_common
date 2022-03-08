@@ -1,5 +1,6 @@
 package cn.yue.base.middle.router;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -17,9 +18,12 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.enums.RouteType;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.activity.CommonActivity;
+import cn.yue.base.middle.mvvm.BaseViewModel;
+import cn.yue.base.middle.mvvm.data.RouterModel;
 
 /**
  * Description : 路由
@@ -117,24 +121,36 @@ public class FRouter implements INavigation, Parcelable {
     }
 
     @Override
-    public void navigation(@NonNull Context context) {
+    public void navigation(@NonNull Object context) {
         this.navigation(context, 0);
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode) {
+    public void navigation(@NonNull Object context, int requestCode) {
         navigation(context, requestCode, null);
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode, String toActivity) {
-        if (mRouterCard.isInterceptLogin() && interceptLogin(context)) {
+    public void navigation(@NonNull Object context, int requestCode, String toActivity) {
+        Context realContext;
+        if (context instanceof Context) {
+            realContext = (Context) context;
+        } else if (context instanceof BaseFragment) {
+            realContext = ((BaseFragment) context).getContext();
+        } else if (context instanceof BaseViewModel){
+            RouterModel routerModel = new RouterModel(mRouterCard, requestCode, toActivity);
+            ((BaseViewModel)context).navigation(routerModel);
+            return;
+        } else {
+            return;
+        }
+        if (mRouterCard.isInterceptLogin() && interceptLogin(realContext)) {
             return;
         }
         if (getRouteType() == RouteType.ACTIVITY) {
-            jumpToActivity(context, requestCode);
+            jumpToActivity(realContext, requestCode);
         } else if (getRouteType() == RouteType.FRAGMENT) {
-            jumpToFragment(context, toActivity, requestCode);
+            jumpToFragment(realContext, toActivity, requestCode);
         } else {
             ToastUtils.showShort("找不到页面~");
         }
@@ -154,6 +170,7 @@ public class FRouter implements INavigation, Parcelable {
         }
     }
 
+    @SuppressLint("WrongConstant")
     private void jumpToFragment(Context context, String toActivity, int requestCode) {
         Intent intent = new Intent();
         intent.putExtra(RouterCard.TAG, mRouterCard);

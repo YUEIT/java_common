@@ -10,7 +10,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import cn.yue.base.middle.components.load.PageStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**

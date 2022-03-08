@@ -5,14 +5,14 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import cn.yue.base.middle.components.load.LoadStatus;
-import cn.yue.base.middle.components.load.PageStatus;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 
 public class LoaderLiveData {
 
     private boolean isFirstLoad;
-    private MutableLiveData<PageStatus> pageStatusLiveData = new MutableLiveData<>();
-    private MutableLiveData<LoadStatus> loadStatusLiveData = new MutableLiveData<>();
+    private final MutableLiveData<PageStatus> pageStatusLiveData = new MutableLiveData<>();
+    private final MutableLiveData<LoadStatus> loadStatusLiveData = new MutableLiveData<>();
 
     public LoaderLiveData() {
         isFirstLoad = true;

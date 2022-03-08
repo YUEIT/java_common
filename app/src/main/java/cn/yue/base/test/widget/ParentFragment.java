@@ -22,7 +22,7 @@ import java.util.List;
 
 import cn.yue.base.common.widget.viewpager.SampleTabStrip;
 import cn.yue.base.common.widget.viewpager.SampleTabStrip2;
-import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.mvp.components.BaseHintFragment;
 import cn.yue.base.test.R;
 
 @Route(path = "/app/parent")

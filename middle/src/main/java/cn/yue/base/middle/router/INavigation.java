@@ -13,9 +13,9 @@ public interface INavigation {
 
     INavigation bindRouterCard(RouterCard routerCard);
 
-    void navigation(@NonNull Context context);
+    void navigation(@NonNull Object context);
 
-    void navigation(@NonNull Context context, int requestCode);
+    void navigation(@NonNull Object context, int requestCode);
 
-    void navigation(@NonNull Context context, int requestCode, String toActivity);
+    void navigation(@NonNull Object context, int requestCode, String toActivity);
 }

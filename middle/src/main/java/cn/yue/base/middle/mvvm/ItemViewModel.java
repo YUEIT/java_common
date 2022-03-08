@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import cn.yue.base.common.activity.rx.RxLifecycleTransformer;
+import cn.yue.base.middle.mvvm.data.RouterModel;
 import cn.yue.base.middle.router.RouterCard;
 import io.reactivex.SingleTransformer;
 
@@ -38,19 +39,8 @@ public abstract class ItemViewModel extends BaseViewModel {
         parentViewModel.dismissWaitDialog();
     }
 
-    @Override
-    public void navigation(RouterCard routerCard) {
-        parentViewModel.navigation(routerCard);
-    }
-
-    @Override
-    public void navigation(RouterCard routerCard, int requestCode) {
-        parentViewModel.navigation(routerCard, requestCode);
-    }
-
-    @Override
-    public void navigation(RouterCard routerCard, int requestCode, String toActivity) {
-        parentViewModel.navigation(routerCard, requestCode, toActivity);
+    public void navigation(RouterModel routerModel) {
+        parentViewModel.navigation(routerModel);
     }
 
     @Override

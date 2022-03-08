@@ -12,7 +12,6 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Lifecycle.Event;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.OnLifecycleEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +25,7 @@ import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.mvvm.data.FinishModel;
 import cn.yue.base.middle.mvvm.data.LoaderLiveData;
 import cn.yue.base.middle.mvvm.data.RouterModel;
-import cn.yue.base.middle.router.RouterCard;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 public class BaseViewModel extends AndroidViewModel
@@ -175,16 +166,7 @@ public class BaseViewModel extends AndroidViewModel
         waitEvent.postValue("");
     }
 
-    public void navigation(RouterCard routerCard) {
-        navigation(routerCard, 0);
-    }
-
-    public void navigation(RouterCard routerCard, int requestCode) {
-       navigation(routerCard, requestCode, null);
-    }
-
-    public void navigation(RouterCard routerCard, int requestCode, String toActivity) {
-        RouterModel routerModel = new RouterModel(routerCard, requestCode, toActivity);
+    public void navigation(RouterModel routerModel) {
         routerEvent.postValue(routerModel);
     }
 

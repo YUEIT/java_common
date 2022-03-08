@@ -10,17 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
-import java.util.concurrent.RecursiveTask;
-import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.common.utils.view.ToastUtils;
-import cn.yue.base.middle.components.load.LoadStatus;
-import cn.yue.base.middle.components.load.PageStatus;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvvm.data.MutableListLiveData;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetObserver;
-import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.middle.net.wrapper.IListModel;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;

@@ -1,49 +1,33 @@
 package cn.yue.base.test.widget;
 
-import android.graphics.pdf.PdfDocument;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.components.BasePageFragment;
-import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.middle.mvp.components.BaseListFragment;
 import cn.yue.base.test.R;
 import cn.yue.base.test.data.TestItemBean;
-import io.reactivex.Single;
 
-public class ChildFragment extends BasePageFragment<TestItemBean> {
+public class ChildFragment extends BaseListFragment<TestItemBean> {
 
-    @Override
-    protected int getItemLayoutId(int viewType) {
-        return R.layout.item_test;
-    }
+    protected ChildPresenter childPresenter = new ChildPresenter(this);
 
     @Override
-    protected void bindItemData(CommonViewHolder<TestItemBean> holder, int position, TestItemBean testItemBean) {
-        holder.setText(R.id.testTV, testItemBean.getName());
+    protected CommonAdapter<TestItemBean> initAdapter() {
+        return new CommonAdapter<TestItemBean>(mActivity) {
+            @Override
+            public int getLayoutIdByType(int viewType) {
+                return R.layout.item_test;
+            }
+
+            @Override
+            public void bindData(CommonViewHolder<TestItemBean> holder, int position, TestItemBean testItemBean) {
+                holder.setText(R.id.testTV, testItemBean.getName());
+            }
+        };
     }
 
     @Override
-    protected void doLoadData(String nt) {
-        getRequestSingle(nt)
-                .compose(new PageTransformer())
-                .subscribe();
+    protected void loadData(boolean isRefresh) {
+        childPresenter.loadData(isRefresh);
     }
 
-
-    protected Single<BaseListBean<TestItemBean>> getRequestSingle(String nt) {
-        BaseListBean listBean = new BaseListBean();
-        listBean.setPageSize(20);
-        listBean.setTotal(22);
-        List<TestItemBean> list = new ArrayList<>();
-        for (int i=0; i < 20; i++) {
-            TestItemBean testItemBean = new TestItemBean();
-            testItemBean.setIndex(i);
-            testItemBean.setName("this is " + i);
-            list.add(testItemBean);
-        }
-        listBean.setList(list);
-        return Single.just(listBean);
-    }
 }

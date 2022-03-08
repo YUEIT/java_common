@@ -4,11 +4,11 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 
-import cn.yue.base.middle.components.load.LoadStatus;
-import cn.yue.base.middle.components.load.PageStatus;
-import cn.yue.base.middle.mvp.IPullView;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
+import cn.yue.base.middle.mvp.IStatusView;
 
-public abstract class PullViewModel extends BaseViewModel implements IPullView {
+public abstract class PullViewModel extends BaseViewModel implements IStatusView {
 
     public PullViewModel(@NonNull Application application) {
         super(application);
@@ -39,18 +39,13 @@ public abstract class PullViewModel extends BaseViewModel implements IPullView {
 
     protected abstract void loadData();
 
-    private void startRefresh() {
-        loader.setLoadStatus(LoadStatus.REFRESH);
-    }
-
     @Override
-    public void finishRefresh() {
-        loader.setLoadStatus(LoadStatus.NORMAL);
-    }
-
-    @Override
-    public void loadComplete(PageStatus status) {
+    public void changePageStatus(PageStatus status) {
         loader.setPageStatus(status);
     }
 
+    @Override
+    public void changeLoadStatus(LoadStatus status) {
+        loader.setLoadStatus(status);
+    }
 }

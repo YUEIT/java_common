@@ -1,34 +1,23 @@
 package cn.yue.base.test;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.haibin.calendarview.CalendarView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.common.utils.event.RxBus;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.mvp.components.BaseHintFragment;
 import cn.yue.base.middle.router.FRouter;
-import cn.yue.base.test.component.TestDialogFragment;
-import cn.yue.base.test.data.TextEvent;
-import io.reactivex.functions.Consumer;
 
 /**
  * Description :

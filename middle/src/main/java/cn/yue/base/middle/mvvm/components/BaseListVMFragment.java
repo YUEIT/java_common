@@ -1,9 +1,6 @@
 package cn.yue.base.middle.mvvm.components;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -17,10 +14,9 @@ import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.components.BaseFooter;
-import cn.yue.base.middle.components.load.LoadStatus;
-import cn.yue.base.middle.components.load.PageStatus;
-import cn.yue.base.middle.mvp.IStatusView;
+import cn.yue.base.middle.view.BaseFooter;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvvm.ListViewModel;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.PageStateView;
@@ -30,7 +26,7 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends BaseVMFragment<VM> implements IStatusView {
+public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends BaseVMFragment<VM> {
 
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
@@ -105,6 +101,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
             @Override
             public void onChanged(PageStatus pageStatus) {
                 showStatusView(pageStatus);
+                refreshL.finishRefreshing();
             }
         });
         viewModel.loader.observeLoad(this, new Observer<LoadStatus>() {
@@ -162,8 +159,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
         return footer;
     }
 
-    @Override
-    public void showStatusView(PageStatus status) {
+    private void showStatusView(PageStatus status) {
         if (stateView != null) {
             if (viewModel.loader.isFirstLoad()) {
                 stateView.show(status);

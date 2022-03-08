@@ -1,4 +1,4 @@
-package cn.yue.base.middle.components;
+package cn.yue.base.middle.view;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,9 +8,7 @@ import android.widget.RelativeLayout;
 
 import cn.yue.base.common.widget.dialog.AppProgressBar;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.components.load.LoadStatus;
-
-import static cn.yue.base.middle.components.load.LoadStatus.*;
+import cn.yue.base.middle.view.load.LoadStatus;
 
 /**
  * Description :
@@ -35,7 +33,7 @@ public class BaseFooter extends RelativeLayout {
         errorLL.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (loadStatus == NO_NET && onReloadListener != null) {
+                if (loadStatus == LoadStatus.NO_NET && onReloadListener != null) {
                     onReloadListener.onReload();
                 }
             }

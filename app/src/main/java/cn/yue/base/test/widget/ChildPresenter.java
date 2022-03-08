@@ -1,21 +1,23 @@
-package cn.yue.base.test.component;
-
-import android.app.Application;
-
-import androidx.annotation.NonNull;
+package cn.yue.base.test.widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.yue.base.middle.mvvm.PageViewModel;
+import cn.yue.base.middle.mvp.IListPresenter;
+import cn.yue.base.middle.mvp.IListView;
 import cn.yue.base.middle.net.wrapper.BaseListBean;
 import cn.yue.base.test.data.TestItemBean;
 import io.reactivex.Single;
 
-public class TestPageViewModel extends PageViewModel<TestItemBean> {
+/**
+ * Description :
+ * Created by yue on 2022/3/8
+ */
 
-    public TestPageViewModel(@NonNull Application application) {
-        super(application);
+public class ChildPresenter extends IListPresenter<BaseListBean<TestItemBean>, TestItemBean> {
+
+    public ChildPresenter(IListView<TestItemBean> iView) {
+        super(iView);
     }
 
     @Override

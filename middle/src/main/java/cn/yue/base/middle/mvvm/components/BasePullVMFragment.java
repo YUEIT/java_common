@@ -2,7 +2,6 @@ package cn.yue.base.middle.mvvm.components;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewStub;
 
 import androidx.lifecycle.Observer;
@@ -10,9 +9,8 @@ import androidx.lifecycle.Observer;
 import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.components.load.LoadStatus;
-import cn.yue.base.middle.components.load.PageStatus;
-import cn.yue.base.middle.mvp.IStatusView;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvvm.PullViewModel;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.PageStateView;
@@ -22,7 +20,7 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  * Description :
  * Created by yue on 2019/3/7
  */
-public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseVMFragment<VM> implements IStatusView {
+public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseVMFragment<VM> {
 
     protected IRefreshLayout refreshL;
     protected PageStateView stateView;
@@ -101,8 +99,7 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
         return true;
     }
 
-    @Override
-    public void showStatusView(PageStatus status) {
+    private void showStatusView(PageStatus status) {
         if (stateView != null) {
             if (viewModel.loader.isFirstLoad()) {
                 stateView.show(status);

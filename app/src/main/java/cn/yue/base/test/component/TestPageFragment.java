@@ -1,26 +1,12 @@
 package cn.yue.base.test.component;
 
-import android.os.Bundle;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.alibaba.android.arouter.facade.annotation.Route;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.components.BaseListFragment;
-import cn.yue.base.middle.net.wrapper.BaseListBean;
+import cn.yue.base.middle.mvp.components.BaseListFragment;
 import cn.yue.base.test.R;
 import cn.yue.base.test.data.TestItemBean;
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 
 /**
  * Description :
@@ -28,7 +14,7 @@ import io.reactivex.SingleOnSubscribe;
  */
 
 @Route(path = "/app/testPullList")
-public class TestPageFragment extends BaseListFragment<BaseListBean<TestItemBean>, TestItemBean> {
+public class TestPageFragment extends BaseListFragment<TestItemBean> {
 
     @Override
     protected int getLayoutId() {
@@ -36,32 +22,25 @@ public class TestPageFragment extends BaseListFragment<BaseListBean<TestItemBean
     }
 
     @Override
-    protected int getItemLayoutId(int viewType) {
-        return R.layout.item_test;
-    }
-
-    @Override
-    protected void bindItemData(CommonViewHolder<TestItemBean> holder, int position, TestItemBean testItemBean) {
-        holder.setText(R.id.testTV, testItemBean.getName());
-    }
-
-    @Override
-    protected void doLoadData(String nt) {
-        Single.create(new SingleOnSubscribe<BaseListBean<TestItemBean>>() {
+    protected CommonAdapter<TestItemBean> initAdapter() {
+        return new CommonAdapter<TestItemBean>(mActivity) {
             @Override
-            public void subscribe(@NonNull SingleEmitter<BaseListBean<TestItemBean>> emitter) throws Exception {
-                BaseListBean listBean = new BaseListBean();
-                List<TestItemBean> list = new ArrayList<>();
-                for (int i=0; i < 20; i++) {
-                    TestItemBean testItemBean = new TestItemBean();
-                    testItemBean.setName("this is " + i);
-                    list.add(testItemBean);
-                }
-                listBean.setList(list);
-                emitter.onSuccess(listBean);
+            public int getLayoutIdByType(int viewType) {
+                return R.layout.item_test;
             }
-        }).compose(new PageTransformer())
-                .subscribe();
+
+            @Override
+            public void bindData(CommonViewHolder<TestItemBean> holder, int position, TestItemBean testItemBean) {
+                holder.setText(R.id.testTV, testItemBean.getName());
+            }
+        };
+    }
+
+    private final TestPagePresenter testPagePresenter = new TestPagePresenter(this);
+
+    @Override
+    protected void loadData(boolean isRefresh) {
+        testPagePresenter.loadData(isRefresh);
     }
 
 }

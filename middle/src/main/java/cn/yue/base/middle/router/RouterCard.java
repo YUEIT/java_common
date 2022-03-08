@@ -1,7 +1,5 @@
 package cn.yue.base.middle.router;
 
-import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -414,21 +412,21 @@ public class RouterCard implements INavigation, Parcelable{
     }
 
     @Override
-    public void navigation(@NonNull Context context) {
+    public void navigation(@NonNull Object context) {
         if (navigation != null) {
             navigation.navigation(context);
         }
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode) {
+    public void navigation(@NonNull Object context, int requestCode) {
         if (navigation != null) {
             navigation.navigation(context, requestCode);
         }
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode, String toActivity) {
+    public void navigation(@NonNull Object context, int requestCode, String toActivity) {
         if (navigation != null) {
             navigation.navigation(context, requestCode, toActivity);
         }

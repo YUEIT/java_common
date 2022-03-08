@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
-import cn.yue.base.middle.components.BasePullFragment;
+import cn.yue.base.middle.mvp.components.BasePullFragment;
 import cn.yue.base.middle.net.observer.BasePullObserver;
 import cn.yue.base.test.R;
 import io.reactivex.Single;

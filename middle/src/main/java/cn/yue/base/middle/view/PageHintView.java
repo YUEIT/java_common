@@ -4,15 +4,12 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.LayoutRes;
 import androidx.core.widget.NestedScrollView;
 
-import cn.yue.base.common.image.ImageLoader;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.components.load.PageStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.router.FRouter;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 

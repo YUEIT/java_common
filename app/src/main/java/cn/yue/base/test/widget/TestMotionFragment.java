@@ -6,7 +6,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import cn.yue.base.middle.components.BaseHintFragment;
+import cn.yue.base.middle.mvp.components.BaseHintFragment;
 import cn.yue.base.test.R;
 
 @Route(path = "/app/testMotion")

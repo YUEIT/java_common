@@ -45,21 +45,21 @@ public class PlatformRouter implements INavigation {
     }
 
     @Override
-    public void navigation(@NonNull Context context) {
+    public void navigation(@NonNull Object context) {
         if (navigation != null) {
             navigation.navigation(context);
         }
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode) {
+    public void navigation(@NonNull Object context, int requestCode) {
         if (navigation != null) {
             navigation.navigation(context, requestCode);
         }
     }
 
     @Override
-    public void navigation(@NonNull Context context, int requestCode, String toActivity) {
+    public void navigation(@NonNull Object context, int requestCode, String toActivity) {
         if (navigation != null) {
             navigation.navigation(context, requestCode, toActivity);
         }
