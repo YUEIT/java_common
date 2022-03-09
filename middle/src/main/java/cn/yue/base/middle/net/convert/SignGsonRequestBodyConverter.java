@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.yue.base.common.utils.constant.EncryptUtils;
-import cn.yue.base.common.utils.debug.LogUtils;
 import cn.yue.base.middle.init.InitConstant;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -47,7 +46,6 @@ final class SignGsonRequestBodyConverter<T> implements Converter<T, RequestBody>
   //body 里的内容直接修改为统一的参数；并且拦截器会判断直接使用该requestBody
   @Override
   public RequestBody convert(T value) throws IOException {
-    LogUtils.i("okhttp", "  origin :  " + value);
     String encodeData = gson.toJson(value);
     return RequestBody.create(MEDIA_TYPE, gson.toJson(getBody(encodeData)));
   }

@@ -15,6 +15,8 @@ import java.util.TreeMap;
 
 import cn.yue.base.common.utils.constant.EncryptUtils;
 import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.variable.ResourceUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.init.InitConstant;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
@@ -110,8 +112,8 @@ public class SignInterceptor implements Interceptor {
             //获取传入的全部参数
             if (!original.url().queryParameterNames().isEmpty()) {
                 for (String key : original.url().queryParameterNames()) {
-                    //URL后面的参数，暂时没想到如何识别list；比较挫的方式参数前加上"LIST_"用来区分；
-                    if(key.startsWith("LIST_")){
+                    //URL后面的参数，以[]的方式用来区分数组；
+                    if(key.endsWith("[]")){
                         //含有list的情况;
                         List<Object> list = new ArrayList<>();
                         for (String value : original.url().queryParameterValues(key)) {
@@ -123,10 +125,10 @@ public class SignInterceptor implements Interceptor {
                                 list.add(value);
                             }
                         }
-                        map.put(key.replace("LIST_", ""), list);
+                        map.put(key.replace("[]", ""), list);
                     }else{
                         if (original.url().queryParameterValues(key).size() > 1) {
-                            throw new ResultException(NetworkConfig.ERROR_OPERATION, "请求的数据类型为list，且参数名未以LIST_开始~");
+                            throw new ResultException(NetworkConfig.ERROR_OPERATION, ResourceUtils.getString(R.string.app_request_list_params_error));
                         }
                         String value = original.url().queryParameterValues(key).get(0);
                         try {

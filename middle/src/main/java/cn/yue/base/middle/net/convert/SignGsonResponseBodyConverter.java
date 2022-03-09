@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.variable.ResourceUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.wrapper.BaseBean;
@@ -31,7 +32,6 @@ class SignGsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
     @Override
     public T convert(ResponseBody value) throws IOException {
         String response = value.string();
-        LogUtils.i("server response: " + response);
         Type BaseBeanTtype = $Gson$Types.newParameterizedTypeWithOwner(null, BaseBean.class, type);
         BaseBean result = gson.fromJson(response, BaseBeanTtype);
         if (NetworkConfig.SUCCESS_FLAG.equals(result.getRealCode())) {
@@ -43,10 +43,10 @@ class SignGsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
             if (type != Object.class) {
                 //空数据返回异常
                 if (data == null) {
-                    throw new ResultException(NetworkConfig.ERROR_NO_DATA, "服务器返回数据为空");
+                    throw new ResultException(NetworkConfig.ERROR_NO_DATA, ResourceUtils.getString(R.string.app_server_response_empty));
                 }
                 if (data instanceof List && ((List) data).isEmpty()) {
-                    throw new ResultException(NetworkConfig.ERROR_NO_DATA, "服务器返回数据为空");
+                    throw new ResultException(NetworkConfig.ERROR_NO_DATA, ResourceUtils.getString(R.string.app_server_response_empty));
                 }
             } else if (null == data) {
                 //Rxjava sucess complete 都不能传空数据 所以....
@@ -56,10 +56,8 @@ class SignGsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
         } else if (null == result.getRealCode()) {
             //不是BaseBean结构
             T json = gson.fromJson(response, type);
-            LogUtils.d("no code : " + json);
             return json;
         } else {
-            LogUtils.d("error " + result.getRealCode() + " , " + result.getRealMessage());
             throw new ResultException(result.getRealCode(), result.getRealMessage());
         }
 
