@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseFragment;
@@ -32,7 +30,7 @@ import cn.yue.base.common.photo.data.MimeType;
 import cn.yue.base.common.photo.perview.ViewMediaActivity;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
 import cn.yue.base.common.utils.code.ThreadUtils;
-import cn.yue.base.common.utils.debug.LogUtils;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.utils.variable.TimeUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
@@ -99,7 +97,9 @@ public class SelectPhotoFragment extends BaseFragment {
                             }
                             checkIV.setSelected(!checkIV.isSelected());
                             addSelectList(mediaVO, checkIV.isSelected());
-                            topBar.setRightTextStr(getSelectList().isEmpty()? "取消" : "确定（" + getSelectList().size() + "/" + getMaxNum() +  "）");
+                            topBar.setRightTextStr(getSelectList().isEmpty() ? ResourceUtils.getString(R.string.app_cancel) :
+                                    ResourceUtils.getString(R.string.app_confirm) + "（" + getSelectList().size() + "/" + getMaxNum() +  "）"
+                            );
                         }
                     }
                 });

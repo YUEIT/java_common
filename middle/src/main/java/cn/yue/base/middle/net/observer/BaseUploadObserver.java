@@ -3,6 +3,8 @@ package cn.yue.base.middle.net.observer;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
+import cn.yue.base.common.utils.variable.ResourceUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.upload.ImageResult;
@@ -38,7 +40,7 @@ public abstract class BaseUploadObserver extends DisposableSingleObserver<ImageR
     @Override
     public void onSuccess(ImageResultListData imageResultListData) {
         if (imageResultListData == null || imageResultListData.getData() == null || imageResultListData.getData().isEmpty()) {
-            onException(new ResultException(NetworkConfig.ERROR_SERVER, "上传失败"));
+            onException(new ResultException(NetworkConfig.ERROR_SERVER, ResourceUtils.getString(R.string.app_upload_fail)));
             return;
         }
         onSuccess(imageResultListData.getData());

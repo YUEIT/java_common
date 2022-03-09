@@ -2,6 +2,8 @@ package cn.yue.base.middle.net.intercept;
 
 import java.io.IOException;
 
+import cn.yue.base.common.utils.variable.ResourceUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import okhttp3.Interceptor;
@@ -20,7 +22,7 @@ public class ResponseInterceptor implements Interceptor{
         Response proceed = chain.proceed(request);
         int code = proceed.code();
         if (code != 200 && code != 404) {
-            throw new ResultException(NetworkConfig.ERROR_NO_NET, "网络不给力，请检查您的网络设置~");
+            throw new ResultException(NetworkConfig.ERROR_NO_NET, ResourceUtils.getString(R.string.app_no_net));
         }
         return proceed;
     }

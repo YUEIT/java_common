@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.yue.base.common.R;
 import cn.yue.base.common.activity.BaseActivity;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.activity.PermissionCallBack;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 
 /**
  * Description : 运行时权限工具
@@ -129,11 +131,11 @@ public class RunTimePermissionUtil {
 
     public static String getPermissionName(String permission) {
         if (permissionMap.isEmpty()) {
-            permissionMap.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, "写入存储空间");
-            permissionMap.put(Manifest.permission.READ_EXTERNAL_STORAGE, "读取存储空间");
-            permissionMap.put(Manifest.permission.READ_PHONE_STATE, "手机识别码");
-            permissionMap.put(Manifest.permission.CAMERA, "相机拍照");
-            permissionMap.put(Manifest.permission.ACCESS_FINE_LOCATION, "定位");
+            permissionMap.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, ResourceUtils.getString(R.string.app_permission_write_external_storage));
+            permissionMap.put(Manifest.permission.READ_EXTERNAL_STORAGE, ResourceUtils.getString(R.string.app_permission_read_external_storage));
+            permissionMap.put(Manifest.permission.READ_PHONE_STATE, ResourceUtils.getString(R.string.app_permission_read_phone_state));
+            permissionMap.put(Manifest.permission.CAMERA, ResourceUtils.getString(R.string.app_permission_camera));
+            permissionMap.put(Manifest.permission.ACCESS_FINE_LOCATION, ResourceUtils.getString(R.string.app_permission_access_fine_location));
         }
         String permissionName = permissionMap.get(permission);
         if (!TextUtils.isEmpty(permissionName)) {
@@ -142,5 +144,5 @@ public class RunTimePermissionUtil {
         return "";
     }
 
-    private static HashMap<String, String> permissionMap = new HashMap<>();
+    private static final HashMap<String, String> permissionMap = new HashMap<>();
 }

@@ -31,7 +31,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
     private IRefreshLayout refreshL;
-    protected PageStateView stateView;
+    private PageStateView stateView;
 
     @Override
     protected int getLayoutId() {
@@ -49,7 +49,7 @@ public abstract class BaseListVMFragment<VM extends ListViewModel, S> extends Ba
                         viewModel.refresh();
                     }
                 } else {
-                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort(R.string.app_no_net);
                 }
             }
         });

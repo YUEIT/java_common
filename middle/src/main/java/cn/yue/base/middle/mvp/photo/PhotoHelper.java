@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -19,7 +18,9 @@ import cn.yue.base.common.Constant;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.activity.PermissionCallBack;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseUploadObserver;
 import cn.yue.base.middle.net.upload.ImageResult;
@@ -138,7 +139,7 @@ public class PhotoHelper {
             cachePhotoPath = tempFile.getAbsolutePath();
             outPutUri = Uri.fromFile(tempFile);
         } else {
-            ToastUtils.showShort("没有裁剪的图片~");
+            ToastUtils.showShort(ResourceUtils.getString(R.string.app_no_crop_picture));
             return;
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -183,19 +184,19 @@ public class PhotoHelper {
             @Override
             protected void onStart() {
                 super.onStart();
-                iPhotoView.showWaitDialog(noHintText ? "" : "上传中~");
+                iPhotoView.showWaitDialog(noHintText ? "" : ResourceUtils.getString(R.string.app_upload_loading));
             }
 
             @Override
             public void onException(ResultException e) {
                 iPhotoView.dismissWaitDialog();
-                ToastUtils.showShort("上传失败：" + e.getMessage());
+                ToastUtils.showShort(ResourceUtils.getString(R.string.app_upload_fail) +"：" + e.getMessage());
             }
 
             @Override
             public void onSuccess(List<ImageResult> imageList) {
                 iPhotoView.dismissWaitDialog();
-                ToastUtils.showShort("上传成功~");
+                ToastUtils.showShort(ResourceUtils.getString(R.string.app_upload_success));
                 List<String> serverList = new ArrayList<>();
                 for (ImageResult imageResult : imageList) {
                     serverList.add(imageResult.getUrl());

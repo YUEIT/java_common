@@ -1,12 +1,17 @@
 package cn.yue.base.common.activity;
 
+import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_BOTTOM;
+import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_CENTER;
+import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_LEFT;
+import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_RIGHT;
+import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_TOP;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,18 +28,11 @@ import androidx.lifecycle.Lifecycle;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.UUID;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.widget.dialog.WaitDialog;
-
-import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_BOTTOM;
-import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_CENTER;
-import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_LEFT;
-import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_RIGHT;
-import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_TOP;
 
 /**
  * Description :
@@ -51,9 +49,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (!(context instanceof BaseFragmentActivity)) {
-            throw new RuntimeException("BaseFragment必须与BaseFragmentActivity配合使用");
-        }
         mActivity = (BaseFragmentActivity) context;
         mFragmentManager = getChildFragmentManager();
     }

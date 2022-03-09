@@ -20,7 +20,6 @@ import androidx.lifecycle.Lifecycle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.UUID;
 
 import cn.yue.base.common.R;
 import cn.yue.base.common.activity.rx.ILifecycleProvider;
@@ -44,9 +43,6 @@ public abstract class BaseFragment extends Fragment implements View.OnTouchListe
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (!(context instanceof BaseFragmentActivity)) {
-            throw new RuntimeException("BaseFragment必须与BaseActivity配合使用");
-        }
         mActivity = (BaseFragmentActivity) context;
         mFragmentManager = getChildFragmentManager();
     }

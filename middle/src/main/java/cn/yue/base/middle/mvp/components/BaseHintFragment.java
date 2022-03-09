@@ -27,8 +27,8 @@ import cn.yue.base.middle.view.load.PageStatus;
  */
 public abstract class BaseHintFragment extends BaseFragment implements IBaseView , IPhotoView{
 
-    protected Loader loader = new Loader();
-    protected PageStateView stateView;
+    private final Loader loader = new Loader();
+    private PageStateView stateView;
     private PhotoHelper photoHelper;
 
     @Override
@@ -44,9 +44,9 @@ public abstract class BaseHintFragment extends BaseFragment implements IBaseView
             @Override
             public void onReload() {
                 if (NetworkUtils.isConnected()) {
-                    showStatusView(loader.setPageStatus(PageStatus.NORMAL));
+                    changePageStatus(PageStatus.NORMAL);
                 } else {
-                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort(R.string.app_no_net);
                 }
             }
         });

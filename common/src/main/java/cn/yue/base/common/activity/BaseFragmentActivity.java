@@ -30,6 +30,7 @@ import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.dialog.HintDialog;
@@ -174,7 +175,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 
     public BaseFragment getCurrentFragment() {
         Fragment fragment = fragmentManager.findFragmentById(R.id.content);
-        if (fragment != null && fragment instanceof BaseFragment) {
+        if (fragment instanceof BaseFragment) {
             return (BaseFragment) fragment;
         }
         return null;
@@ -240,11 +241,9 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         }
         if (fragmentManager != null) {
             List<Fragment> fragments = fragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
-                        ((BaseFragment) fragment).onNewIntent(intent.getExtras());
-                    }
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
+                    ((BaseFragment) fragment).onNewIntent(intent.getExtras());
                 }
             }
         }
@@ -255,11 +254,9 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (fragmentManager != null) {
             List<Fragment> fragments = fragmentManager.getFragments();
-            if (fragments != null && fragments.size() > 0) {
-                for (Fragment fragment : fragments) {
-                    if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
-                        ((BaseFragment) fragment).onActivityResult(requestCode, resultCode, data);
-                    }
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isAdded() && fragment instanceof BaseFragment && fragment.isVisible()) {
+                    ((BaseFragment) fragment).onActivityResult(requestCode, resultCode, data);
                 }
             }
         }
@@ -284,10 +281,10 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     public void showFailDialog() {
         if (failDialog == null) {
             failDialog = new HintDialog.Builder(this)
-                    .setTitleStr("消息")
-                    .setContentStr("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
-                    .setLeftClickStr("取消")
-                    .setRightClickStr("确定")
+                    .setTitleStr(ResourceUtils.getString(R.string.app_message))
+                    .setContentStr(ResourceUtils.getString(R.string.app_permission_no_granted_and_to_request))
+                    .setLeftClickStr(ResourceUtils.getString(R.string.app_cancel))
+                    .setRightClickStr(ResourceUtils.getString(R.string.app_confirm))
                     .setOnRightClickListener(new HintDialog.OnRightClickListener() {
                         @Override
                         public void onRightClick() {
@@ -308,7 +305,8 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
-                        ToastUtils.showShort("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
+                        ToastUtils.showShort(String.format(ResourceUtils.getString(R.string.app_permission_request_fail),
+                                RunTimePermissionUtil.getPermissionName(permissions[i])));
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }

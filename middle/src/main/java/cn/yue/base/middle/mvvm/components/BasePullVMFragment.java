@@ -22,8 +22,8 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  */
 public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseVMFragment<VM> {
 
-    protected IRefreshLayout refreshL;
-    protected PageStateView stateView;
+    private IRefreshLayout refreshL;
+    private PageStateView stateView;
 
     @Override
     protected int getLayoutId() {
@@ -39,7 +39,7 @@ public abstract class BasePullVMFragment<VM extends PullViewModel> extends BaseV
                 if (NetworkUtils.isConnected()) {
                     viewModel.refresh();
                 } else {
-                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort(R.string.app_no_net);
                 }
             }
         });

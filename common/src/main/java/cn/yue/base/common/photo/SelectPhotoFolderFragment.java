@@ -19,6 +19,7 @@ import cn.yue.base.common.photo.data.MediaFolderVO;
 import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MediaVO;
 import cn.yue.base.common.utils.code.ThreadUtils;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.widget.TopBar;
 import cn.yue.base.common.widget.recyclerview.CommonAdapter;
 import cn.yue.base.common.widget.recyclerview.CommonViewHolder;
@@ -79,7 +80,7 @@ public class SelectPhotoFolderFragment extends BaseFragment {
                     lastMediaFolderVO.setId("");
                     lastMediaFolderVO.setCoverUri(lastPhotos.get(0).getUri());
                     lastMediaFolderVO.setCount(lastPhotos.size());
-                    lastMediaFolderVO.setName("最近照片");
+                    lastMediaFolderVO.setName(ResourceUtils.getString(R.string.app_photos_folder_nearly));
                     allFolder.add(0, lastMediaFolderVO);
                 }
                 handler.sendMessage(Message.obtain(handler, 101, allFolder));

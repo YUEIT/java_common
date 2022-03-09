@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Window;
@@ -14,10 +13,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 
+import cn.yue.base.common.R;
 import cn.yue.base.common.activity.rx.ILifecycleProvider;
 import cn.yue.base.common.activity.rx.RxLifecycleProvider;
 import cn.yue.base.common.utils.app.BarUtils;
 import cn.yue.base.common.utils.app.RunTimePermissionUtil;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.dialog.HintDialog;
 
@@ -101,10 +102,10 @@ public abstract class BaseActivity extends FragmentActivity {
     public void showFailDialog() {
         if (failDialog == null) {
             failDialog = new HintDialog.Builder(this)
-                    .setTitleStr("消息")
-                    .setContentStr("当前应用无此权限，该功能暂时无法使用。如若需要，请单击确定按钮进行权限授权！")
-                    .setLeftClickStr("取消")
-                    .setRightClickStr("确定")
+                    .setTitleStr(ResourceUtils.getString(R.string.app_message))
+                    .setContentStr(ResourceUtils.getString(R.string.app_permission_no_granted_and_to_request))
+                    .setLeftClickStr(ResourceUtils.getString(R.string.app_cancel))
+                    .setRightClickStr(ResourceUtils.getString(R.string.app_confirm))
                     .setOnRightClickListener(new HintDialog.OnRightClickListener() {
                         @Override
                         public void onRightClick() {
@@ -125,7 +126,8 @@ public abstract class BaseActivity extends FragmentActivity {
                     if (verificationPermissions(grantResults)) {
                         permissionCallBack.requestSuccess(permissions[i]);
                     } else {
-                        ToastUtils.showShort("获取" + RunTimePermissionUtil.getPermissionName(permissions[i]) + "权限失败~");
+                        ToastUtils.showShort(String.format(ResourceUtils.getString(R.string.app_permission_request_fail),
+                                RunTimePermissionUtil.getPermissionName(permissions[i])));
                         permissionCallBack.requestFailed(permissions[i]);
                     }
                 }

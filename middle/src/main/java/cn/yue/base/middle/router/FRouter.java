@@ -21,6 +21,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.utils.view.ToastUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.activity.CommonActivity;
 import cn.yue.base.middle.mvvm.BaseViewModel;
 import cn.yue.base.middle.mvvm.data.RouterModel;
@@ -152,7 +153,7 @@ public class FRouter implements INavigation, Parcelable {
         } else if (getRouteType() == RouteType.FRAGMENT) {
             jumpToFragment(realContext, toActivity, requestCode);
         } else {
-            ToastUtils.showShort("找不到页面~");
+            ToastUtils.showShort(R.string.app_find_not_page);
         }
     }
     

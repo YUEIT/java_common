@@ -2,15 +2,16 @@ package cn.yue.base.common.utils.variable;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.RawRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.RawRes;
-import androidx.core.content.ContextCompat;
 
 import cn.yue.base.common.utils.Utils;
 import cn.yue.base.common.utils.UtilsBridge;
@@ -29,6 +30,10 @@ public final class ResourceUtils {
 
     private ResourceUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
+    public static String getString(@StringRes int id) {
+        return Utils.getApp().getString(id);
     }
 
     /**

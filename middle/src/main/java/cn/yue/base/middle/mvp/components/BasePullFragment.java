@@ -12,14 +12,14 @@ import cn.yue.base.common.utils.device.NetworkUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
 import cn.yue.base.common.widget.dialog.WaitDialog;
 import cn.yue.base.middle.R;
-import cn.yue.base.middle.view.load.LoadStatus;
-import cn.yue.base.middle.mvp.components.data.Loader;
-import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvp.IBaseView;
+import cn.yue.base.middle.mvp.components.data.Loader;
 import cn.yue.base.middle.mvp.photo.IPhotoView;
 import cn.yue.base.middle.mvp.photo.PhotoHelper;
 import cn.yue.base.middle.view.PageHintView;
 import cn.yue.base.middle.view.PageStateView;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
@@ -28,7 +28,7 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  */
 public abstract class BasePullFragment extends BaseFragment implements IBaseView, IPhotoView {
 
-    protected Loader loader = new Loader();
+    private final Loader loader = new Loader();
     private IRefreshLayout refreshL;
     private PageStateView stateView;
     private PhotoHelper photoHelper;
@@ -47,7 +47,7 @@ public abstract class BasePullFragment extends BaseFragment implements IBaseView
                 if (NetworkUtils.isConnected()) {
                     refresh();
                 } else {
-                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort(R.string.app_no_net);
                 }
             }
         });

@@ -1,6 +1,8 @@
 package cn.yue.base.middle.view;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +12,6 @@ import androidx.core.widget.NestedScrollView;
 
 import cn.yue.base.middle.R;
 import cn.yue.base.middle.view.load.PageStatus;
-import cn.yue.base.middle.router.FRouter;
 import cn.yue.base.middle.view.refresh.IRefreshLayout;
 
 /**
@@ -61,10 +62,9 @@ public class PageHintView extends NestedScrollView {
         noNetView.findViewById(R.id.checkNetTV).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                FRouter.getInstance().build("/middle/noNet").navigation(context);
+                context.startActivity(new Intent(Settings.ACTION_SETTINGS));
             }
         });
-
         serverErrorView.findViewById(R.id.reloadTV).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,11 +73,10 @@ public class PageHintView extends NestedScrollView {
                 }
             }
         });
-
         serverErrorView.findViewById(R.id.checkNetTV).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                FRouter.getInstance().build("/middle/noNet").navigation(context);
+                context.startActivity(new Intent(Settings.ACTION_SETTINGS));
             }
         });
     }

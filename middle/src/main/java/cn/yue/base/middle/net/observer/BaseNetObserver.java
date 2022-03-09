@@ -2,7 +2,9 @@ package cn.yue.base.middle.net.observer;
 
 import java.util.concurrent.CancellationException;
 
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.utils.view.ToastUtils;
+import cn.yue.base.middle.R;
 import cn.yue.base.middle.module.IAppModule;
 import cn.yue.base.middle.module.manager.ModuleManager;
 import cn.yue.base.middle.net.NetworkConfig;
@@ -33,7 +35,7 @@ public abstract class BaseNetObserver<T> extends DisposableSingleObserver<T> {
             }
             onException(resultException);
         } else if (e instanceof CancellationException) {
-            onCancel(new ResultException(NetworkConfig.ERROR_CANCEL, "请求取消~"));
+            onCancel(new ResultException(NetworkConfig.ERROR_CANCEL, ResourceUtils.getString(R.string.app_request_cancel)));
         } else {
             onException(new ResultException(NetworkConfig.ERROR_OPERATION, e.getMessage()));
         }
@@ -45,7 +47,7 @@ public abstract class BaseNetObserver<T> extends DisposableSingleObserver<T> {
 
     private void onLoginInvalid() {
         IAppModule iAppModule = ModuleManager.getModuleService(IAppModule.class);
-        ToastUtils.showShort("登录失效~");
+        ToastUtils.showShort(R.string.app_login_fail);
         iAppModule.loginInvalid();
     }
 }

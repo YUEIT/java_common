@@ -28,6 +28,7 @@ import cn.yue.base.common.activity.BaseFragment;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.photo.data.MediaVO;
+import cn.yue.base.common.utils.variable.ResourceUtils;
 import cn.yue.base.common.widget.viewpager.PagerSlidingTabStrip;
 
 /**
@@ -87,7 +88,9 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                         finish();
                     }
                 })
-                .setRightTextStr(photoList.isEmpty()? "取消" : "确定(" + photoList.size() + "/" + maxNum + ")")
+                .setRightTextStr(photoList.isEmpty() ? ResourceUtils.getString(R.string.app_cancel) :
+                        ResourceUtils.getString(R.string.app_confirm) + "(" + photoList.size() + "/" + maxNum + ")"
+                )
                 .setRightClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -122,9 +125,9 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
             @Override
             public CharSequence getPageTitle(int position) {
                 if (position == 0) {
-                    return "相册选择";
+                    return ResourceUtils.getString(R.string.app_photos_folder_select);
                 } else {
-                    return "最近照片";
+                    return ResourceUtils.getString(R.string.app_photos_folder_nearly);
                 }
             }
         };
@@ -209,7 +212,7 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                             finish();
                         }
                     })
-                    .setRightTextStr("取消")
+                    .setRightTextStr(ResourceUtils.getString(R.string.app_cancel))
                     .setRightClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -221,7 +224,8 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                     .setCenterClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            changeFragment(SelectPhotoFolderFragment.class.getName(), "相册选择");
+                            changeFragment(SelectPhotoFolderFragment.class.getName(),
+                                    ResourceUtils.getString(R.string.app_photos_folder_select));
                         }
                     })
                     .setLeftImage(R.drawable.app_icon_back)
@@ -231,7 +235,9 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                             finish();
                         }
                     })
-                    .setRightTextStr(photoList.isEmpty()? "取消" : "确定（" + photoList.size() + "/" + maxNum + "）")
+                    .setRightTextStr(photoList.isEmpty()? ResourceUtils.getString(R.string.app_cancel) :
+                            ResourceUtils.getString(R.string.app_confirm) + "（" + photoList.size() + "/" + maxNum + "）"
+                    )
                     .setRightClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

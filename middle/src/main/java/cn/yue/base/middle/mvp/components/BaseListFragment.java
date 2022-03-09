@@ -33,11 +33,11 @@ import cn.yue.base.middle.view.refresh.IRefreshLayout;
  */
 public abstract class BaseListFragment<S> extends BaseFragment implements IListView<S>, IPhotoView {
 
+    private final Loader loader = new Loader();
     private CommonAdapter<S> adapter;
     private BaseFooter footer;
-    private final Loader loader = new Loader();
     private IRefreshLayout refreshL;
-    protected PageStateView stateView;
+    private PageStateView stateView;
     private PhotoHelper photoHelper;
 
     @Override
@@ -56,7 +56,7 @@ public abstract class BaseListFragment<S> extends BaseFragment implements IListV
                         refresh();
                     }
                 } else {
-                    ToastUtils.showShort("网络不给力，请检查您的网络设置~");
+                    ToastUtils.showShort(R.string.app_no_net);
                 }
             }
 
