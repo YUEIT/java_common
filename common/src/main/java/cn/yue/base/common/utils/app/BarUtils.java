@@ -1,5 +1,7 @@
 package cn.yue.base.common.utils.app;
 
+import static android.Manifest.permission.EXPAND_STATUS_BAR;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -18,19 +20,18 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.lang.reflect.Method;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import java.lang.reflect.Method;
 
 import cn.yue.base.common.utils.Utils;
 import cn.yue.base.common.utils.UtilsBridge;
-
-import static android.Manifest.permission.EXPAND_STATUS_BAR;
 
 /**
  * <pre>
@@ -709,61 +710,61 @@ public final class BarUtils {
     /**
      * 设置状态栏样式
      * @param activity
-     * @param isFillUpTop   是否置顶，全屏，布局在状态栏底部
+     * @param isFullScreen   是否置顶，全屏，布局在状态栏底部
      * @param isDarkIcon    状态栏内的时间等ICON，文字颜色为暗色系
      * @param bgColor       状态栏背景色
      */
-    public static void setStyle(Activity activity, boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+    public static void setStyle(Activity activity, boolean isFullScreen, boolean isDarkIcon, int bgColor) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return;
         }
         Window window = activity.getWindow();
-        View decorView = window.getDecorView();
-        if (isFillUpTop) {
-            if (isDarkIcon) {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            }
-        } else {
-            if (isDarkIcon) {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            }
-        }
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(bgColor);
+        setStyle(window, isFullScreen, isDarkIcon, bgColor);
     }
 
     /**
      * 设置状态栏样式
-     * @param isFillUpTop   是否置顶，全屏，布局在状态栏底部
+     * @param isFullScreen   是否置顶，全屏，布局在状态栏底部
      * @param isDarkIcon    状态栏内的时间等ICON，文字颜色为暗色系
      * @param bgColor       状态栏背景色
      */
-    public static void setStyle(Window window, boolean isFillUpTop, boolean isDarkIcon, int bgColor) {
+    public static void setStyle(Window window, boolean isFullScreen, boolean isDarkIcon, int bgColor) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return;
         }
         View decorView = window.getDecorView();
-        if (isFillUpTop) {
-            if (isDarkIcon) {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            try {
+                WindowInsetsControllerCompat windowInsetsCompat = WindowCompat.getInsetsController(window, decorView);
+                windowInsetsCompat.setAppearanceLightStatusBars(isDarkIcon);
+                if (isFullScreen) {
+                    WindowCompat.setDecorFitsSystemWindows(window, false);
+                    window.setStatusBarColor(Color.TRANSPARENT);
+                } else {
+                    WindowCompat.setDecorFitsSystemWindows(window, true);
+                    window.setStatusBarColor(bgColor);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } else {
-            if (isDarkIcon) {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            if (isFullScreen) {
+                if (isDarkIcon) {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                } else {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                }
             } else {
-                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                if (isDarkIcon) {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                } else {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                }
             }
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(bgColor);
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(bgColor);
     }
 
 }

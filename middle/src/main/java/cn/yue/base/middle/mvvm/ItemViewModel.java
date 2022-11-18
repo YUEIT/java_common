@@ -7,8 +7,6 @@ import androidx.lifecycle.Lifecycle;
 
 import cn.yue.base.common.activity.rx.RxLifecycleTransformer;
 import cn.yue.base.middle.mvvm.data.RouterModel;
-import cn.yue.base.middle.router.RouterCard;
-import io.reactivex.SingleTransformer;
 
 public abstract class ItemViewModel extends BaseViewModel {
 

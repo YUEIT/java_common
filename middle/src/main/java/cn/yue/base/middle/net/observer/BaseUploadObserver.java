@@ -9,7 +9,8 @@ import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.upload.ImageResult;
 import cn.yue.base.middle.net.upload.ImageResultListData;
-import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
+
 
 /**
  * Description :

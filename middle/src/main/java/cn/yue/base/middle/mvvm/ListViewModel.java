@@ -12,18 +12,18 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import java.util.ArrayList;
 
 import cn.yue.base.common.utils.view.ToastUtils;
-import cn.yue.base.middle.view.load.LoadStatus;
-import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.mvvm.data.MutableListLiveData;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.IListModel;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleSource;
+import io.reactivex.rxjava3.core.SingleTransformer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 public abstract class ListViewModel<P extends IListModel<S>, S> extends BaseViewModel{
 

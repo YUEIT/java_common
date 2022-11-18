@@ -25,8 +25,9 @@ import cn.yue.base.middle.mvp.IWaitView;
 import cn.yue.base.middle.mvvm.data.FinishModel;
 import cn.yue.base.middle.mvvm.data.LoaderLiveData;
 import cn.yue.base.middle.mvvm.data.RouterModel;
-import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+
 
 public class BaseViewModel extends AndroidViewModel
         implements ILifecycleProvider<Event>, DefaultLifecycleObserver, IWaitView {

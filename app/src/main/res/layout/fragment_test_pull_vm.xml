@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="cn.yue.base.test.component.TestPullViewModel" />
+            type="cn.yue.test.component.TestPullViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

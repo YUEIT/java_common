@@ -7,6 +7,7 @@ import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_RIGHT;
 import static cn.yue.base.common.activity.TransitionAnimation.TRANSITION_TOP;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,12 +43,12 @@ import cn.yue.base.common.widget.dialog.WaitDialog;
 public abstract class BaseDialogFragment extends DialogFragment {
 
     private ILifecycleProvider<Lifecycle.Event> lifecycleProvider;
-    protected View cacheView;
+    private View cacheView;
     protected FragmentManager mFragmentManager;
     protected BaseFragmentActivity mActivity;
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mActivity = (BaseFragmentActivity) context;
         mFragmentManager = getChildFragmentManager();
@@ -56,13 +57,14 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lifecycleProvider = initLifecycleProvider();
+        initLifecycle(new RxLifecycleProvider());
         getLifecycle().addObserver(lifecycleProvider);
         setStyle(STYLE_NO_TITLE, 0);
     }
 
-    protected ILifecycleProvider<Lifecycle.Event> initLifecycleProvider() {
-        return new RxLifecycleProvider();
+    protected void initLifecycle(ILifecycleProvider<Lifecycle.Event> provider) {
+        lifecycleProvider = provider;
+        getLifecycle().addObserver(lifecycleProvider);
     }
 
     public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
@@ -70,47 +72,22 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initEnterStyle();
-        if (!hasCache) {
-            initView(savedInstanceState);
-            initOther();
-        }
+        initView();
+        initOther();
     }
 
     protected void initOther() { }
 
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (cacheView == null || !needCache()) {//如果view没有被初始化或者不需要缓存的情况下，重新初始化控件
-            if (getLayoutId() == 0) {
-                cacheView = null;
-            } else {
-                cacheView = inflater.inflate(getLayoutId(), container, false);
-            }
-            hasCache = false;
-        } else {
-            hasCache = true;
-            ViewGroup v = (ViewGroup) cacheView.getParent();
-            if (v != null) {
-                v.removeView(cacheView);
-            }
+        if (cacheView == null ) {
+            cacheView = inflater.inflate(getLayoutId(), container, false);
         }
         return cacheView;
     }
-
-    /**
-     * true 避免当前Fragment被replace后回退回来重走onCreateView，导致重复初始化View和数据
-     */
-    protected boolean needCache() {
-        return true;
-    }
-
-    /**
-     * 是否有缓存，避免重新走initView方法
-     */
-    private boolean hasCache;
 
     /**
      * 获取布局
@@ -122,7 +99,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     /**
      * 直接findViewById()初始化组件
      */
-    protected abstract void initView(Bundle savedInstanceState);
+    protected abstract void initView();
 
     protected abstract void initEnterStyle();
 
@@ -177,37 +154,13 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
+    @NonNull
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        boolean isShow = getShowsDialog();
-        setShowsDialog(false);
-        super.onActivityCreated(savedInstanceState);
-        setShowsDialog(isShow);
-        if (getDialog() == null) {
-            return;
-        }
-        View view = getView();
-        if (view != null) {
-            if (view.getParent() != null) {
-                throw new IllegalStateException(
-                        "DialogFragment can not be attached to a container view");
-            }
-            getDialog().setContentView(view);
-        }
-        final Activity activity = getActivity();
-        if (activity != null) {
-            getDialog().setOwnerActivity(activity);
-        }
-        getDialog().setCancelable(isCancelable());
-        // 使用静态内部类取代，防止message中持有fragment的引用而造成内存泄漏
-        getDialog().setOnCancelListener(onCancelListener);
-        getDialog().setOnDismissListener(onDismissListener);
-        if (savedInstanceState != null) {
-            Bundle dialogState = savedInstanceState.getBundle("android:savedDialogState");
-            if (dialogState != null) {
-                getDialog().onRestoreInstanceState(dialogState);
-            }
-        }
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        WeakDialog dialog = new WeakDialog(requireContext(), getTheme());
+        dialog.setWeakOnCancelListener(onCancelListener);
+        dialog.setWeakOnDismissListener(onDismissListener);
+        return super.onCreateDialog(savedInstanceState);
     }
 
     @Override
@@ -218,6 +171,35 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
+    }
+
+    public static class WeakDialog extends Dialog {
+
+        public WeakDialog(@NonNull Context context, int themeResId) {
+            super(context, themeResId);
+        }
+
+        @Override
+        public void setOnCancelListener(@Nullable OnCancelListener listener) {
+            if (listener == null) {
+                super.setOnCancelListener(null);
+            }
+        }
+
+        @Override
+        public void setOnDismissListener(@Nullable OnDismissListener listener) {
+            if (listener == null) {
+                super.setOnDismissListener(null);
+            }
+        }
+
+        public void setWeakOnCancelListener(@Nullable OnCancelListener listener) {
+            super.setOnCancelListener(listener);
+        }
+
+        public void setWeakOnDismissListener(@Nullable OnDismissListener listener) {
+            super.setOnDismissListener(listener);
+        }
     }
 
     private final OnCancelListener onCancelListener = new OnCancelListener(this);

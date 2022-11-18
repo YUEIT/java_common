@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -42,7 +40,7 @@ import cn.yue.base.common.widget.dialog.HintDialog;
 
 public abstract class BaseFragmentActivity extends FragmentActivity {
 
-    private RxLifecycleProvider lifecycleProvider;
+    private ILifecycleProvider<Lifecycle.Event> lifecycleProvider;
     private TopBar topBar;
     private FrameLayout topFL;
     private FrameLayout content;
@@ -54,13 +52,13 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lifecycleProvider = new RxLifecycleProvider();
-        getLifecycle().addObserver(lifecycleProvider);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setStatusBar();
-        setContentView(getContentViewLayoutId());
+        initLifecycle(new RxLifecycleProvider());
         initView();
-        replace(getFragment(), null, false);
+    }
+
+    protected void initLifecycle(ILifecycleProvider<Lifecycle.Event> provider) {
+        lifecycleProvider = provider;
+        getLifecycle().addObserver(lifecycleProvider);
     }
 
     public ILifecycleProvider<Lifecycle.Event> getLifecycleProvider() {
@@ -71,7 +69,10 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         return R.layout.base_activity_layout;
     }
 
-    private void initView() {
+    protected void initView() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setStatusBar();
+        setContentView(getContentViewLayoutId());
         topFL = findViewById(R.id.topBar);
         topFL.addView(topBar = new TopBar(this));
         content = findViewById(R.id.content);
@@ -88,39 +89,19 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
                 resultBundle = null;
             }
         });
+        replace(getFragment(), null, false);
     }
 
     public void setStatusBar() {
-        setStatusBar(false);
+        setStatusBar(true);
     }
 
-    public void setStatusBar(boolean isFullUpTop) {
-        setStatusBar(isFullUpTop, true);
+    public void setStatusBar(boolean isDarkIcon) {
+        setStatusBar(isDarkIcon, Color.WHITE);
     }
 
-    public void setStatusBar(boolean isFullUpTop, boolean isDarkIcon) {
-        setStatusBar(isFullUpTop, isDarkIcon, Color.WHITE);
-    }
-
-    public void setStatusBar(boolean isFullUpTop, boolean isDarkIcon, int bgColor) {
+    public void setStatusBar(boolean isDarkIcon, int bgColor) {
         BarUtils.setStyle(this, true, isDarkIcon, bgColor);
-        setFullUpTopLayout(isFullUpTop);
-    }
-
-    private void setFullUpTopLayout(boolean isFullUpTop) {
-        if (topBar == null) {
-            return;
-        }
-        int subject = R.id.topBar;
-        if (isFullUpTop) {
-            subject = 0;
-            topBar.setBgColor(Color.TRANSPARENT);
-        }
-        RelativeLayout.LayoutParams topBarLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        topFL.setLayoutParams(topBarLayoutParams);
-        RelativeLayout.LayoutParams contentLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        contentLayoutParams.addRule(RelativeLayout.BELOW, subject);
-        content.setLayoutParams(contentLayoutParams);
     }
 
     public TopBar getTopBar() {
@@ -147,7 +128,9 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         content.setBackgroundColor(color);
     }
 
-    public abstract Fragment getFragment();
+    public Fragment getFragment(){
+        return null;
+    }
 
     public void recreateFragment(String fragmentName) {
         replace(getFragment(), null, false);

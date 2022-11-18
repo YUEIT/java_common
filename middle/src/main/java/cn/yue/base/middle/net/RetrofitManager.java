@@ -10,12 +10,12 @@ import cn.yue.base.middle.net.intercept.NoNetInterceptor;
 import cn.yue.base.middle.net.intercept.ParamInterceptor;
 import cn.yue.base.middle.net.intercept.ResponseInterceptor;
 import cn.yue.base.middle.net.intercept.SignInterceptor;
-import io.reactivex.functions.Consumer;
-import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -82,7 +82,7 @@ public class RetrofitManager {
         return new Retrofit.Builder()
                 .client(signBuilder.build())
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 //注册自定义的工厂类
                 .addConverterFactory(SignGsonConverterFactory.create())
                 .build();
@@ -97,7 +97,7 @@ public class RetrofitManager {
         return new Retrofit.Builder()
                 .client(builder.build())
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -112,7 +112,7 @@ public class RetrofitManager {
         return new Retrofit.Builder()
                 .client(builder.build())
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonResponseConverterFactory.create())
                 .build();
     }
@@ -126,7 +126,7 @@ public class RetrofitManager {
         return new Retrofit.Builder()
                 .client(builder.build())
                 .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonResponseConverterFactory.create())
                 .build();
     }

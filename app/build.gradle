@@ -33,6 +33,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
+    ndkVersion '20.1.5948944'
 }
 
 //1.0.0 = 10000; 1.1.0 = 10100 分割"."，每项固定显示长度为2
@@ -56,10 +62,6 @@ def appVersionCode(String appVersionName) {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation rootProject.ext.androidx["junit"]
-    androidTestImplementation rootProject.ext.androidx["junit-test"]
-    androidTestImplementation rootProject.ext.androidx["espresso-test"]
-
     implementation rootProject.ext.androidx["appcompat"]
     implementation rootProject.ext.androidx["constraintlayout"]
 
@@ -69,4 +71,5 @@ dependencies {
     kapt rootProject.ext.dependencies["arouter-compiler"]
 
     implementation 'com.haibin:calendarview:3.6.9'
+
 }

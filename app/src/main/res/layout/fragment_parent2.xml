@@ -13,12 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/headerFL"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:background="#00fff0"/>
-
         <cn.yue.base.common.widget.viewpager.SampleTabStrip
             android:id="@+id/tabs"
             android:layout_width="match_parent"

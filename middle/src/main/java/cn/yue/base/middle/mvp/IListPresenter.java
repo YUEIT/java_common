@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.yue.base.common.utils.view.ToastUtils;
-import cn.yue.base.middle.view.load.LoadStatus;
 import cn.yue.base.middle.mvp.components.data.Loader;
-import cn.yue.base.middle.view.load.PageStatus;
 import cn.yue.base.middle.net.NetworkConfig;
 import cn.yue.base.middle.net.ResultException;
 import cn.yue.base.middle.net.observer.BaseNetObserver;
 import cn.yue.base.middle.net.wrapper.IListModel;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import cn.yue.base.middle.view.load.LoadStatus;
+import cn.yue.base.middle.view.load.PageStatus;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleSource;
+import io.reactivex.rxjava3.core.SingleTransformer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * Description :

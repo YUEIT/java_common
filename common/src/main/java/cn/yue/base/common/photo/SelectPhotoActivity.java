@@ -48,8 +48,11 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
     private PagerSlidingTabStrip tabs;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected int getContentViewLayoutId() {
+        return R.layout.activity_select_photo;
+    }
+
+    private void initBundle() {
         if (getIntent() != null) {
             maxNum = getIntent().getIntExtra("maxNum", 1);
             List<Uri> defaultList = getIntent().getParcelableArrayListExtra("uris");
@@ -71,13 +74,6 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
             mediaType = MediaType.valueOf(type);
             isPreview = getIntent().getBooleanExtra("isPreview", false);
         }
-        initTopBar();
-        initView();
-    }
-
-    @Override
-    protected int getContentViewLayoutId() {
-        return R.layout.activity_select_photo;
     }
 
     private void initTopBar() {
@@ -103,7 +99,10 @@ public class SelectPhotoActivity extends BaseFragmentActivity {
                 });
     }
 
-    private void initView() {
+    @Override
+    protected void initView() {
+        initBundle();
+        initTopBar();
         viewPager = findViewById(R.id.viewPager);
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getSupportFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @NonNull

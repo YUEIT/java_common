@@ -2,22 +2,11 @@ package cn.yue.base.common.photo.perview;
 
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.PagerAdapter;
-
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import cn.yue.base.common.R;
-import cn.yue.base.common.activity.BaseActivity;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.photo.data.MediaType;
 import cn.yue.base.common.utils.app.FragmentUtils;

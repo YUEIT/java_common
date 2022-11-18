@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.yue.base.common.R;
-import cn.yue.base.common.activity.BaseActivity;
 import cn.yue.base.common.activity.BaseFragmentActivity;
 import cn.yue.base.common.activity.PermissionCallBack;
 import cn.yue.base.common.utils.variable.ResourceUtils;
@@ -29,9 +28,7 @@ public class RunTimePermissionUtil {
     public static int REQUEST_CODE = 100;
 
     public static void requestPermissions(Context context, PermissionCallBack permissionCallBack, String... permissions) {
-        if (context instanceof BaseActivity) {
-            requestPermissions((BaseActivity) context, permissionCallBack, permissions);
-        } else if (context instanceof BaseFragmentActivity) {
+        if (context instanceof BaseFragmentActivity) {
             requestPermissions((BaseFragmentActivity) context, permissionCallBack, permissions);
         }
     }
@@ -41,27 +38,6 @@ public class RunTimePermissionUtil {
     }
 
     public static void requestPermissions(BaseFragmentActivity context, int requestCode, PermissionCallBack permissionCallBack, String... permissions) {
-        //检查权限是否授权
-        context.setPermissionCallBack(permissionCallBack);
-        if (shouldShowRequestPermissionRationale(context, permissions)) {
-            context.showFailDialog();
-        }
-        if(RunTimePermissionUtil.checkPermissions(context, permissions)) {
-            if(permissionCallBack != null) {
-                for(String permission : permissions) {
-                    permissionCallBack.requestSuccess(permission);
-                }
-            }
-        } else {
-            ActivityCompat.requestPermissions(context, getNeedRequestPermissions(context, permissions), requestCode);
-        }
-    }
-
-    public static void requestPermissions(BaseActivity context, PermissionCallBack permissionCallBack, String... permissions) {
-        requestPermissions(context, REQUEST_CODE, permissionCallBack, permissions);
-    }
-
-    public static void requestPermissions(BaseActivity context, int requestCode, PermissionCallBack permissionCallBack, String... permissions) {
         //检查权限是否授权
         context.setPermissionCallBack(permissionCallBack);
         if (shouldShowRequestPermissionRationale(context, permissions)) {

@@ -17,17 +17,15 @@ public class Constant {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    public static final String COMMON_NAME = "MyShop";
-
     public static String getExternalStorage() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return Environment.getExternalStorageDirectory() + File.separator + COMMON_NAME;
+            return Environment.getExternalStorageDirectory().getAbsolutePath();
         } else {
             File filesDir = Utils.getApp().getExternalFilesDir("");
             if (filesDir == null) {
-                return Utils.getApp().getFilesDir() + File.separator + COMMON_NAME;
+                return Utils.getApp().getFilesDir().getAbsolutePath();
             }
-            return filesDir.getPath() + File.separator + COMMON_NAME;
+            return filesDir.getPath();
         }
     }
 

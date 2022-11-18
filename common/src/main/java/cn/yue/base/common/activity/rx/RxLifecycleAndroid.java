@@ -4,8 +4,8 @@ import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle.Event;
 
-import io.reactivex.Observable;
-import io.reactivex.functions.Function;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Function;
 
 public class RxLifecycleAndroid {
     private static final Function<Event, Event> LIFECYCLE = new Function<Event, Event>() {

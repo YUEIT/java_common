@@ -2,11 +2,12 @@ package cn.yue.base.common.utils.event;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.subjects.PublishSubject;
-import io.reactivex.subjects.Subject;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+import io.reactivex.rxjava3.subjects.Subject;
 
 public class RxBus {
 

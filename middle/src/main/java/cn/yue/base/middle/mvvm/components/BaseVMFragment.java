@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -52,7 +53,8 @@ public abstract class BaseVMFragment<VM extends BaseViewModel> extends BaseFragm
     }
 
     public VM createViewModel(Class<VM> cls) {
-        return new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(mActivity.getApplication())).get(cls);
+        return new ViewModelProvider((ViewModelStoreOwner) this,
+                (ViewModelProvider.Factory) new ViewModelProvider.AndroidViewModelFactory(mActivity.getApplication())).get(cls);
     }
 
     @Override

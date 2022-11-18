@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="cn.yue.base.test.component.ui_vm.TestItemViewModel2" />
+            type="cn.yue.test.component.ui_vm.TestItemViewModel2" />
     </data>
 
     <LinearLayout

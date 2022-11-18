@@ -10,8 +10,7 @@ public class BaseModuleService implements IBaseModule {
 
     @Override
     public void init(Context context) {
-        FRouter.init((Application) context);
-        BaseUrlAddress.setDebug(InitConstant.isDebug());
         NotificationConfig.initChannel();
+        AutoSizeInitUtils.init((Application) context);
     }
 }
